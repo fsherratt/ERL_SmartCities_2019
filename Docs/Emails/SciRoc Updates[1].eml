@@ -1,0 +1,313 @@
+Received: from LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:d2::25)
+ by LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM with HTTPS via
+ LNXP123CA0013.GBRP123.PROD.OUTLOOK.COM; Mon, 17 Jun 2019 10:24:51 +0000
+Received: from CWLP265CA0029.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:11::17)
+ by LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:96::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1965.14; Mon, 17 Jun
+ 2019 10:24:48 +0000
+Received: from VE1EUR01FT032.eop-EUR01.prod.protection.outlook.com
+ (2a01:111:f400:7e01::207) by CWLP265CA0029.outlook.office365.com
+ (2603:10a6:401:11::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1987.12 via Frontend
+ Transport; Mon, 17 Jun 2019 10:24:47 +0000
+Authentication-Results: spf=pass (sender IP is 40.107.6.84)
+ smtp.mailfrom=open.ac.uk; bath.ac.uk; dkim=pass (signature was verified)
+ header.d=openuniv.onmicrosoft.com;bath.ac.uk; dmarc=pass action=none
+ header.from=open.ac.uk;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of open.ac.uk designates
+ 40.107.6.84 as permitted sender) receiver=protection.outlook.com;
+ client-ip=40.107.6.84; helo=EUR04-DB3-obe.outbound.protection.outlook.com;
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (40.107.6.84) by
+ VE1EUR01FT032.mail.protection.outlook.com (10.152.2.222) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.11 via Frontend Transport; Mon, 17 Jun 2019 10:24:47 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=openuniv.onmicrosoft.com; s=selector1-openuniv-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xQYMGSyitZuczTevDgQji2ebKhg8R33kbc8IrZo3hmA=;
+ b=MVKSwzMrRr99KHWELQzyVO6zAPXuIS9mgXivk3yUGmKDlEhTh2MugB7fes6/OcH/rJ4XsMnP+gHd6Yk6yH29Cy3glR+Ipfjzl06cT+Y2bMZxZkjtDtGK2u0WPHzQMv5VsTNPhFk9vV7qvDnhf8u4+5E+A/9EEGO40u+bDL/VQ/g=
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com (20.179.2.144) by
+ AM6PR04MB6261.eurprd04.prod.outlook.com (20.179.7.204) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.12; Mon, 17 Jun 2019 10:24:46 +0000
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::f5f4:712e:d82a:75d0]) by AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::f5f4:712e:d82a:75d0%3]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
+ 10:24:46 +0000
+From: Gianluca.Bardaro <gianluca.bardaro@open.ac.uk>
+Subject: SciRoc Updates
+Thread-Topic: SciRoc Updates
+Thread-Index: AQHVJPNROzDj3LcwjUOYPTAadvN4Vw==
+Date: Mon, 17 Jun 2019 10:24:46 +0000
+Message-ID: <AM6PR04MB5800C96F3654DBA1579D4F7EAFEB0@AM6PR04MB5800.eurprd04.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=gianluca.bardaro@open.ac.uk; 
+x-originating-ip: [137.108.115.229]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-Correlation-Id: ed169842-69f7-42f0-b22f-08d6f30e0617
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:AM6PR04MB6261;
+X-MS-TrafficTypeDiagnostic: AM6PR04MB6261:|LO2P265MB1341:
+X-MS-Exchange-PUrlCount: 1
+x-microsoft-antispam-prvs: <AM6PR04MB62612FB7F12B365F1D7DCCA5AFEB0@AM6PR04MB6261.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
+x-forefront-prvs: 0071BFA85B
+X-Forefront-Antispam-Report-Untrusted:
+ SFV:NSPM;SFS:(10009020)(396003)(366004)(376002)(39860400002)(346002)(136003)(199004)(66544003)(189003)(73956011)(26005)(81156014)(55016002)(881003)(86362001)(2906002)(109986005)(8676002)(9686003)(6116002)(8936002)(221733001)(6306002)(236005)(186003)(3846002)(478600001)(7736002)(54896002)(6506007)(53936002)(102836004)(68736007)(486006)(74316002)(66066001)(81166006)(7696005)(5660300002)(105004)(1671002)(71190400001)(71200400001)(25786009)(7416002)(316002)(74482002)(786003)(7116003)(476003)(66946007)(6436002)(19627405001)(33656002)(606006)(14454004)(99286004)(413944005)(966005)(256004)(3480700005)(14444005)(52536014)(76116006)(91956017)(66446008)(64756008)(66556008)(66476007);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR04MB6261;H:AM6PR04MB5800.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: open.ac.uk does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+X-Microsoft-Antispam-Message-Info-Original:
+ kFHkNoeV55C0fSbz2nfsGRMfMmISdnY/hSRReB70PrYQ7erx2IH04rtDMfvqSxL+7Wp9iMo0A4JA3xbP6lYTcG1mduLYxSLBjv8Yoa9lAypblvMJVNzOFJO6573g4iV9erDxTGMuE8EsnlJfjS3hc0irUQhvq8EmrRVWVK4GNe3sHGoau1Y1B092S+863kp8VDNLGJbsYIP6ogef8BFqiF2sA7JqMbvF6UqaqTi69GyeSfyruT7SqEHaC1VmDadAoCJzBLDXyLftnZNulKfibg3tq0ONSbN5Vr+fvCkXnpEGO4O0QR3cagfr5sIZ0om5Mpr8WdklfiuBeSIsP7g4AHWZb9rS8fUqMvp6/J1OQygM4XmrVEqxQ6qiIMwGznj0GCSDbZhXw8xfqOc/Yx2RESDtzKcJi5J32yEES3TW6fA=
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB6261
+To: Undisclosed recipients:;
+Return-Path: gianluca.bardaro@open.ac.uk
+X-MS-Exchange-Organization-ExpirationStartTime: 17 Jun 2019 10:24:47.6811
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ ed169842-69f7-42f0-b22f-08d6f30e0617
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ VE1EUR01FT032.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersPromoted:
+ VE1EUR01FT032.eop-EUR01.prod.protection.outlook.com
+X-Forefront-Antispam-Report:
+ CIP:40.107.6.84;IPV:NLI;CTRY:IE;EFV:NLI;SFV:NSPM;SFS:(2980300002)(199004)(189003)(66544003)(14444005)(413944005)(54896002)(6306002)(9686003)(236005)(58800400005)(476003)(66066001)(5660300002)(4006050)(109986005)(75640400001)(52536014)(881003)(55016002)(126002)(336012)(8636004)(14454004)(26005)(966005)(102836004)(86362001)(6506007)(16003)(486006)(2160300002)(106002)(1096003)(74316002)(33656002)(606006)(105004)(356004)(74482002)(3480700005)(3846002)(6116002)(7736002)(7636002)(7116003)(25786009)(6436002)(61614004)(221733001)(1671002)(16586007)(99286004)(246002)(8676002)(7696005)(19627405001)(71190400001)(127190200001);DIR:INB;SFP:;SCL:1;SRVR:LO2P265MB1341;H:EUR04-DB3-obe.outbound.protection.outlook.com;FPR:;SPF:Pass;LANG:en;PTR:mail-eopbgr60084.outbound.protection.outlook.com;A:1;MX:1;
+X-MS-Exchange-Organization-AuthSource:
+ VE1EUR01FT032.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+ ea2d3b11-464b-4b6c-8977-08d6f30e0559
+X-Microsoft-Antispam:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(5600148)(710020)(711020)(4605104)(4709080)(1420029)(8001031)(1402095)(71702078)(7193020);SRVR:LO2P265MB1341;
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2019 10:24:47.5570
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed169842-69f7-42f0-b22f-08d6f30e0617
+X-MS-Exchange-CrossTenant-Id: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P265MB1341
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:03.5346342
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.1965.018
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(20160514016)(750119)(520011016)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pTAkCW1QJgesEfoUpHIZt0pgA0FBeCBNc41PU/9wUH5wNt6bwuInC3/oryQv?=
+ =?us-ascii?Q?VTLy/BQdmPkYp9zEU09I4HVU7xYjFTso5+AF3iZmpeLSgrzN9RXdQo+BjmyU?=
+ =?us-ascii?Q?LLAKs9PrTqludBIEgu+wr4wY1npT96JKMJKU75lBKcKFfNXgLAVQ0683+BMP?=
+ =?us-ascii?Q?N1oulVAkfghpv972cWF/T90j7UIbETINSPb3kdyAwDjCmQ4U5+mYbNVT/95U?=
+ =?us-ascii?Q?PglHOV6lJ3M9x0aQ1FUgGEvE9PT6X4Nh/+AW4JOFWNTr8WTzjyLh10nPo6aa?=
+ =?us-ascii?Q?da01lA1wrPt0y79GPrm7DWteincNC973Xlgm8L69Jx8/m7hOE4Vb/6pBmla/?=
+ =?us-ascii?Q?tMY8YoEz2GoYR0wO7RmBmPJ0T3vSn+8eN5d/4Wcy2KuHHA5lbcR7GAhLDedH?=
+ =?us-ascii?Q?utMH3xG+ArtuHOPKCJGeYrpsBA18YnYkovMRq1aD6sn9fyFitBsDxgWb3qv3?=
+ =?us-ascii?Q?RY56m23lwVF5agD76EPb7+QXskTrz9fB/u38xwXatePv4ImqW0a9SUt2jZ7y?=
+ =?us-ascii?Q?TWFOPIGIehoxW7Vejdd5dM/K7Vy2uBN7dINWG/sCD+mXUE9swfiiR9sHr+KD?=
+ =?us-ascii?Q?ZrdLb9Q8+kg2iZtP92CWr7UjIEzzhlt1inHLaIUWNd5mhYO0tJDcaEo2i85r?=
+ =?us-ascii?Q?IoIBUkTBhML0V7xWJsXdPgndJA+IHWLbeSlRUIi5Cboj2g9zY1AuAJY5D6EA?=
+ =?us-ascii?Q?zzxCnmkY4Zav5lhIpdOp68EmxcMcM82htzLWVdfrAI7M+gqu64H/aa//upfT?=
+ =?us-ascii?Q?P0XgsKsWau5QybCR+E02SNEk8QFSQrWQRd/e8RbOss/P1jihfbQwxHaHNqZL?=
+ =?us-ascii?Q?Osvn20WB+dKi8WbGJ06ysG3LLZzfPQEl3fFg2oj2/eiSdx5Ega8uEqRa3p9E?=
+ =?us-ascii?Q?KFSTXC5JT0004M76hmEc4nsopwFPzFYHlcyMe3wVB+LYjLhpQXvVco8vZrvc?=
+ =?us-ascii?Q?9HsZUSs4HuioeP/Ll6YkZ9MATosbTO459XmHcmPWuZg=3D?=
+Content-type: multipart/alternative;
+	boundary="B_3647772135_1323278088"
+
+> This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+--B_3647772135_1323278088
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+Dear Team Leaders,
+
+Registration to the first ERL Smart CIty RObotic Challenge (the SciRoc chal=
+lenge) is now officially closed and I am glad to confirm that your team has =
+been accepted to compete in the challenge, which comprises five episodes, to=
+gether with other  14 teams.
+
+The event, which is the first of its kind, promises to be extremely excitin=
+g and I would like to thank you again for supporting it.
+
+In earlier emails, we asked you to give us information about your team, you=
+r platform and your involvement in the competition. If you already gave us a=
+ll the necessary information, we will get in touch in the next few days aski=
+ng you to check that the information  we have about your team and your plans=
+ for the competition is still correct. If you have not sent us all the relev=
+ant information, we will send you shortly a form to complete. You will also =
+be asked to provide us with a team logo (for the competition website)  and c=
+ompile a safety check list for your robots, as well as a Photograph & Video =
+Release Form.
+
+Since we need to schedule the competition for fifteen teams over five episo=
+des, your co-operation in this matter is very important and we will ask you =
+to reply promptly to our email, either confirming or providing the necessary=
+ information about your team.
+
+Earlier, we announced a financial support of up to =C2=A31000 for each particip=
+ating team. This will allow each team to ask for a refund for their accommod=
+ation, travel and other relevant expenses up to the designated amount. We wi=
+ll provide you with the relevant  form and details of the reimbursement proc=
+edure soon.=20
+
+As far as accommodation is concerned, we recommend that you stay in Central=
+ Milton Keynes (CMK), where the competition will take place.  A particular c=
+heap option in the area is EasyHotel, which provides single rooms from =C2=A319.=
+99 per night. There are also  plenty of apartments that can be rented in CMK=
+, which may overall provide a cheaper alternative to hotels, especially for =
+larger teams. We will publish a list of accommodation options shortly on our=
+ website.=20
+
+Finally, we will also provide you soon with details about where to ship rob=
+ots prior to the competition.
+
+For those of you interest in taking part in Episode 4, we did a small modif=
+ication of the rulebook:
+In the description of Phase 2 (Section 6.1), the part of the rule specifyin=
+g the behaviour of the robot in the elevator has been modified with the foll=
+owing sentence:
+"There will be always a person in the elevator when the robot has to get ou=
+t."
+This means that the robot can assume there will always be a person in the e=
+levator at the floor it has to exit.
+
+This is all for now. Please do not hesitate to contact us if you have queri=
+es about any aspect of the competition, whether to do with technical element=
+s or logistics.
+
+See you soon in MK!
+
+Gianluca Bardaro=20
+(on behalf of the SciRoc Team)=20
+https://sciroc.eu/
+
+-- The Open University is incorporated by Royal Charter (RC 000391), an exe=
+mpt charity in England & Wales and a charity registered in Scotland (SC 0383=
+02). The Open University is authorised and regulated by the Financial Conduc=
+t Authority in relation to its  secondary activity of credit broking. 
+
+--B_3647772135_1323278088
+Content-type: text/html;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bottom=
+:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+<span>Dear Team Leaders,</span></div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+<div>
+<div><span><br>
+</span><span>Registration to the first ERL Smart CIty RObotic Challenge (th=
+e SciRoc challenge) is now officially closed and I am glad to confirm that y=
+our team has been accepted to&nbsp;compete in the challenge, which comprises=
+ five episodes, together with other
+ 14 teams.</span></div>
+<div><span><br>
+</span></div>
+<div><span>The event, which is the first of its kind, promises to be extrem=
+ely exciting and I would like to thank you again for supporting it.</span></=
+div>
+<span><br>
+In earlier emails, we asked you to give us information about your team, you=
+r platform and your involvement in the competition. If you already gave us a=
+ll the necessary&nbsp;information, we will get in touch in the next few days=
+ asking you to check that the information
+ we have about your team and your plans for the competition is still correc=
+t. If&nbsp;you have not sent us all the relevant information, we will send y=
+ou shortly a form to complete. You will also be asked to provide us with a t=
+eam logo (for the competition website)
+ and<b>&nbsp;</b>compile a&nbsp;safety check list for your robots, as well =
+as a&nbsp;</span><span>Photograph&nbsp;&amp; Video Release Form.<br>
+</span><span></span><span></span><span></span><span></span><span></span><sp=
+an></span><span></span><span></span><span></span><span></span><span></span><=
+span></span><span></span><span></span><span></span><span></span><span></span=
+><span></span><span></span><span><br>
+</span>
+<div>Since we need to schedule the competition for fifteen teams over five =
+episodes, your co-operation in this matter is very important and we will ask=
+ you to reply promptly to our email, either confirming or providing the nece=
+ssary information about your team.</div>
+<div><br>
+</div>
+<div>Earlier, we announced a financial support of up to =C2=A31000 for each par=
+ticipating team. This will allow each team to ask for a refund for their acc=
+ommodation,&nbsp;travel and other relevant expenses up to the designated amo=
+unt. We will provide you with the relevant
+ form and details of the reimbursement procedure soon.&nbsp;</div>
+<div><br>
+</div>
+<div>As far as accommodation is concerned, we recommend that you stay in Ce=
+ntral Milton Keynes (CMK), where the competition will take place. &nbsp;A pa=
+rticular cheap option in the area is EasyHotel, which provides single rooms =
+from =C2=A319.99 per night. There are also
+ plenty of apartments that can be rented in CMK, which may overall provide =
+a cheaper alternative to hotels, especially for larger teams. We will publis=
+h a list of accommodation options shortly on our website.&nbsp;</div>
+<div><br>
+</div>
+<div>Finally, we will also provide you soon with details about where to shi=
+p robots prior to the competition.</div>
+<div><br>
+</div>
+<div><b>For those of you interest in taking part in Episode 4, we did a sma=
+ll modification of the rulebook:</b></div>
+<div><i>In the description of Phase 2 (Section 6.1), the part of the rule s=
+pecifying the behaviour of the robot in the elevator has been modified with =
+the following sentence:<br>
+&quot;There will be always a person in the elevator when the robot has to g=
+et out.&quot;<br>
+This means that the robot can assume there will always be a person in the e=
+levator at the floor it has to exit.</i><br>
+</div>
+<div><br>
+</div>
+<div>This is all for now. Please do not hesitate to contact us if you have =
+queries about any aspect of the competition, whether to do with technical el=
+ements or logistics.</div>
+<div><br>
+</div>
+<div>See you soon in MK!<br>
+</div>
+<div><br>
+</div>
+<div>Gianluca Bardaro <br>
+</div>
+<div>(on behalf of the SciRoc Team) <br>
+</div>
+<div><a href=3D"https://sciroc.eu/" id=3D"LPNoLP634374">https://sciroc.eu/</a><=
+br>
+</div>
+<br>
+</div>
+</div>
+-- The Open University is incorporated by Royal Charter (RC 000391), an exe=
+mpt charity in England &amp; Wales and a charity registered in Scotland (SC =
+038302). The Open University is authorised and regulated by the Financial Co=
+nduct Authority in relation to its
+ secondary activity of credit broking.
+</body>
+</html>
+
+
+--B_3647772135_1323278088--
+

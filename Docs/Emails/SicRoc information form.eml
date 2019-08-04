@@ -1,0 +1,172 @@
+Received: from LNXP265MB1340.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:d2::34)
+ by LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM with HTTPS via
+ LNXP123CA0022.GBRP123.PROD.OUTLOOK.COM; Tue, 2 Jul 2019 10:49:12 +0000
+Received: from LNXP265CA0038.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:5c::26)
+ by LNXP265MB1340.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:7f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2032.20; Tue, 2 Jul
+ 2019 10:49:06 +0000
+Received: from HE1EUR01FT051.eop-EUR01.prod.protection.outlook.com
+ (2a01:111:f400:7e1f::200) by LNXP265CA0038.outlook.office365.com
+ (2603:10a6:600:5c::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2032.20 via Frontend
+ Transport; Tue, 2 Jul 2019 10:49:06 +0000
+Authentication-Results: spf=pass (sender IP is 40.107.7.71)
+ smtp.mailfrom=open.ac.uk; bath.ac.uk; dkim=pass (signature was verified)
+ header.d=openuniv.onmicrosoft.com;bath.ac.uk; dmarc=pass action=none
+ header.from=open.ac.uk;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of open.ac.uk designates
+ 40.107.7.71 as permitted sender) receiver=protection.outlook.com;
+ client-ip=40.107.7.71; helo=EUR04-HE1-obe.outbound.protection.outlook.com;
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (40.107.7.71) by
+ HE1EUR01FT051.mail.protection.outlook.com (10.152.1.71) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2032.15 via Frontend Transport; Tue, 2 Jul 2019 10:49:05 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=openuniv.onmicrosoft.com; s=selector1-openuniv-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7CBzcu67+87Due25oFr8Ap58drlKnm7kImWB53B5EuI=;
+ b=V2q39TQE+2x2q2QdDRyjYZnP0DEPZ67Xs3IY/PqSaXybQ35xcEkdadsmBagQE63vAbQAYIp83xyJrqQtoEbCwzsI28yiEl6+V8LBOYO5cVxkp8X4k/hQnQJ3v0qavkzKP1Og7AYnDwuWrfsrFGXguC425qO3Lq1QIRTurfldu7A=
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com (20.179.2.144) by
+ AM6PR04MB4438.eurprd04.prod.outlook.com (20.177.39.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2032.20; Tue, 2 Jul 2019 10:49:04 +0000
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::f5f4:712e:d82a:75d0]) by AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::f5f4:712e:d82a:75d0%3]) with mapi id 15.20.2032.019; Tue, 2 Jul 2019
+ 10:49:04 +0000
+From: Gianluca.Bardaro <gianluca.bardaro@open.ac.uk>
+Subject: SicRoc information form
+Thread-Topic: SicRoc information form
+Thread-Index: AQHVMMJfLoVb4JzeTEeKdh0hV7Dnkw==
+Date: Tue, 2 Jul 2019 10:49:04 +0000
+Message-ID: <AM6PR04MB5800BFF3E093A5B48E847001AFF80@AM6PR04MB5800.eurprd04.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=gianluca.bardaro@open.ac.uk; 
+x-originating-ip: [137.108.121.42]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-Correlation-Id: 1af3895b-9975-4029-e3a3-08d6fedae772
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:AM6PR04MB4438;
+X-MS-TrafficTypeDiagnostic: AM6PR04MB4438:|LNXP265MB1340:
+x-microsoft-antispam-prvs: <AM6PR04MB443817BE482E8B98450ECBF8AFF80@AM6PR04MB4438.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4125;OLM:7691;
+x-forefront-prvs: 008663486A
+X-Forefront-Antispam-Report-Untrusted:
+ SFV:NSPM;SFS:(10009020)(346002)(396003)(366004)(39860400002)(376002)(136003)(199004)(189003)(53936002)(55016002)(3480700005)(8936002)(54896002)(8676002)(9686003)(14454004)(81166006)(81156014)(66066001)(7736002)(881003)(786003)(256004)(476003)(2906002)(316002)(486006)(74316002)(86362001)(66556008)(102836004)(6116002)(105004)(7116003)(99286004)(66446008)(19627405001)(64756008)(25786009)(413944005)(478600001)(6506007)(6436002)(66476007)(7696005)(186003)(26005)(66946007)(33656002)(73956011)(5660300002)(52536014)(3846002)(4744005)(74482002)(109986005)(71190400001)(71200400001)(1671002)(76116006)(68736007);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR04MB4438;H:AM6PR04MB5800.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: open.ac.uk does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+X-Microsoft-Antispam-Message-Info-Original:
+ VvdkPMLcGwXZjdlGWdKsxr4Fzhgav/BTxSFCoDBGbHDmJyhvdhz5BzakH4XMtmG35cEnpcm2Ge21v1wix4Y8dm+auws4Y1FA12SbQH0vyau8RSap54+x15JyPpExDmzoTfEMLG0Uvukthev7U2OAejx3YSnAaUDk+lv2LdzGj0avEz58VjQtixDZInJZtcP5kGualNaZ29vGqjQmGbKYTl/TOewr/axLh7qhTBCQ62gsx0NhZ4ruDCfKjFKJiCNY4VBRXuXLTg5Hkm7yERrAo7AOkeSywofUr7Cpl6XQMW8srYBsw824m6Nm8xFFS/+f08A0IlmBQJfLFOOe5dUWXNengGV2bInmthX2VdjGLwe0mIwNscX/Tg4WZx2FxodyP0qZtjeg0CU2MKCZu6Cq4PT2vHjV7r7oRLI6ExEWAw4=
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4438
+To: Undisclosed recipients:;
+Return-Path: gianluca.bardaro@open.ac.uk
+X-MS-Exchange-Organization-ExpirationStartTime: 02 Jul 2019 10:49:05.8895
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ 1af3895b-9975-4029-e3a3-08d6fedae772
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ HE1EUR01FT051.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersPromoted:
+ HE1EUR01FT051.eop-EUR01.prod.protection.outlook.com
+X-Forefront-Antispam-Report:
+ CIP:40.107.7.71;IPV:NLI;CTRY:FI;EFV:NLI;SFV:NSPM;SFS:(4636009)(2980300002)(199004)(189003)(102836004)(2160300002)(413944005)(3480700005)(54896002)(16003)(8676002)(5000100001)(9686003)(55016002)(99286004)(19627405001)(5660300002)(74482002)(3846002)(71190400001)(1096003)(16586007)(6116002)(109986005)(7696005)(14454004)(8636004)(6436002)(1671002)(26005)(25786009)(61614004)(6506007)(356004)(106002)(476003)(881003)(336012)(7636002)(66066001)(105004)(74316002)(126002)(75640400001)(86362001)(4006050)(7116003)(486006)(246002)(33656002)(52536014)(7736002);DIR:INB;SFP:;SCL:1;SRVR:LNXP265MB1340;H:EUR04-HE1-obe.outbound.protection.outlook.com;FPR:;SPF:Pass;LANG:en;PTR:mail-eopbgr70071.outbound.protection.outlook.com;A:1;MX:1;
+X-MS-Exchange-Organization-AuthSource:
+ HE1EUR01FT051.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+ 76b43036-1c44-4e14-b31d-08d6fedae6a9
+X-Microsoft-Antispam:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(5600148)(710020)(711020)(4605104)(4709080)(1420029)(8001031)(1402095)(71702078)(7193020);SRVR:LNXP265MB1340;
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2019 10:49:05.7925
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1af3895b-9975-4029-e3a3-08d6fedae772
+X-MS-Exchange-CrossTenant-Id: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LNXP265MB1340
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:07.1580760
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.2032.008
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(20160514016)(750119)(520011016)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	pFU3FMaoWpVzmaw2G1QKch5aikFANsQIKHzbD6LPw1+pvFSlP+15NzFEiym/5zn9S7s9EYl3a1ikQdPkLjViz0DTezuMZR5c0MQ5h++vQr45BEx1h1kZF+tZeO9KKLjV5ueiED6d/seBLbqwJUJw8UwrNBOqsNhMjApkhNuOuWY8l8pDAG5Py/3MXcd5jk2my7qDjaW2wAtNyS7/Mqvvk16mwA9jki7RMoZP1YFv3OGoZ+zEnhFqOkIzCTYMFSOkM+4/SPXI6D8CMZ3+u8olQ8cRh87ynShbY3Fl7E8iEWoDFssKteLCCVYuLoD2qH5Eg9TVCF8bgFA6qhQKwqqP61MEtSiJfuh+cV4T+LsnnJdjzkfPU9Ewe+5clg20CcNRmuy+uZhVeh9nfs6qt7+xwkQUlrXh7xkWJ4NkxgiRWU//rrfaUK5Qlv6ycE9QFwzilaD2I4aj1x2sK5KA47VwZ7amux+aJEUbO5igs6uzsUuJAY9XbN19b22h+3ra2CR0C8MBWKA1r4ZKo641aPd32eK8HhDwdagBerf4EllJKJLngHlI8bV7HkBKZJH36d9eq0XBI7AmUA4QgoR6jJbODPEpUN7W6ZPptJF7A8xNMbv5ZZ8/pObdqW27ZIgulMb17lALgJ2Kt2LViy7evQLjOIrpc2G1mnuYSbLzpzBxRDJ13gDl73hG8ZC+7GvWyrKYUHiUwsShLs7yDbo6dZXaDf4AZ62Mm/wQDTVs+kqMfGQfZlgfz1HPH0rATtJAGX3x739qex+S+dMfP4Mmtt294GxjZOIBla+6GlbXVbFdww6Hwb4BbSRTHH4WfFmC50K9Tj6o/Kb8J9C4TsZ7uIK/KpizR9j9ws5Z+dYbROxTvr2o5+CwHzXI3nEi6ZN8PIuRJBh4DMJ6FipZDvOUFmvnQqMvMQqeHbcK6NHO0l2/iIFNj8Fbj2apoCRtRklMKR8L
+Content-type: multipart/alternative;
+	boundary="B_3647772129_1859540895"
+
+> This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+--B_3647772129_1859540895
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: 7bit
+
+Dear team leader,
+this email is to let you know that I received your information form.
+
+Thank you
+
+Regards
+Gianluca Bardaro
+-- The Open University is incorporated by Royal Charter (RC 000391), an exempt charity in England & Wales and a charity registered in Scotland (SC 038302). The Open University is authorised and regulated by the Financial Conduct Authority in relation to its  secondary activity of credit broking. 
+
+--B_3647772129_1859540895
+Content-type: text/html;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bottom=
+:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+Dear team leader,</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+this email is to let you know that I received your information form.</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+Thank you</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+Regards</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+Gianluca Bardaro<br>
+</div>
+-- The Open University is incorporated by Royal Charter (RC 000391), an exe=
+mpt charity in England &amp; Wales and a charity registered in Scotland (SC =
+038302). The Open University is authorised and regulated by the Financial Co=
+nduct Authority in relation to its
+ secondary activity of credit broking.
+</body>
+</html>
+
+
+--B_3647772129_1859540895--
+

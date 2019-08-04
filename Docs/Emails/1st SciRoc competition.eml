@@ -1,0 +1,293 @@
+Received: from CWLP265MB1633.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:53::16)
+ by CWXP265MB1637.GBRP265.PROD.OUTLOOK.COM with HTTPS via
+ CWLP265CA0124.GBRP265.PROD.OUTLOOK.COM; Fri, 17 May 2019 16:34:15 +0000
+Received: from CWLP265CA0023.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:10::35)
+ by CWLP265MB1633.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:34::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1900.17; Fri, 17 May
+ 2019 16:34:14 +0000
+Received: from HE1EUR01FT057.eop-EUR01.prod.protection.outlook.com
+ (2a01:111:f400:7e1f::204) by CWLP265CA0023.outlook.office365.com
+ (2603:10a6:401:10::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1900.16 via Frontend
+ Transport; Fri, 17 May 2019 16:34:14 +0000
+Authentication-Results: spf=pass (sender IP is 40.107.0.67)
+ smtp.mailfrom=open.ac.uk; bath.ac.uk; dkim=pass (signature was verified)
+ header.d=openuniv.onmicrosoft.com;bath.ac.uk; dmarc=pass action=none
+ header.from=open.ac.uk;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of open.ac.uk designates
+ 40.107.0.67 as permitted sender) receiver=protection.outlook.com;
+ client-ip=40.107.0.67; helo=EUR02-AM5-obe.outbound.protection.outlook.com;
+Received: from EUR02-AM5-obe.outbound.protection.outlook.com (40.107.0.67) by
+ HE1EUR01FT057.mail.protection.outlook.com (10.152.0.208) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.1900.16 via Frontend Transport; Fri, 17 May 2019 16:34:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=openuniv.onmicrosoft.com; s=selector1-openuniv-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cT42FPhURmoV6uR+dcTDxKE9fBZrh+DVzXBKXQWRFXU=;
+ b=rkakosX7aVHBgOSBgmAH5L4E7O68qjcxeYlifVob6CTOsP+NSncJhNmU22z0fT9QyJkxBmH63ebNgHeCPjxHgfCb3cL+pvkb95Ht3iH+EHOd+gEwE8gjY5y7oG8mx2AqI97qCsvDh+3zaMpMmTi905bUqIqU9CwB424/15FRioo=
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com (20.179.2.144) by
+ AM6PR04MB5544.eurprd04.prod.outlook.com (20.178.94.29) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1900.18; Fri, 17 May 2019 16:34:11 +0000
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::1d5e:d1d4:aa5b:f85a]) by AM6PR04MB5800.eurprd04.prod.outlook.com
+ ([fe80::1d5e:d1d4:aa5b:f85a%6]) with mapi id 15.20.1900.010; Fri, 17 May 2019
+ 16:34:11 +0000
+From: Gianluca.Bardaro <gianluca.bardaro@open.ac.uk>
+Subject: 1st SciRoc competition
+Thread-Topic: 1st SciRoc competition
+Thread-Index: AQHVDMrzKZJeVkcxoEqbSwX2GLfJBw==
+Date: Fri, 17 May 2019 16:34:11 +0000
+Message-ID: <AM6PR04MB5800B98E6A79E8E9FF2887D1AF0B0@AM6PR04MB5800.eurprd04.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=gianluca.bardaro@open.ac.uk; 
+x-originating-ip: [137.108.119.162]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-Correlation-Id: 5c68a8dc-6e09-45c3-ca42-08d6dae57f2a
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR04MB5544;
+X-MS-TrafficTypeDiagnostic: AM6PR04MB5544:|CWLP265MB1633:
+X-MS-Exchange-PUrlCount: 1
+x-microsoft-antispam-prvs: <AM6PR04MB5544C3287EE4550E72F9E8E3AF0B0@AM6PR04MB5544.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
+x-forefront-prvs: 0040126723
+X-Forefront-Antispam-Report-Untrusted:
+ SFV:NSPM;SFS:(10009020)(136003)(376002)(346002)(366004)(39860400002)(396003)(40764003)(189003)(199004)(504964003)(66544003)(66066001)(8936002)(14454004)(19627405001)(71200400001)(5660300002)(81166006)(68736007)(71190400001)(81156014)(8676002)(786003)(316002)(33656002)(7736002)(606006)(6306002)(55016002)(881003)(76116006)(54896002)(478600001)(9686003)(966005)(74316002)(413944005)(236005)(14444005)(256004)(52536014)(66946007)(66556008)(7416002)(73956011)(66476007)(64756008)(66446008)(26005)(109986005)(6436002)(25786009)(476003)(1671002)(53936002)(486006)(86362001)(7696005)(6506007)(186003)(6116002)(74482002)(99286004)(2906002)(102836004)(105004)(3846002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR04MB5544;H:AM6PR04MB5800.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: open.ac.uk does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+X-Microsoft-Antispam-Message-Info-Original:
+ 36PqvZLyjLjFm8T03lAMixBjLt2qmAbB9h3yje13xzqME3YYaaNrCbpD59XyLrPbh4s7DrqhryZSjwTfbJVkajMpio5kIiQQgwbM3rfHMhhLOYUKSsyGSvHys2F/ikZyIsr8rMMjk+cOj92/o3a1Y6uxqBQPDCoKe0CKcu4zpAUXvJofsbb4vV6MvnrueZvfYPVEplEZy+NK8SzsoRL1+T35Bn0LFXAzlreSzyoyU7EZD5tKR8z92u0utXN9HW/7mKEB7tbuV8O05whLWp22lGp5jog4efZTOXLJwR+dUuxL/Po977K0ORuCwrAKhOitxY5Himy5EZr1DWiO+u/d0Ow+dxo/e2KMkLc9oe8edHtVbaIcf0qUPJjGW71POxqZQ4yxJk95KmZVz9xDbFE0eazYzOKXCjfY5pyxVLqzBRY=
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB5544
+To: Undisclosed recipients:;
+Return-Path: gianluca.bardaro@open.ac.uk
+X-MS-Exchange-Organization-ExpirationStartTime: 17 May 2019 16:34:13.5380
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 2:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ 5c68a8dc-6e09-45c3-ca42-08d6dae57f2a
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ HE1EUR01FT057.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersPromoted:
+ HE1EUR01FT057.eop-EUR01.prod.protection.outlook.com
+X-Forefront-Antispam-Report:
+ CIP:40.107.0.67;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(2980300002)(504964003)(66544003)(40764003)(189003)(199004)(84326002)(1671002)(6436002)(74482002)(61614004)(486006)(246002)(74316002)(236005)(413944005)(966005)(8676002)(9686003)(54896002)(6306002)(606006)(881003)(105004)(16586007)(5660300002)(1096003)(52536014)(476003)(75640400001)(106002)(126002)(336012)(4006050)(86362001)(99286004)(25786009)(7736002)(7636002)(58800400004)(55016002)(14444005)(7696005)(356004)(19627405001)(16003)(26005)(14454004)(6116002)(3846002)(6506007)(102836004)(71190400001)(33656002)(66066001)(2160300002)(8636004)(109986005)(127190200001);DIR:INB;SFP:;SCL:1;SRVR:CWLP265MB1633;H:EUR02-AM5-obe.outbound.protection.outlook.com;FPR:;SPF:Pass;LANG:en;PTR:mail-eopbgr00067.outbound.protection.outlook.com;MX:1;A:1;
+X-MS-Exchange-Organization-AuthSource:
+ HE1EUR01FT057.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+ e3f91ba0-e210-4d10-a8c8-08d6dae57dc4
+X-Microsoft-Antispam:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(5600141)(710020)(711020)(4605104)(4709054)(1401320)(8001031)(1420029)(1421009)(1422010)(1423009)(1402095)(71702078)(7193020);SRVR:CWLP265MB1633;
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2019 16:34:13.4329
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c68a8dc-6e09-45c3-ca42-08d6dae57f2a
+X-MS-Exchange-CrossTenant-Id: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB1633
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:02.3238264
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.1900.000
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(20160514016)(750119)(520011016)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?g0heIZ9LkyiCdPxfFIPmX3L2NlY53aEURkUkTF7IvNKR/ALWM4jpDTp2t4X4?=
+ =?us-ascii?Q?96sbP87mveUVCG2OtDys09j1m9cY72wdG0gWVXja19ZYaA21LvGQ5tirduhj?=
+ =?us-ascii?Q?6129TwctCaYYSiiRycLENMGHHaSgqyUkIsxFgsNyk3eJOw7PwJlgO/zAnAxw?=
+ =?us-ascii?Q?SrmEev27YHFR0+g03SnQlLKpOap7YaVxkWQmpAi1L3BKI6zVm8VnpgtFMNYd?=
+ =?us-ascii?Q?QxL6TZHK5/eaQlqSPmNQtsiyvSAqM8zIBQzOG62qL73nC3HFT+g1GQrAMU2M?=
+ =?us-ascii?Q?uDJjbci4yMQ0N1n6aMyVBP8lTczrflOkRsLtfxkHp1XqSQ/sAxxvxng76V26?=
+ =?us-ascii?Q?hDiqJkFxlEiLv15aM0GKJvPsBGEPX3BRzoJs8YIJtnKze1LbrVh001kA6MHN?=
+ =?us-ascii?Q?z5oueWt5rzhdvwyWbnu1TGa1czpFVtDXd3KgPOAk62ZZlDLyp/R6fQqU/IWe?=
+ =?us-ascii?Q?QnFParhqi+fJyPdJQWP2wzyQv876AsJYCVezZpuoLHfM8XQyFVcJ6OSgIAtN?=
+ =?us-ascii?Q?GZ8hEbhAX8sBn3ZsuZBJA3mtUoLSwsTdqo8K/lx82OtywvPTnQRqgsCw+qZd?=
+ =?us-ascii?Q?LY2IDpqGgnfST8CQZCUkcw8Kfk5Al+H5Qym+4XvP8spUGIpm+fA5d6+yWX8D?=
+ =?us-ascii?Q?YLdigDCFsuoDLO9EAGt8ab4yt7dcUYNjsIGklTXpk0GeEfeDD2S2mrjuTGz8?=
+ =?us-ascii?Q?3opBkWvp3MjRId0PTVGwJNUrFWqPUdEpCYR/IxmJPgvu4bK2GThSxfQFylLS?=
+ =?us-ascii?Q?DPitkZaOl0dcku+Q2JMr1KtgkhFD62tmWAxn/8GQWLiz1P3ontZe5+YWgRV+?=
+ =?us-ascii?Q?uMagxe7Cz5AEiyhBwxNYncENwCXB7Woq4uTjGPQCciu8WguJ26C66hIJa4Vj?=
+ =?us-ascii?Q?4U+tGqUpvhYOrdfbxslFlCAmpk4JQd+QrRsCJjnrq202+/mT667+SRYaZRHj?=
+ =?us-ascii?Q?4wKIwK6kSukSTS66TEjNcppVkYaD0Ldb5LLwVfieTXU=3D?=
+Content-type: multipart/alternative;
+	boundary="B_3647772138_1742298873"
+
+> This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+--B_3647772138_1742298873
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+Dear Team Leaders,
+
+Many thanks again for registering in the 1st SciRoc competition.
+
+Currently, we are still working to provide accommodation solutions for you.=
+ For this reason we ask you to provide the list of the members of your team =
+who will attend the competition (name, surname and contact email). If you do=
+n't know the full list yet, at least provide us an estimate of the number of=
+ participants.
+
+In addition, as we are in the process of defining the schedule of the event=
+, we need to understand exactly in which episodes are you planning to compet=
+e, especially if you selected more than two in the registration phase. I wou=
+ld be grateful if you could also send me this information as soon as possibl=
+e.
+
+Lastly, we are going to provide a locked storage space at the venue. For th=
+is reason, we need to know an estimate of the material (e.g., robots, comput=
+ers, tools, etc) you are planning to bring with you.
+
+The final registration phase of the competition will close at the end of Ma=
+y. This means we need to finalise the early phases of the organization as so=
+on as possible.
+Moreover, these information we ask you are required to finalise you partici=
+pation to the competition and to unlock the financial support of =C2=A3 1000=20
+
+Thank you in advance for your help and=20
+See you soon in MK!
+
+Gianluca
+
+& The SciRoc Team
+https://sciroc.eu/
+
+
+-- The Open University is incorporated by Royal Charter (RC 000391), an exe=
+mpt charity in England & Wales and a charity registered in Scotland (SC 0383=
+02). The Open University is authorised and regulated by the Financial Conduc=
+t Authority in relation to its  secondary activity of credit broking. 
+
+--B_3647772138_1742298873
+Content-type: text/html;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bottom=
+:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size: =
+12pt; color: rgb(0, 0, 0);">
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Dear Team Leaders,</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<br>
+</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Many thanks again for registering in the 1st SciRoc competition.</div>
+<br>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Currently, we are still working to provide accommodation solutions for you.=
+ For this reason<b> we ask you to provide the list of the members of your te=
+am who will attend the competition (name, surname and contact email).
+</b>If you don't know the full list yet, at least provide us an estimate of=
+ the number of participants.<br>
+<b></b></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<br>
+</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+In addition, as we are in the process of defining the schedule of the event=
+, we need to understand
+<b>exactly&nbsp;<span>in</span><span>&nbsp;</span></b><span><b>which episod=
+es are you planning to compete</b>, especially if you selected more than two=
+ in the registration phase. I would be grateful if you could also send me th=
+is information as soon as possible.</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span><br>
+</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Lastly, we are going to provide a locked storage space at the venue. <b>For=
+ this reason, we need to know an estimate of the material (e.g., robots, com=
+puters, tools, etc) you are planning to bring with you.</b></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<b><br>
+</b></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+The final registration phase of the competition will close at the end of Ma=
+y. This means we need to finalise the early phases of the organization as so=
+on as possible.</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Moreover, these information we ask you are required to finalise you partici=
+pation to the competition and
+<b>to unlock the financial support of =C2=A3 1000</b> <br>
+</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<br>
+</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+Thank you in advance for your help and <br>
+</div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span>See you soon in MK!</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span><br>
+</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span>Gianluca<br>
+</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span><br>
+</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span>&amp; The SciRoc Team</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span><a href=3D"https://sciroc.eu/" target=3D"_blank" rel=3D"noopener noreferrer=
+">https://sciroc.eu/</a></span></div>
+</span></div>
+<div style=3D"font-size:12pt; font-family:Calibri,Arial,Helvetica,sans-serif,=
+serif,EmojiFont">
+<span><br>
+</span></div>
+<br>
+</div>
+-- The Open University is incorporated by Royal Charter (RC 000391), an exe=
+mpt charity in England &amp; Wales and a charity registered in Scotland (SC =
+038302). The Open University is authorised and regulated by the Financial Co=
+nduct Authority in relation to its
+ secondary activity of credit broking.
+</body>
+</html>
+
+
+--B_3647772138_1742298873--
+

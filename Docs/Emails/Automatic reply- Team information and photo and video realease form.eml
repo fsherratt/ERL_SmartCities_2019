@@ -1,0 +1,151 @@
+Received: from LO2P265MB1344.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:a2::20)
+ by LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM with HTTPS via
+ LO2P265CA0464.GBRP265.PROD.OUTLOOK.COM; Mon, 24 Jun 2019 14:19:03 +0000
+Received: from LO2P265CA0113.GBRP265.PROD.OUTLOOK.COM (20.176.151.29) by
+ LO2P265MB1344.GBRP265.PROD.OUTLOOK.COM (20.176.144.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Mon, 24 Jun 2019 14:19:01 +0000
+Received: from DB5EUR01FT033.eop-EUR01.prod.protection.outlook.com
+ (2a01:111:f400:7e02::203) by LO2P265CA0113.outlook.office365.com
+ (2603:10a6:600:c::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2008.13 via Frontend
+ Transport; Mon, 24 Jun 2019 14:19:01 +0000
+Authentication-Results: spf=pass (sender IP is 52.101.137.13)
+ smtp.helo=EUR04-HE1-obe.outbound.protection.outlook.com; bath.ac.uk;
+ dkim=pass (signature was verified)
+ header.d=openuniv.onmicrosoft.com;bath.ac.uk; dmarc=fail action=none
+ header.from=open.ac.uk;compauth=pass reason=115
+Received-SPF: Pass (protection.outlook.com: domain of
+ EUR04-HE1-obe.outbound.protection.outlook.com designates 52.101.137.13 as
+ permitted sender) receiver=protection.outlook.com; client-ip=52.101.137.13;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com;
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (52.101.137.13)
+ by DB5EUR01FT033.mail.protection.outlook.com (10.152.4.248) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2008.13 via Frontend Transport; Mon, 24 Jun 2019 14:19:01 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=openuniv.onmicrosoft.com; s=selector1-openuniv-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ai6kS0nupl3z5Sfxtw0LwJamBElAYvF9I59R+o9KP7Y=;
+ b=HXndjbYClYoctaa5GiIyqAXVjsWx/X0GcKAsMoVlM4JbcPaQK/J6H3eFCQUFV1oLgnPYp89DwlsLeuZ5BMJtqfctPJUuiUOyiMCWSfmEYr9A1J1u5j9/T3VvuMhHTq92echeoAesMCuEstUcejGh7N/EdwPW24g8DEudnXpRcI4=
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com (20.179.2.144) by
+ AM6PR04MB5431.eurprd04.prod.outlook.com (20.178.95.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.13; Mon, 24 Jun 2019 14:19:00 +0000
+Received: from AM6PR04MB5800.eurprd04.prod.outlook.com ([::1]) by
+ AM6PR04MB5800.eurprd04.prod.outlook.com ([fe80::f5f4:712e:d82a:75d0%3]) with
+ Microsoft SMTP Server id 15.20.2008.014; Mon, 24 Jun 2019 14:19:00 +0000
+From: Gianluca.Bardaro <gianluca.bardaro@open.ac.uk>
+To: Freddie Sherratt <fs349@bath.ac.uk>
+Subject: Automatic reply: Team information and photo and video realease form
+Thread-Topic: Team information and photo and video realease form
+Thread-Index: AQHVJ1nwn8/q6B6HEEW0l4fAJabZzaaq4FBAgAAAhVM=
+Date: Mon, 24 Jun 2019 14:19:00 +0000
+Message-ID: <3d5a25d313d24163b7ddc9d63133d6da@AM6PR04MB5800.eurprd04.prod.outlook.com>
+References: <AM6PR04MB58007EFEBDB0EB5ADC380E36AFE40@AM6PR04MB5800.eurprd04.prod.outlook.com>,<LO2P265MB13419F1B6CF9DC42248C05FED2E00@LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM>
+In-Reply-To: <LO2P265MB13419F1B6CF9DC42248C05FED2E00@LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM>
+X-MS-Has-Attach:
+X-Auto-Response-Suppress: All
+X-MS-Exchange-Inbox-Rules-Loop: gianluca.bardaro@open.ac.uk
+X-MS-TNEF-Correlator:
+Authentication-Results-Original: spf=none (sender IP is ) smtp.mailfrom=<>; 
+x-ms-exchange-parent-message-id: <LO2P265MB13419F1B6CF9DC42248C05FED2E00@LO2P265MB1341.GBRP265.PROD.OUTLOOK.COM>
+auto-submitted: auto-generated
+x-ms-exchange-generated-message-source: Mailbox Rules Agent
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-Correlation-Id: abceeb65-0ac6-4939-4f53-08d6f8aee7a8
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(8559020)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328);SRVR:AM6PR04MB5431;
+X-MS-TrafficTypeDiagnostic: AM6PR04MB5431:|LO2P265MB1344:
+x-microsoft-antispam-prvs: <AM6PR04MB543137D1457B35F22421A2D4B8E00@AM6PR04MB5431.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;OLM:7691;
+x-forefront-prvs: 007814487B
+X-Forefront-Antispam-Report-Untrusted:
+ SFV:NSPM;SFS:(10009020)(50650200002)(136003)(346002)(39860400002)(366004)(396003)(376002)(199004)(61684003)(189003)(6436002)(64756008)(66476007)(66946007)(486006)(71190400001)(256004)(786003)(6916009)(446003)(76176011)(25786009)(71200400001)(498600001)(24736004)(558084003)(7696005)(102836004)(8936002)(99286004)(108616005)(316002)(26005)(8676002)(73956011)(9686003)(74482002)(66446008)(2906002)(66556008)(68736007)(88996005)(476003)(6506007)(53096004)(78352004)(14444005)(11346002)(74316002)(54896002)(5660300002)(42882007)(81156014)(81166006)(53936002)(55016002)(111220200004)(80100003);DIR:OUT;SFP:1501;SCL:1;SRVR:AM6PR04MB5431;H:AM6PR04MB5800.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:0;MX:0;
+received-spf: None (protection.outlook.com:
+ AM6PR04MB5800.eurprd04.prod.outlook.com does not designate permitted sender
+ hosts)
+x-ms-exchange-senderadcheck: 1
+X-Microsoft-Antispam-Message-Info-Original:
+ Eya1P7NWVVufyzrZypbOtikohdZLNbGuHhOmfL+UcXuBKd2SwJ2AJVJis+L98zjKJceNI4B/Kkgc/ZpjkFGEiQjvgAYmAZsPF9TArCdQZAiv58ZPo4ncSEl2G1dnfAFJQX2gMIXcYWnzHMCgq77sYyGxSjL3bTmAWbO11l6ZUEYrWtkoqaPOPG0rmN87OSzEQA8JegHijZCjkl7r2ixGAeQA86VYF/h53Ak2D3OzG33QloWWf5+A4v/Pz1zRmIX8QuHlw5gSGvUJGNTMkuSr5aiC/U6x2g74hWr4ikQO8Dv3zadDFpJ8nKqPhxg3QMTpYFZz2YqN2Mh9NyyceXC0WBRIW/FPl8jIrsxun6Dri+ekzjtzWcMnM74+AulNQ4M3IaYqYcVx6Qzi/lhWeq9LE3eOUGEHjn5HTP3GwzCDbsI=
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB5431
+Return-Path: <>
+X-MS-Exchange-Organization-ExpirationStartTime: 24 Jun 2019 14:19:01.4069
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ abceeb65-0ac6-4939-4f53-08d6f8aee7a8
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DB5EUR01FT033.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersPromoted:
+ DB5EUR01FT033.eop-EUR01.prod.protection.outlook.com
+X-Forefront-Antispam-Report:
+ CIP:52.101.137.13;IPV:NLI;CTRY:FI;EFV:NLI;SFV:NSPM;SFS:(2970300002)(61684003)(189003)(199004)(16586007)(106002)(11346002)(8676002)(246002)(16003)(78352004)(5000100001)(7696005)(99286004)(74316002)(7636002)(53096004)(9686003)(75640400001)(1096003)(54896002)(58800400005)(4006050)(6436002)(55016002)(42882007)(496002)(336012)(14444005)(446003)(356004)(71190400001)(486006)(5660300002)(6916009)(476003)(25786009)(126002)(108616005)(6506007)(102836004)(74482002)(26005)(8636004)(76176011)(24736004)(111220200004);DIR:INB;SFP:;SCL:1;SRVR:LO2P265MB1344;H:EUR04-HE1-obe.outbound.protection.outlook.com;FPR:;SPF:Pass;LANG:en;PTR:mail-he1eur04hn2013.outbound.protection.outlook.com;MX:0;A:0;
+X-MS-Exchange-Organization-AuthSource:
+ DB5EUR01FT033.eop-EUR01.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+ e48efb05-3745-40a2-cc8a-08d6f8aee6ef
+X-Microsoft-Antispam:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(5600148)(710020)(711020)(4605104)(1420029)(8001031)(1417108)(71702078);SRVR:LO2P265MB1344;
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2019 14:19:01.2447
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: abceeb65-0ac6-4939-4f53-08d6f8aee7a8
+X-MS-Exchange-CrossTenant-Id: 377e3d22-4ea1-422d-b0ad-8fcc89406b9e
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P265MB1344
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:01.7655643
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.1987.013
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(20160514016)(750119)(520011016)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	Dd8jAbYET5p/rcIvcXs80Ffmf6Ev8lM4chxSVdVR8lmz+QMJt0+Mqt0hJ2qIjPPhlL24AeGMmPiZL5g3CCrb3MRzjL0g946QmgzDUDuBa5HTsNVrdaemaal4rTco/Y05xSry7IIt0R25oN9ByMcVqzIJqNs2wdFkJFIWIufBdpLONDJkStYK1yxe5L61R1bPQbv1dcMBR6LC5b8wnpcSAZzz7fVieMfwYo7cRVvY8ynueT+ZjvuyaVLEFcjpcIUS1k7J7miQpgCB40mrZz2DcaJ8uqq6aRyxckXqFl3HkV+mqJOLRTjOvLUY393I893gCsRvjxM9qznDuv6eVZYLslJsnFNEuydJK/zijSi3d7f4DcFwameEozHYRLZNRLfIna2KUfWX59DftjQ1BpCSaAk/VcKoMwIml0MVMS3NSgIlkht5vwX9cNtSNuondsZBAVLgIawBs0NCHaFmI1zJo9MGP72DQkMwJp5uiXv86URgTWOPPe6kneu9UN9tvsoY8naDEdBiW+lmqf9Epg9lVctbkHAmS/OKSZoosK4WkVi2VTQci/WU916uW63yaLxc2H55OdlNcPuVeqCKPzJgwv6Mj/sKrJZc9bCOGU4FpVS1hJ+PJYjOCPOjftv1L090t7nzLwUJsshYvBfjatI/WdjDqP2T8OSnOT5vzi9xHz9G0aBBNYCQEwSljt6jsO+xbBJvbpAWPTPCitbCmmh378LGLGzjRIN3S/m2yWsRyOHtcmuOANQBDks5SSkFnxwpQx5SEMr2U1tWYyTFy9IGLdXKyewanulKimQxNo91HlniuLmT6UtRBNC3sVFhkIi7j15/Z6HgaVRRCCnKiLXhh4vziHCgMlI5Ei9zHQErNQRTHQI2b4Xy4SMCWRxWhtoFwQwirxCTwS4sMJmPcYtOacerzMU7d+ltFKAyP1VHSU8+LSPS/Ytc/bCcSTE4oX2U+AuCtKdRu9ixZeoT1hKFYg==
+Content-type: multipart/alternative;
+	boundary="B_3647772132_55063692"
+
+> This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+--B_3647772132_55063692
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+Thank you for your email. I=E2=80=99m out of office and I will be back on 2nd of =
+July.
+During this period I will have very limited access to my email.
+
+Regards
+Gianluca Bardaro
+
+
+--B_3647772132_55063692
+Content-type: text/html;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8">
+</head>
+<body>
+<div>Thank you for your email. I=E2=80=99m out of office and I will be back on 2n=
+d of July.</div>
+<div>During this period I will have very limited access to my email.</div>
+<div><br>
+</div>
+<div>Regards</div>
+<div>Gianluca Bardaro</div>
+</body>
+</html>
+
+
+--B_3647772132_55063692--
+
