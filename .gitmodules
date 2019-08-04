@@ -1,0 +1,6 @@
+[submodule "MAVLinkThread"]
+	path = MAVLinkThread
+	url = https://github.com/fsherratt/MAVLinkThread.git
+[submodule "modules/MAVLinkThread"]
+	path = modules/MAVLinkThread
+	url = https://github.com/fsherratt/MAVLinkThread.git
