@@ -96,9 +96,10 @@ cmake   -D CMAKE_BUILD_TYPE=RELEASE \
 	-D BUILD_EXAMPLES=OFF \
 	-D ENABLE_PRECOMPILED_HEADERS=OFF \
 	..
+```
 
 ### Install
-```
+```bash
 make -j$(nproc)
 
 sudo make install
@@ -119,6 +120,7 @@ git submodule update --init --recursive
 ./Tools/scripts/install-prereqs-ubuntu.sh -y
 . ~/.profile
 ```
+
 Log off and on to make permanent
 
 ```bash
