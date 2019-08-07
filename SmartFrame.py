@@ -11,6 +11,7 @@ __author__ = 'Alex Powell, Freddie Sherrat'
 
 import utilities.argparser as ap
 import modules.pixhawk as px
+import modules.mavlinkModules as mvLink
 
 """
 Deals with message routing.
@@ -26,8 +27,17 @@ class SmartFrame():
 if __name__=='__main__':
 	# setup arguments
 	args = ap.GetParser().parse_args()
+	
 	# Get pixhawk
-	pix = px.pixhawk( args.pix[0], args.pix[1] )
+	pixComms = mvLink.pixhawkComms.pixhawkTelemetry( 
+		shortHand = 'PIX',
+        mavSystemID = 101,
+        mavComponentID = 1,
+        serialPortAddress = args.pix[0],
+        baudrate = int(args.pix[1])
+        )
+
+	pix = px.pixhawk( pixComms )
 	
 	# Startup frame
 	sf = SmartFrame( pix )
