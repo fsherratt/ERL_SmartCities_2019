@@ -1,4 +1,4 @@
-# Ubuntu 18.04 Installation of ERL dependencies
+# Setup Simulation Enviroment Ubuntu 18.04
 Installation of OpenCV, librealsense and simulation enviroment
 
 ## Update
