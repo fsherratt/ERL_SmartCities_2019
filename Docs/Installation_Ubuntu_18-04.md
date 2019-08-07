@@ -106,6 +106,12 @@ sudo make install
 sudo ldconfig
 ```
 
+### Link to pip
+```bash
+cd python_loader
+python3 setup.py install
+```
+
 ### Source
 https://www.pyimagesearch.com/2018/08/15/how-to-install-opencv-4-on-ubuntu/
 https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313
