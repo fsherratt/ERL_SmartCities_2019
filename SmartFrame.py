@@ -20,9 +20,13 @@ class SmartFrame():
 	"""
 	Default init. Unused properties can be null
 	"""
-	def __init__( self, pixhawk, mapping ):
+	def __init__( self, pixhawk, mapping, routeCalc ):
 		self.pixhawk = pixhawk
 		self.mapping = mapping
+		self.routeCalc = routeCalc
+		self._CurrentMap = [ 0, 0 ] # Replace with ap defualt
+		# Not sure this is needed, can deal with updating to same pos in pixhawk?
+		self._currentRoute = [ [ 0, 0 ] ] 
 
 	"""
 	Generic run for the smart frame.
@@ -31,7 +35,10 @@ class SmartFrame():
 	"""
 	def Run(self):
 		self._RunPix()
-		self._CheckMap()
+		map = self._CheckMap()
+		route = self._CalcSafeRoute( map )
+		self._SetGoto( [ 0, 0 ,0 ] )
+
 
 	"""
 	Items included when checking the pixhawk
@@ -50,9 +57,31 @@ class SmartFrame():
 		if self.mapping:
 			# Do all map related functionality
 			print( "Checking map" )
+			self._CurrentMap = [ 1, 1 ]
 		else:
 			pass
 
+	"""
+	Items for calculating the safe route
+	"""
+	def _CalcSafeRoute( self, map ):
+		if self.routeCalc:
+			print( "Calculating route" )
+			return [ 0, 1 , 1]
+		else:
+			pass
+
+	"""
+	Items for setting the new position on autopilot
+	"""
+	def _SetGoto( self, position ):
+		if self.pixhawk:
+			if self.pixhawk.SetGoto( position ):
+				print( "Updated position to: " + str( position ) )
+			else:
+				print( "Failed to update position..." )
+		else:
+			pass
 
 if __name__=='__main__':
 	# setup arguments
@@ -61,5 +90,5 @@ if __name__=='__main__':
 	pix = px.PX2( args.pix[0], args.pix[1] )
 	print( pix.Get6DOF() )
 	# Startup frame
-	sf = SmartFrame( pix, None )
+	sf = SmartFrame( pix, None, None )
 	sf.Run()

@@ -9,7 +9,7 @@ class pixhawk(ABC):
 		pass
 
 	@classmethod
-	def SetPosition( self, position ) -> int:
+	def SetGoto( self, position ) -> int:
 		pass
 
 """
@@ -23,6 +23,6 @@ class PX2( pixhawk ):
 	def Get6DOF( self ) -> int:
 		return 1
 
-	def SetPosition( self, position ) -> bool:
+	def SetGoto( self, position ) -> bool:
 		print( "Sending mavlink messae" )
 		return True
