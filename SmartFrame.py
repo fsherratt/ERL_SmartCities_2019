@@ -23,10 +23,12 @@ class SmartFrame():
 	"""
 	Default init. Unused properties can be null
 	"""
-	def __init__( self, pixhawk, mapping, routeCalc ):
+	def __init__( self, pixhawk:px.pixhawk, mapping = None, routeCalc = None, mkHub = None, SLAM = None ):
 		self.pixhawk = pixhawk
 		self.mapping = mapping
 		self.routeCalc = routeCalc
+		self.MkHub = mkHub
+		self.SLAM = SLAM
 		self._CurrentMap = [ 0, 0 ] # Replace with ap defualt
 		# Not sure this is needed, can deal with updating to same pos in pixhawk?
 		self._currentRoute = [ [ 0, 0 ] ] 
@@ -95,7 +97,7 @@ class SmartFrame():
 			return [ 0, 1 , 1]
 		else:
 			pass
-		return self.route # return defualt
+		return self._currentRoute # return defualt
 
 	"""
 	Items for setting the new position on autopilot
@@ -144,5 +146,5 @@ if __name__=='__main__':
 	pix = px.PX2( args.pix[0], args.pix[1] )
 	print( pix.Get6DOF() )
 	# Startup frame
-	sf = SmartFrame( pix, None, None )
+	sf = SmartFrame( pixhawk=pix )
 	sf.Run()

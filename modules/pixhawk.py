@@ -8,17 +8,17 @@ __all__ = []
 __version__ = '0.1'
 __author__ = 'Alex Powell, Freddie Sherrat'
 
-from abc import ABC
+from abc import ABC, abstractmethod, ABCMeta
 
 """
 Abstract base class for anything pixhawk related
 """
 class pixhawk(ABC):
-	@classmethod	
+	@abstractmethod	
 	def Get6DOF( self ) -> int:
 		pass
 
-	@classmethod
+	@abstractmethod
 	def SetGoto( self, position ) -> bool:
 		pass
 
