@@ -13,6 +13,7 @@ __author__ = 'Alex Powell, Freddie Sherrat'
 
 import utilities.argparser as ap
 import modules.pixhawk as px
+from typing import List
 
 """
 Deals with message routing.
@@ -46,11 +47,11 @@ class SmartFrame():
 	If any modules are no-existant, the code will continue and pass.
 	If any modules get bound using an add method, it will begin to incorperate them
 	"""
-	def Run(self):
-		position = self._RunPix()
-		map = self._CheckMap( position)
-		route = self._CalcSafeRoute( map )
-		self._SetGoto( [ 0, 0 ,0 ] )
+	def Run(self) -> None:
+		position = self._CheckPosition()
+		currMap = self._CheckMap( position )
+		route = self._CalcSafeRoute( currMap )
+		self._SetGoto( route[ 0 ] )
 		self._CheckMKSmart()
 		self._UpdateSmartHub()
 
@@ -73,7 +74,7 @@ class SmartFrame():
 	"""
 	Items for checking the map state
 	"""
-	def _CheckMap(self, position):
+	def _CheckMap(self, position) -> List[ int ]:
 		if self.mapping:
 			# Do all map related functionality
 			# Basically update and pull
@@ -81,11 +82,12 @@ class SmartFrame():
 			self._CurrentMap = [ 1, 1 ]
 		else:
 			pass
+		return self._CurrentMap
 
 	"""
 	Items for calculating the safe route
 	"""
-	def _CalcSafeRoute( self, map ):
+	def _CalcSafeRoute( self, map ) -> List[ int ]:
 		if self.routeCalc:
 			print( "Calculating route" )
 			# Interpolate all routes, calculate the best safe route
@@ -93,11 +95,12 @@ class SmartFrame():
 			return [ 0, 1 , 1]
 		else:
 			pass
+		return self.route # return defualt
 
 	"""
 	Items for setting the new position on autopilot
 	"""
-	def _SetGoto( self, position ):
+	def _SetGoto( self, position ) -> None:
 		if self.pixhawk:
 			# If setting the goto works, log correct, else show error
 			if self.pixhawk.SetGoto( position ):
@@ -110,7 +113,7 @@ class SmartFrame():
 	"""
 	Check details recieved from smart hub
 	"""
-	def _CheckMKSmart( self ):
+	def _CheckMKSmart( self ) -> None:
 		if self.MkHub:
 			print( "Checking items from MK HUB..." )
 			# Check for any data in the buffer
@@ -123,7 +126,7 @@ class SmartFrame():
 	Items to update the smart hub.
 	Should send current position and images?
 	"""
-	def _UpdateSmartHub( self ):
+	def _UpdateSmartHub( self ) -> None:
 		if self.MkHub:
 			print( "Passing items to smart hub..." )
 			# Send position

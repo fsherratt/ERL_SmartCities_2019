@@ -19,13 +19,17 @@ class pixhawk(ABC):
 		pass
 
 	@classmethod
-	def SetGoto( self, position ) -> int:
+	def SetGoto( self, position ) -> bool:
 		pass
 
 """
 Pixhawk implementation for using the PX2
 """
 class PX2( pixhawk ):
+	"""
+	Simple init for pixhawk.
+	Will likely need to use the mavlink thread module
+	"""
 	def __init__(self, port, baud):
 		self.port = port
 		self.baud = baud
