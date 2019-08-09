@@ -4,7 +4,7 @@ It requires a number of features from the abstract base class,
 otherwise any implementation of autopilot can be used
 """
 
-__all__ = []
+__all__ = [ 'pixhawk', 'PX2']
 __version__ = '0.1'
 __author__ = 'Alex Powell, Freddie Sherrat'
 

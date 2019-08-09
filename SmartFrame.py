@@ -7,7 +7,7 @@ It will simply run as a loop to check the state and send relevant updates
 following a simple flow. Complexity can be added later if requried.
 """
 
-__all__ = []
+__all__ = [ 'SmartFrame' ]
 __version__ = '0.1'
 __author__ = 'Alex Powell, Freddie Sherrat'
 
