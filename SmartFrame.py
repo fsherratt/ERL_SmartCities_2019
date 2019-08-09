@@ -1,8 +1,10 @@
 # !/bin/python
-""" This module defines the main inerconnecting framework
+""" This module defines the main interconnecting framework
 ntrol.
 
 It should deal with initilizing moudules, routing messages.
+It will simply run as a loop to check the state and send relevant updates
+following a simple flow. Complexity can be added later if requried.
 """
 
 __all__ = []
@@ -31,31 +33,50 @@ class SmartFrame():
 	"""
 	Generic run for the smart frame.
 	This is an endless loop that will check the state of each module attached
-	and respond to events when requried
+	and respond to events when requried.
+
+	Will effectivly follow this control flow:
+	Update position -> check the map state ->
+	Calculate the safe route -> send new goto
+	-> check any mk hub -> send to mk hub
+	-> Check POI camera -> Update POI location -> 
+	-> Rip video feed -> Check GCS
+	-> send to GCS
+
+	If any modules are no-existant, the code will continue and pass.
+	If any modules get bound using an add method, it will begin to incorperate them
 	"""
 	def Run(self):
-		self._RunPix()
-		map = self._CheckMap()
+		position = self._RunPix()
+		map = self._CheckMap( position)
 		route = self._CalcSafeRoute( map )
 		self._SetGoto( [ 0, 0 ,0 ] )
+		self._CheckMKSmart()
+		self._UpdateSmartHub()
 
 
 	"""
-	Items included when checking the pixhawk
+	Items included when updating the position
+	Will do data fusion between all avaliable objects
 	"""
-	def _RunPix(self):
+	def _CheckPosition(self) -> int:
 		if self.pixhawk:
+			# Update 6DOF. Probably should be more like Check current position
 			print( "I have a pixhawk" )
-			print( self.pixhawk.baud )
+		if self.SLAM:
+			print( "Updating from SLAM sensor" )
 		else:
 			pass
+		self.position = 1337 
+		return 5
 
 	"""
 	Items for checking the map state
 	"""
-	def _CheckMap(self):
+	def _CheckMap(self, position):
 		if self.mapping:
 			# Do all map related functionality
+			# Basically update and pull
 			print( "Checking map" )
 			self._CurrentMap = [ 1, 1 ]
 		else:
@@ -67,6 +88,8 @@ class SmartFrame():
 	def _CalcSafeRoute( self, map ):
 		if self.routeCalc:
 			print( "Calculating route" )
+			# Interpolate all routes, calculate the best safe route
+			# Definate candidate for threading
 			return [ 0, 1 , 1]
 		else:
 			pass
@@ -76,6 +99,7 @@ class SmartFrame():
 	"""
 	def _SetGoto( self, position ):
 		if self.pixhawk:
+			# If setting the goto works, log correct, else show error
 			if self.pixhawk.SetGoto( position ):
 				print( "Updated position to: " + str( position ) )
 			else:
@@ -83,6 +107,33 @@ class SmartFrame():
 		else:
 			pass
 
+	"""
+	Check details recieved from smart hub
+	"""
+	def _CheckMKSmart( self ):
+		if self.MkHub:
+			print( "Checking items from MK HUB..." )
+			# Check for any data in the buffer
+			# Check what it is and update
+			self.patient = [ 1, 1 ,2 ]
+		else:
+			pass
+
+	"""
+	Items to update the smart hub.
+	Should send current position and images?
+	"""
+	def _UpdateSmartHub( self ):
+		if self.MkHub:
+			print( "Passing items to smart hub..." )
+			# Send position
+			# Send image from camera
+		else:
+			pass
+
+"""
+Simple main loop for iniial developing
+"""
 if __name__=='__main__':
 	# setup arguments
 	args = ap.GetParser().parse_args()

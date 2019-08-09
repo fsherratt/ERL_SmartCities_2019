@@ -1,5 +1,15 @@
+"""
+This class deals with abstracting away the pixhawk implementation
+It requires a number of features from the abstract base class,
+otherwise any implementation of autopilot can be used
+"""
+
+__all__ = [ pixhawk, PX2 ]
+__version__ = '0.1'
+__author__ = 'Alex Powell, Freddie Sherrat'
+
 from abc import ABC
-import typing # Why is this not working?
+
 """
 Abstract base class for anything pixhawk related
 """
