@@ -16,7 +16,7 @@ class rs_t265:
         self.cfg = None
 
         # Adjust yaw to align north
-        self.rot_Offset = R.from_euler('zyx', [0, 0, 0], degrees=True) # roll, pitch yaw
+        self.rot_Offset = R.from_euler('zyx', [90, 90, 0], degrees=True) # roll, pitch yaw
 
     def __enter__(self):
         self.openConnection()
@@ -69,6 +69,7 @@ class rs_t265:
 
             # Apply pixhawk rotational offset
             rot = rot * self.rot_Offset
+            pos = self.rot_Offset.apply(pos)
 
             return pos, rot, conf
 

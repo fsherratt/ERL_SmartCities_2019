@@ -108,6 +108,8 @@ class rs_d435:
 
         depth_points = np.asarray( depth.get_data(), np.float32 )
 
+        depth_points *= self.scale
+
         return depth_points
 
     # --------------------------------------------------------------------------
@@ -116,8 +118,6 @@ class rs_d435:
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
     def deproject_frame( self, frame ):
-        frame *= self.scale
-
         Z = frame
         X = np.multiply( frame, self.xDeprojectMatrix )
         Y = np.multiply( frame, self.yDeprojectMatrix )
