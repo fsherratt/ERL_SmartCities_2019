@@ -16,7 +16,7 @@ class rs_t265:
 
         self.closeConnection()
 
-    def getPose(self):
+    def getFrame(self):
         # Wait for new frame
         frames = self.pipe.wait_for_frames()
 
@@ -27,12 +27,12 @@ class rs_t265:
             data = pose.get_pose_data()
 
             # Condition and return
-            pose = [data.translation.x, data.translation.y, data.translation.z, \
-                    data.rotation.w, data.rotation.x, data.rotation.y, data.rotation.z] # 6 DOF pose data
-
+            pos = [data.translation.x, data.translation.y, data.translation.z]
+            quat = [data.rotation.w, data.rotation.x, data.rotation.y, data.rotation.z]
+            conf = data.tracker_confidence
             confidence = data.tracker_confidence # Quality of data
 
-            return pose, confidence
+            return pos, quat, conf
 
         return None
 
