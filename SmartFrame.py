@@ -1,4 +1,4 @@
-# !/bin/python
+# !/bin/python3
 """ This module defines the main interconnecting framework
 ntrol.
 
@@ -17,7 +17,17 @@ from typing import List
 
 """
 Deals with message routing.
-Setup should allow for items to be configured at runtime
+Setup should allow for items to be configured at runtime.
+
+RECOMMENDED CHANGE:
+Have these items attempt to bind to ports and supply a retry period.
+This should allow items to come up fall over without breaking the program.
+There are fairly minor data needs (bar the map) that have to be passed around, so this could
+simply act as a "ferrying" data structure.
+This basically means every class becomes its own python class to run,
+will keep good de-coupling and should allow for easy testing.
+Internal state can be stored for passing between items.
+Loops can then be checked on state of buffer/if items need to be recieved or not
 """
 class SmartFrame():
 	"""

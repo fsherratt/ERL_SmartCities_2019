@@ -1,3 +1,4 @@
+#!/bin/python3
 """
 This class deals with abstracting away the pixhawk implementation
 It requires a number of features from the abstract base class,
@@ -22,6 +23,10 @@ class pixhawk(ABC):
 	def SetGoto( self, position ) -> bool:
 		pass
 
+	@abstractmethod
+	def SetPosition( self, position ) -> bool:
+		pass
+
 """
 Pixhawk implementation for using the PX2
 """
@@ -40,3 +45,14 @@ class PX2( pixhawk ):
 	def SetGoto( self, position ) -> bool:
 		print( "Sending mavlink messae" )
 		return True
+
+	def SetPosition( self, position ) -> bool:
+		print( "Updaating position..." )
+		return True
+
+	def _SendMavlinK( self, msg ) -> bool:
+		print( "Sending message..." )
+		return True
+
+	def _GetMavLinkMessage( self ) -> str:
+		return "How should this wait??"
