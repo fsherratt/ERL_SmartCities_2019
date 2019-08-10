@@ -50,6 +50,8 @@ class rs_t265:
         self.profile = self.pipe.start( self.cfg  )
 
         self.initialise_deprojection_matrix()
+
+        print('rs_t265:D435 Connection Open')
     
     # --------------------------------------------------------------------------
     # closeConnection
@@ -57,6 +59,8 @@ class rs_t265:
     # --------------------------------------------------------------------------
     def closeConnection(self):
         self.pipe.stop()
+        
+        print('rs_t265:D435 Connection Closed')
 
     # --------------------------------------------------------------------------
     # getIntrinsics
@@ -112,8 +116,10 @@ class rs_t265:
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
     def deproject_frame( self, frame ):
-        Z = frame * self.scale
-        X = np.multiply( frame, xDeprojectMatrix )
-        Y = np.multiply( frame, yDeprojectMatrix )
+        frame *= self.scale
+
+        Z = frame
+        X = np.multiply( frame, self.xDeprojectMatrix )
+        Y = np.multiply( frame, self.yDeprojectMatrix )
 
         return np.asanyarray( [X, Y, Z] )

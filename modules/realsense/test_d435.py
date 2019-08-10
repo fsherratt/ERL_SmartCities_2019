@@ -5,13 +5,11 @@ import cv2
 d435Obj = d435.rs_t265( framerate = 30 )
 
 with d435Obj:
-    for i in range(1000):
+    while True:
         frame = d435Obj.getFrame()
-        
-        frame = frame * (d435Obj.scale*25)
-        frame = np.asarray(frame, np.uint8)
-        
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+        threeDFrame = d435Obj.deproject_frame(frame)
 
-        cv2.imshow('frame', frame)
+        cv2.imshow('frameX', threeDFrame[0,:,:])
+        cv2.imshow('frameY', threeDFrame[1,:,:])
+        cv2.imshow('frameZ', threeDFrame[2,:,:])
         cv2.waitKey(1)
