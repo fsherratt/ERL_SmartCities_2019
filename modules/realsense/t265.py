@@ -1,4 +1,10 @@
 import pyrealsense2 as rs
+import traceback
+import sys
+
+class unexpectedDisconnect( Exception):
+    # Camera unexpectably disconnected
+    pass
 
 class rs_t265:
     def __init__(self):
@@ -11,14 +17,17 @@ class rs_t265:
 
     def __exit__(self, exception_type, exception_value, traceback):
         if traceback:
-            print(exception_type, exception_value)
             print(traceback.tb_frame)
 
         self.closeConnection()
 
     def getFrame(self):
         # Wait for new frame
-        frames = self.pipe.wait_for_frames()
+        try:
+            frames = self.pipe.wait_for_frames()
+        except RuntimeError as e:
+            traceback.print_exc(file=sys.stdout)
+            raise unexpectedDisconnect( e )
 
         # Fetch data
         pose = frames.get_pose_frame()
@@ -30,7 +39,6 @@ class rs_t265:
             pos = [data.translation.x, data.translation.y, data.translation.z]
             quat = [data.rotation.w, data.rotation.x, data.rotation.y, data.rotation.z]
             conf = data.tracker_confidence
-            confidence = data.tracker_confidence # Quality of data
 
             return pos, quat, conf
 
