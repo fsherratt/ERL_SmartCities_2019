@@ -17,15 +17,15 @@ Abstract base class for anything pixhawk related
 class pixhawk(ABC):
 	@abstractmethod	
 	def Get6DOF( self ) -> int:
-		pass
+		raise NotImplementedError('Get6DOF is not implemented')
 
 	@abstractmethod
 	def SetGoto( self, position ) -> bool:
-		pass
+		raise NotImplementedError('SetGoTo is not implemented')
 
 	@abstractmethod
 	def SetPosition( self, position ) -> bool:
-		pass
+		raise NotImplementedError('SetPosition is not implemented')
 
 """
 Pixhawk implementation for using the PX2
