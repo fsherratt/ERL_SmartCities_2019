@@ -8,7 +8,7 @@ class unexpectedDisconnect( Exception):
     # Camera unexpectably disconnected
     pass
 
-class rs_t265:
+class rs_d435:
     def __init__(self, width=640, height=480, framerate=6):
         self.width = width
         self.height = height
