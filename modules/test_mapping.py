@@ -19,10 +19,8 @@ try:
             frame = d435.getFrame()
             pos, r, _ = t265.getFrame() 
 
-            # ***ADD TO D435 ABSTRACTION***
             # Filter depth frame so that some parts are ignored
-            outOfRange = np.where( (frame > 1) | (frame < 0.5) )
-            frame[outOfRange] = np.nan
+            frame = d435.range_filter(frame, minRange = 0.5, maxRange = 1)
 
             # Convert to list of 3D coordinates
             frame = d435.deproject_frame( frame )
@@ -30,7 +28,6 @@ try:
             
             # Filter out invalid points
             points = points[ ~np.isnan(points[:, 2]), :]
-            # ***END***
 
             # Transform into global coordinate frame
             points_global = r.apply( points )

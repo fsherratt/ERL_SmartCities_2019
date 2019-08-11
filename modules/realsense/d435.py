@@ -123,3 +123,15 @@ class rs_d435:
         Y = np.multiply( frame, self.yDeprojectMatrix )
 
         return np.asanyarray( [X, Y, Z] )
+
+    # --------------------------------------------------------------------------
+    # range_filter
+    # Filter out points that are out of range, np.nan is applied to out of range
+    # values
+    # return in range depth frame
+    # --------------------------------------------------------------------------
+    def range_filter( self, frame, minRange = 0, maxRange = 10 ):
+        outOfRange = np.where( (frame < minRange) | (frame > maxRange) )
+        frame[outOfRange] = np.nan
+
+        return frame
