@@ -23,26 +23,11 @@ class mapper:
                                                                bounds_error = False,
                                                                fill_value = np.nan )
 
-    def update(self, frame, pos, r):
-        # Filter depth frame so that some parts are ignored
-        outOfRange = np.where( (frame > 1) | (frame < 0.5) )
-        frame[outOfRange] = np.nan
-
-        # Convert to list of 3D coordinates
-        frame = self._d435.deproject_frame( frame )
-        points = np.reshape(frame, (3, -1)).transpose()
-        
-        # Filter out invalid points
-        points = points[ ~np.isnan(points[:, 2]), :]
-
-        # Transform into global coordinate frame
-        points_global = r.apply( points )
-        points_global += np.tile(pos, (points.shape[0], 1))
-
+    def update(self, points):
         # Update map
-        xSort = np.digitize( points_global[:, 0], self.xBins ) - 1
-        ySort = np.digitize( points_global[:, 1], self.yBins ) - 1
-        zSort = np.digitize( points_global[:, 2], self.zBins ) - 1
+        xSort = np.digitize( points[:, 0], self.xBins ) - 1
+        ySort = np.digitize( points[:, 1], self.yBins ) - 1
+        zSort = np.digitize( points[:, 2], self.zBins ) - 1
 
         np.add.at(self.grid, [xSort, ySort, zSort], 1)
 
