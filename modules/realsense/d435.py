@@ -130,7 +130,8 @@ class rs_d435:
     # values
     # return in range depth frame
     # --------------------------------------------------------------------------
-    def range_filter( self, frame, minRange = 0, maxRange = 10 ):
+    @staticmethod
+    def range_filter( frame, minRange = 0, maxRange = 10 ):
         outOfRange = np.where( (frame < minRange) | (frame > maxRange) )
         frame[outOfRange] = np.nan
 
