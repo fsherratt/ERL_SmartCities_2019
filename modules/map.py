@@ -22,6 +22,18 @@ class mapper:
                                                                self.grid, method = 'linear',
                                                                bounds_error = False,
                                                                fill_value = np.nan )
+    
+    @staticmethod
+    def frame_to_global_points( frame, pos, r ):
+        # Produce list of valid points
+        points = np.reshape(frame, (3, -1)).transpose()
+        points = points[ ~np.isnan(points[:, 2]), :]
+
+        # Transform into global coordinate frame
+        points_global = r.apply( points )
+        points_global += np.tile(pos, (points.shape[0], 1))
+
+        return points_global
 
     def updateMap(self, points):
         # Update map
@@ -30,8 +42,3 @@ class mapper:
         zSort = np.digitize( points[:, 2], self.zBins ) - 1
 
         np.add.at(self.grid, [xSort, ySort, zSort], 1)
-
-        # Top down view
-        tmpGrid = np.sum( self.grid, axis=2 )
-        cv2.imshow('grid', tmpGrid)
-        cv2.waitKey(1)
