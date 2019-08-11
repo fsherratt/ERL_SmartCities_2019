@@ -42,3 +42,11 @@ class mapper:
         zSort = np.digitize( points[:, 2], self.zBins ) - 1
 
         np.add.at(self.grid, [xSort, ySort, zSort], 1)
+    
+    # --------------------------------------------------------------------------
+    # queryMap
+    # param queryPoints - (N,3) list of points to query against map
+    # return (N) list of risk for each point
+    # --------------------------------------------------------------------------
+    def queryMap(self, queryPoints):
+        return self.interpFunc(queryPoints)
