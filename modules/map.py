@@ -23,7 +23,7 @@ class mapper:
                                                                bounds_error = False,
                                                                fill_value = np.nan )
 
-    def update(self, points):
+    def updateMap(self, points):
         # Update map
         xSort = np.digitize( points[:, 0], self.xBins ) - 1
         ySort = np.digitize( points[:, 1], self.yBins ) - 1

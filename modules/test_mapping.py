@@ -24,16 +24,16 @@ try:
 
             # Convert to list of 3D coordinates
             frame = d435.deproject_frame( frame )
-            points = np.reshape(frame, (3, -1)).transpose()
             
-            # Filter out invalid points
+            # Produce list of valid points
+            points = np.reshape(frame, (3, -1)).transpose()
             points = points[ ~np.isnan(points[:, 2]), :]
 
             # Transform into global coordinate frame
             points_global = r.apply( points )
             points_global += np.tile(pos, (points.shape[0], 1))
 
-            mapObj.update(points_global)
+            mapObj.updateMap(points_global)
             t1 = time.time()
 
             print(t1-t0)
