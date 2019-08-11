@@ -11,13 +11,14 @@ mapObj = map.mapper()
 try:
     with t265, d435:
         while True:
-            
             # Get frames of data - points and global 6dof
             frame = d435.getFrame()
             pos, r, _ = t265.getFrame()
 
-            # Filter depth frame so that some parts are ignored
+            # Limit range of depth camera
             frame = d435.range_filter(frame, minRange = 0, maxRange = 30)
+
+            # Convert to 3D coordinates
             frame = d435.deproject_frame( frame )
 
             # Convert to global coordinates

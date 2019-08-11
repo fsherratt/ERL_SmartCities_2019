@@ -23,6 +23,13 @@ class mapper:
                                                                bounds_error = False,
                                                                fill_value = np.nan )
     
+    # --------------------------------------------------------------------------
+    # frame_to_global_points
+    # param frame - (3,X,Y) matrix of coordinates from d435 camera
+    # param pos - [x,y,z] offset cooridnates
+    # param r - scipy local->global rotation object
+    # return Null
+    # --------------------------------------------------------------------------
     @staticmethod
     def frame_to_global_points( frame, pos, r ):
         # Produce list of valid points
@@ -35,6 +42,11 @@ class mapper:
 
         return points_global
 
+    # --------------------------------------------------------------------------
+    # updateMap
+    # param points - (N,3) list of points to qadd to the map
+    # return Null
+    # --------------------------------------------------------------------------
     def updateMap(self, points):
         # Update map
         xSort = np.digitize( points[:, 0], self.xBins ) - 1
