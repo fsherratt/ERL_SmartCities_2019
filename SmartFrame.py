@@ -143,7 +143,7 @@ class SmartFrame():
 			# Update map
 			self.mapping.updateMap(points_global)
 			self._CurrentMap = self.mapping.grid
-		else if self.mapping:
+		elif self.mapping:
 			# If we only have the map module, then we supply the map data from the sim
 			self.mapping.updateMap(  )
 		return self._CurrentMap

@@ -1,8 +1,22 @@
 import numpy as np
 from scipy import interpolate
 import cv2
+from abc import ABC, abstractmethod, ABCMeta
 
-class mapper:
+class aMap( ABC ):
+    @abstractmethod
+    def updateMap( self, points: np.ndarray ) -> None:
+        raise NotImplementedError('updateMap is not implemented')
+
+    @abstractmethod
+    def queryMap(self, queryPoints: list[ int ]) -> list[ int ]:
+        raise NotImplementedError('queryMap is not implemented')
+    @abstractmethod
+    def getCurrentMap( self ) -> np.ndarray:
+        raise NotImplementedError('getCurrentMap is not implemented')
+
+
+class mapper( aMap ):
     def __init__(self):
         xRange = [-10, 10]
         yRange = [-10, 10]
@@ -47,7 +61,7 @@ class mapper:
     # param points - (N,3) list of points to qadd to the map
     # return Null
     # --------------------------------------------------------------------------
-    def updateMap(self, points):
+    def updateMap(self, points: np.ndarray) -> None:
         # Update map
         xSort = np.digitize( points[:, 0], self.xBins ) - 1
         ySort = np.digitize( points[:, 1], self.yBins ) - 1
@@ -60,5 +74,5 @@ class mapper:
     # param queryPoints - (N,3) list of points to query against map
     # return (N) list of risk for each point
     # --------------------------------------------------------------------------
-    def queryMap(self, queryPoints):
+    def queryMap(self, queryPoints: list[ int ]) -> list[ int ]:
         return self.interpFunc(queryPoints)
