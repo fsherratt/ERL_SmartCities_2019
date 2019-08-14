@@ -118,7 +118,14 @@ class SmartFrame():
 	Return: Numpy array representing the risk mapping.
 	TODO : Define numpy in output
 	"""
-	def _CheckMap(self, position) -> List[ int ]:
+	def _CheckMap(self, frame, position, rotation) -> List[ int ]:
+		# I want this to work without the cameras i.e. a simulated map
+		# Can I add an overload on the update map and make it so if
+		# we only have a map it calls this one?
+
+		## TODO : REMOVE THE CAMERA FRAME PARTS FROM THIS> MAKE SEPERATE CALL!!!
+		# We always have the pixhawk so we will always have a 6DOF referencec for the rotation.
+		# This will also always give us a position! 
 		if self.mapping and self.t265 and self.d435:
 			# Get frames of data - points and global 6dof
 			frame = d435.getFrame()
@@ -136,7 +143,9 @@ class SmartFrame():
 			# Update map
 			self.mapping.updateMap(points_global)
 			self._CurrentMap = self.mapping.grid
-
+		else if self.mapping:
+			# If we only have the map module, then we supply the map data from the sim
+			self.mapping.updateMap(  )
 		return self._CurrentMap
 
 	"""
