@@ -13,6 +13,9 @@ __author__ = 'Alex Powell, Freddie Sherrat'
 
 import utilities.argparser as ap
 import modules.pixhawk as px
+import modules.map as mp
+import modules.realsense.d435 as realsense_d435
+import modules.realsense.t265 as realsense_t265
 from typing import List
 
 """
@@ -36,6 +39,8 @@ class SmartFrame():
 	def __init__( self, 
 				pixhawk:px.pixhawk, 
 				mapping = None, 
+				d435 = None,
+				t265 = None,
 				routeCalc = None, 
 				mkHub = None, 
 				SLAM = None,
@@ -43,6 +48,8 @@ class SmartFrame():
 				GCS = None ):
 		# Classes injected
 		self.pixhawk = pixhawk
+		self.d435 = d435
+		self.t265 = t265
 		self.mapping = mapping
 		self.routeCalc = routeCalc
 		self.MkHub = mkHub
@@ -79,7 +86,8 @@ class SmartFrame():
 	def Run(self) -> None:
 		position = self._CheckPosition()
 		currMap = self._CheckMap( position )
-		route = self._CalcSafeRoute( currMap )
+		potentialRoutes = self._GetPotentialRoute( currMap, position, self._poiLocation )
+		route = self._CalcSafeRoute( potentialRoutes )
 		self._SetGoto( route[ 0 ] )
 		self._CheckMKSmart()
 		self._UpdateSmartHub()
@@ -104,26 +112,53 @@ class SmartFrame():
 		return self._position
 
 	"""
-	Items for checking the map state
+	Items for checking the map state.
+	Calls to the d435 depth sensor, then the t265 position sensor.
+	Then updates the global map with risk data relevant to the current view.
+	Return: Numpy array representing the risk mapping.
+	TODO : Define numpy in output
 	"""
 	def _CheckMap(self, position) -> List[ int ]:
-		if self.mapping:
-			# Do all map related functionality
-			# Basically update and pull
-			print( "Checking map" )
-			self._CurrentMap = [ 1, 1 ]
+		if self.mapping and self.t265 and self.d435:
+			# Get frames of data - points and global 6dof
+			frame = d435.getFrame()
+			pos, r, _ = t265.getFrame()
 
-		return self._CurrentMap
+			# Limit range of depth camera
+			frame = d435.range_filter(frame, minRange = 0, maxRange = 30)
 
+			# Convert to 3D coordinates
+			frame = d435.deproject_frame( frame )
+
+			# Convert to global coordinates
+			points_global = self.mapping.frame_to_global_points(frame, pos, r)
+
+			# Update map
+			self.mapping.updateMap(points_global)
+
+		return self.mapping.grid
+
+	"""
+	Items for estiamting routes
+	currentMap : current state of the risk map
+	position : current position
+	poi : current poi
+	Return : Potential routes
+	"""
+	def _GetPotentialRoute( self, currentMap, position, poi ):
+		print( "add route finder here..." )
+		return [ 0, 0 ,0 ]
+		
 	"""
 	Items for calculating the safe route
 	"""
-	def _CalcSafeRoute( self, map ) -> List[ List[ int ] ]:
-		if self.routeCalc:
-			print( "Calculating route" )
-			# Interpolate all routes, calculate the best safe route
-			# Definate candidate for threading
-			self._currentRoute = [ [ 0, 1 , 1] ]
+	def _CalcSafeRoute( self, routes ) -> List[ List[ int ] ]:
+		# Not sure about containing this in the mapping function.
+		# Would like to have it in its own fuction
+		if self.mapping:
+			queryPoints = self.mapping.queryMap( routes )
+			# linked list to get the min risk and get those points?
+			self._currentRoute = minRiskRoute
 
 		return self._currentRoute # return defualt
 
@@ -215,7 +250,11 @@ if __name__=='__main__':
 	# Get pixhawk
 	pix = px.PX2( args.pix[0], args.pix[1] )
 
+	# To update the mapping we need either one or both of the cameras.
+	d435 = realsense_d435.rs_d435()
+	t265 = realsense_t265.rs_t265()
+	mapping = mp.mapper()
 	# Startup frame
-	sf = SmartFrame( pixhawk=pix )
+	sf = SmartFrame( pixhawk=pix, mapping=mapping, d435=d435, t265=t265 )
 
 	sf.Run()
