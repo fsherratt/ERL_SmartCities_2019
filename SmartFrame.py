@@ -58,7 +58,7 @@ class SmartFrame():
 		self.GCS = GCS
 
 		# Internal variables
-		self._CurrentMap = [ 0, 0 ] # Replace with ap defualt
+		self._CurrentMap = self.mapping.grid # Replace with ap defualt
 		# Not sure this is needed, can deal with updating to same pos in pixhawk?
 		self._currentRoute = [ [ 0, 0, 0 ] ] 
 		self._poiLocation = [ [0, 0, 0] ]
@@ -135,8 +135,9 @@ class SmartFrame():
 
 			# Update map
 			self.mapping.updateMap(points_global)
+			self._CurrentMap = self.mapping.grid
 
-		return self.mapping.grid
+		return self._CurrentMap
 
 	"""
 	Items for estiamting routes
@@ -148,7 +149,7 @@ class SmartFrame():
 	def _GetPotentialRoute( self, currentMap, position, poi ):
 		print( "add route finder here..." )
 		return [ 0, 0 ,0 ]
-		
+
 	"""
 	Items for calculating the safe route
 	"""
