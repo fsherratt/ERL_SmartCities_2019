@@ -1,19 +1,12 @@
 from enum import Enum
 from MAVLinkThread.mavlinkThread import mavThread, mavSerial, mavSocket
-from pymavlink.dialects.v20 import ardupilotmega as pymavlink
+import pymavlink.dialects.v20.ardupilotmega as pymavlink
 from pymavlink import mavutil
 
 from threading import Thread
 import time
 
 import queue
-
-class Mode(Enum):
-    STABALISED = 0
-    POS_HOLD = 1
-    GUIDED = 2
-    LAND = 3
-    INITIALISING = 4
 
 class pixhawkAbstract(mavThread.mavThread, object):
     def __init__( self, conn, mavLib ):
@@ -108,16 +101,16 @@ class pixhawkAbstract(mavThread.mavThread, object):
     # Send messages
     def setMode(self, mode):
         # Only subset required - land, takeoff, guided
-        msg = pymavlink.MAVLink_command_long_message(0, 0, pymavlink.MAV_CMD_DO_SET_MODE, 0, 0,0,0,0,0,0,0)
+        msg = self._mavLib.MAVLink_command_long_message(0, 0, self._mavLib.MAV_CMD_DO_SET_MODE, 0, 0,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
 
     def setHome(self):
         use_current = 1 # 1 use current location, 0 use specificified location
-        msg = pymavlink.MAVLink_command_long_message( 0, 0, pymavlink.MAV_CMD_DO_SET_HOME, 0, use_current, 0,0,0,0,0,0)
+        msg = self._mavLib.MAVLink_command_long_message( 0, 0, self._mavLib.MAV_CMD_DO_SET_HOME, 0, use_current, 0,0,0,0,0,0)
         self.queueOutputMsg(msg)
 
     def requestHome(self):
-        msg = pymavlink.MAVLink_command_long_message(0,0, pymavlink.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
+        msg = self._mavLib..MAVLink_command_long_message(0,0, self._mavLib.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
     
     def sendPosition(self, pos, conf, loopClosure):
@@ -129,7 +122,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg( msg, priority=1) # Highest priority
 
     def requestHighLatency(self):
-        msg = pymavlink.MAVLink_command_long_message(0, 0, pymavlink.MAV_CMD_CONTROL_HIGH_LATENCY, 0, 1, 0,0,0,0,0,0)
+        msg = self._mavLib.MAVLink_command_long_message(0, 0, self._mavLib.MAV_CMD_CONTROL_HIGH_LATENCY, 0, 1, 0,0,0,0,0,0)
         self.queueOutputMsg(msg)
 
 if __name__ == "__main__":
@@ -144,12 +137,8 @@ if __name__ == "__main__":
     pixThread = Thread( target = mavObj.loop )
     pixThread.daemon = True
     pixThread.start()
-    
-    time.sleep(1)
 
     try:
-        mavObj.requestHome()
-
         while True:
             time.sleep(1)
 
