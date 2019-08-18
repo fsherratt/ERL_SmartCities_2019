@@ -156,10 +156,10 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
 if __name__ == "__main__":
     # Connect to pixhawk
-    commObj = mavSocket.mavSocket( broadcastPort = 14550,
-                                    listenPort = 14551 )
+    commObj = mavSocket.mavSocket( port = 14550, listenAddress='localhost' )
+    commObj.openPort()
     
-    mavObj = pixhawkAbstract( conn = commObj, 
+    mavObj = pixhawkAbstract( conn = commObj, mavLib = pymavlink )
                               mavLib = pymavlink )
 
     # Start pixhawk connection
@@ -174,9 +174,9 @@ if __name__ == "__main__":
         time.sleep(1)
         mavObj.takeoff(5)
 
-        while True:
-            mavObj.sendHeartbeat()
-            time.sleep(0.5)
+    while not commObj.isOpen() or not mavObj.sendHeartbeat:
+        mavObj.sendHeartbeat()
+        time.sleep(0.5)
 
     except KeyboardInterrupt:
         pass
