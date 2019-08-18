@@ -131,7 +131,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
     
     # To test
-    def sendGoto(self, pos):
+    def sendPosition(self, pos):
         msg = self._mavLib.MAVLink_vision_position_estimate_message(self.UNIX_time, pos[0], pos[1], pos[2], 
                                                                 pos[3], pos[4], pos[5])
         self.queueOutputMsg( msg, priority=1) # Highest priority
