@@ -6,8 +6,6 @@ from pymavlink import mavutil
 from threading import Thread
 import time
 
-import queue
-
 class pixhawkAbstract(mavThread.mavThread, object):
     def __init__( self, conn, mavLib ):
         self._pixhawkTimeOffset = 0
@@ -97,7 +95,12 @@ class pixhawkAbstract(mavThread.mavThread, object):
     @property
     def inAir(self):
         return self._inair
-    
+
+    @property
+    def relativePosition(self):
+        pass
+        # return self._position - self._home
+
     # Send messages
     def setMode(self, mode):
         # Only subset required - land, takeoff, guided
@@ -110,7 +113,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
 
     def requestHome(self):
-        msg = self._mavLib..MAVLink_command_long_message(0,0, self._mavLib.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
+        msg = self._mavLib.MAVLink_command_long_message(0,0, self._mavLib.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
     
     def sendPosition(self, pos, conf, loopClosure):
