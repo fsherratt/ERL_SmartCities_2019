@@ -116,12 +116,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
         msg = self._mavLib.MAVLink_command_long_message(0,0, self._mavLib.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
     
-    def sendPosition(self, pos, rot, conf, loopClosure):
-        covar = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] # Covariance matrix start with NaN if not knowm
-        reset = 0 # Increment on loopclosure - not sure this can currently be extracted from realsense
-
+    def sendPosition(self, pos, rot):
         msg = self._mavLib.MAVLink_vision_position_estimate_message(self.UNIX_time, pos[0], pos[1], pos[2], 
-                                                                rot[0], rot[1], rot[2], covar, reset)
+                                                                rot[0], rot[1], rot[2])
         self.queueOutputMsg( msg, priority=1) # Highest priority
 
     def requestHighLatency(self):
