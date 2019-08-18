@@ -71,7 +71,6 @@ class rs_t265:
             rot = R.from_quat( quat )
 
             # Apply pixhawk rotational offset
-            rot = rot * self.ROffset
             pos = self.ROffset.apply(pos)
 
             return pos, rot, conf

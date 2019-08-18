@@ -1,5 +1,5 @@
 from enum import Enum
-from MAVLinkThread.mavlinkThread import mavThread, mavSerial, mavSocket
+from .MAVLinkThread.mavlinkThread import mavThread, mavSerial, mavSocket
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 from pymavlink import mavutil
 
@@ -116,12 +116,12 @@ class pixhawkAbstract(mavThread.mavThread, object):
         msg = self._mavLib.MAVLink_command_long_message(0,0, self._mavLib.MAV_CMD_GET_HOME_POSITION, 0,0,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
     
-    def sendPosition(self, pos, conf, loopClosure):
+    def sendPosition(self, pos, rot, conf, loopClosure):
         covar = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] # Covariance matrix start with NaN if not knowm
         reset = 0 # Increment on loopclosure - not sure this can currently be extracted from realsense
 
         msg = self._mavLib.MAVLink_vision_position_estimate_message(self.UNIX_time, pos[0], pos[1], pos[2], 
-                                                                pos[3], pos[4], pos[5], covar, reset)
+                                                                rot[0], rot[1], rot[2], covar, reset)
         self.queueOutputMsg( msg, priority=1) # Highest priority
 
     def requestHighLatency(self):
