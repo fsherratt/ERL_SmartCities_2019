@@ -152,8 +152,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
 
 if __name__ == "__main__":
-    # Connect to pixhawk
-    commObj = mavSocket.mavSocket( port = 14550, listenAddress='localhost' )
+    # Connect to pixhawk - write port is determined from incoming messages
+    commObj = mavSocket.mavSocket( listenPort = 14550, listenAddress='localhost' )
     commObj.openPort()
     
     mavObj = pixhawkAbstract( conn = commObj, mavLib = pymavlink )
@@ -165,7 +165,8 @@ if __name__ == "__main__":
 
     print('***RUNNING***')
 
-    while not commObj.isOpen() or not mavObj.sendHeartbeat:
+    # Wait until we have a complete connection
+    while not commObj.isOpen() or not mavObj.seenHeartbeat:
         mavObj.sendHeartbeat()
         time.sleep(0.5)
         
