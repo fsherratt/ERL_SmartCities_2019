@@ -17,7 +17,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         self.seenHeartbeat = False
 
-        super( pixhawkAbstract, self).__init__( conn, mavLib, sysid=40, cmpid=0 )
+        super( pixhawkAbstract, self).__init__( conn, mavLib )
 
     # Process Messages
     def _processReadMsg(self, msglist):
@@ -153,7 +153,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
-    commObj = mavSocket.mavSocket( listenPort = 14550, listenAddress='localhost' )
+    commObj = mavSocket.mavSocket(  listenAddress = ('localhost', 14550) )
     commObj.openPort()
     
     mavObj = pixhawkAbstract( conn = commObj, mavLib = pymavlink )
