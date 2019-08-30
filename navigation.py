@@ -9,28 +9,35 @@ from threading import Thread
 
 PI_2 = 1.5708
 
-rotOffset=[-90,-90,0]
+rotOffset=[-90,-90,0] # Degrees
 positionUpdateRate = 30 # Hz
 
-comm = mavSocket.mavSocket( 14550, 14551 )
+comm = mavSocket.mavSocket( ('localhost', 14550) )
 # comm = mavSerial.mavSerial( '/dev/ttyUSB1', 115200 )
 
-pixInterface = pixhawk.pixhawkAbstract( comm, pymavlink )
+pix = pixhawk.pixhawkAbstract( comm, pymavlink )
 
 # Start pixhawk connection
-pixThread = Thread( target = pixInterface.loop )
+pixThread = Thread( target = pix.loop )
 pixThread.daemon = True
 pixThread.start()
+
+while not comm.isOpen() or not pix.seenHeartbeat:
+    pix.sendHeartbeat()
+    time.sleep(0.5)
+
+print('**Pixhawk Connected**')
 
 t265Obj = t265.rs_t265( rotOffset=rotOffset )
 
 try:
     with t265Obj:
+        print('**T265 Connected**')
         while True:
             pos, r, _ = t265Obj.getFrame()
             rot = r.as_euler('xzy', degrees=False)
 
-            pixInterface.sendPosition(pos, rot)
+            pix.sendPosition(pos, rot)
 
             print([pos, r.as_euler('xzy', degrees=True)])
 
@@ -40,5 +47,5 @@ except KeyboardInterrupt:
     pass
 
 finally:
-    pixInterface.stopLoop()
+    pix.stopLoop()
     comm.closePort()
