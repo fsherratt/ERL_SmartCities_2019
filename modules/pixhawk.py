@@ -40,7 +40,10 @@ class pixhawkAbstract(mavThread.mavThread, object):
             elif id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
                 self._attitudeHandler(msg)
 
-            elif id == pymavlink.MAVLINK_MSG_ID_AUTOPILOT_VERSION:
+            elif id == self._mavLib.MAVLINK_MSG_ID_AUTOPILOT_VERSION:
+                print(msg)
+
+            elif id == self._mavLib.MAVLINK_MSG_ID_STATUSTEXT:
                 print(msg)
     
     def _heartbeatHandler(self, msg): 
@@ -74,7 +77,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
     # Aircraft state
     @property
     def UNIX_time(self):
-        return int(time.time()*1e6 - self._pixhawkTimeOffset)
+        return int(time.time()*1e6)# - self._pixhawkTimeOffset)
 
     @property
     def armed(self):
@@ -91,7 +94,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
     # Send messages
     def sendHeartbeat(self):
-        msg = self._mavLib.MAVLink_heartbeat_message(pymavlink.MAV_TYPE_ONBOARD_CONTROLLER, pymavlink.MAV_AUTOPILOT_INVALID,0,0,0,1)
+        msg = self._mavLib.MAVLink_heartbeat_message(self._mavLib.MAV_TYPE_ONBOARD_CONTROLLER, self._mavLib.MAV_AUTOPILOT_INVALID,0,0,0,1)
         self.queueOutputMsg(msg)
 
     def requestCapabilities(self):
@@ -99,11 +102,11 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
 
     def requestParams(self):
-        msg = pymavlink.MAVLink_param_request_list_message(1,1)
+        msg = self._mavLib.MAVLink_param_request_list_message(1,1)
         self.queueOutputMsg(msg)
 
     def setArm(self, state):
-        msg = pymavlink.MAVLink_command_long_message(0,0,pymavlink.MAV_CMD_COMPONENT_ARM_DISARM,0,state,0,0,0,0,0,0)
+        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_COMPONENT_ARM_DISARM,0,state,0,0,0,0,0,0)
         self.queueOutputMsg(msg)
     
     def setModeGuided(self):
@@ -117,7 +120,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
     def setCustomMode(self, cMode):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_DO_SET_MODE,
-                                    0,pymavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,cMode,0,0,0,0,0)
+                                    0,self._mavLib.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,cMode,0,0,0,0,0)
         self.queueOutputMsg(msg)
 
     # To test
@@ -136,7 +139,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg( msg, priority=1) # Highest priority
 
     def setTakeoff(self, alt):
-        msg = pymavlink.MAVLink_command_long_message(0,0,pymavlink.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
+        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
 
     def sendConditionYaw(self, heading, rate=25, dir=1, offset=0):
@@ -149,6 +152,27 @@ class pixhawkAbstract(mavThread.mavThread, object):
                                                         heading, rate, dir, offset, 0,0,0)
         self.queueOutputMsg(msg)
 
+    def sendSetGlobalOrigin(self,lat,lon,alt):
+        msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,lat,lon,alt)
+        self.queueOutputMsg(msg)
+
+    def sendSetHomePosition(self,lat,lon,alt):
+        x = 0
+        y = 0
+        z = 0
+        q = [1,0,0,0]
+        approach_x = 0
+        approach_y = 0
+        approach_z = 1
+
+        msg = self._mavLib.MAVLink_set_home_position_message(0,
+            lat,lon,alt,
+            x,y,z,q,
+            approach_x,
+            approach_y,
+            approach_z)
+
+        self.queueOutputMsg(msg)
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
