@@ -117,8 +117,8 @@ class navigation:
         pointRisk += 1e-256 # Baseline risk
 
         # Normalise based on route distance -> shorter routes are prefered
-        pathADist = np.linalg.norm(gotoPoints[0] - self.aircraftPosition)
-        pathADist = np.tile(pathADist, (self._numPaths,self.pathMeshElements))
+        pathADist = np.linalg.norm(gotoPoints - self.aircraftPosition,axis=1)
+        pathADist = np.tile(pathADist, (self.pathMeshElements,1)).transpose()
 
         pathBDist = np.linalg.norm(self.targetPosition - gotoPoints, axis=1)
         pathBDist = np.tile(pathBDist, (self.pathMeshElements,1)).transpose()
