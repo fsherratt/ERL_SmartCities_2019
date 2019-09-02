@@ -12,17 +12,6 @@
 # ------------------------------------------------------------------------------
 import math
 import numpy as np
-from scipy import interpolate
-import time
-import os
-
-import airTraffic
-
-from uavAbstract import MODE
-
-from common import mavLib as mavlink
-from common import mavAbstract
-from common import mavComm
 
 # ------------------------------------------------------------------------------
 # manager
@@ -118,7 +107,6 @@ class manager:
     # return 3-tuple  x, y and z coordinates of the calculated point
     # --------------------------------------------------------------------------
     def _calculateChasePoint( self ):
-        currTime = time.time()
         min_path_point = self._targetPosition_UTM
 
         uavPosition = np.asarray( self._UAV.uavLocation_UTM )
@@ -151,9 +139,6 @@ class manager:
 
         r = np.linspace( 0, self.CpDist, self.pathMeshElements + 1 )
         r = r[1:]
-
-        timeToPointA = ( r / self.uavVelocity ) + currTime
-        tOffset = timeToPointA[-1]
 
         el, az, r = np.meshgrid( el, az, r, indexing = 'ij' )
 
@@ -205,46 +190,18 @@ class manager:
 
         points = np.concatenate( ( pointA, pointB ), axis = 1 )
 
-
-        # ----------------------------------------------------------------------
-        # Calculate path velocity vectors
-        # ----------------------------------------------------------------------
-        vectorLength = np.sqrt( vectorB[:, 0] ** 2
-                              + vectorB[:, 1] ** 2
-                              + vectorB[:, 2] ** 2 )
-
-        vectorB /= np.tile( vectorLength, (self._numCoordinates, 1) ) \
-                     .transpose()
-
-        # Calculate velocty vector at each point
-        velocityVectorA = vectorA * self.uavVelocity
-        velocityVectorA = np.repeat(
-                velocityVectorA.reshape( self._numPaths, 1,
-                                         self._numCoordinates ),
-                self.pathMeshElements, 1 )
-        velocityVectorB = vectorB * self.uavVelocity
-        velocityVectorB = np.repeat(
-                velocityVectorB.reshape( self._numPaths, 1,
-                                         self._numCoordinates ),
-                self.pathMeshElements, 1 )
-
-        velocityVector = np.concatenate( ( velocityVectorA, velocityVectorB ),
-                                         axis = 1 )
-
-
-        # ----------------------------------------------------------------------
+d        # ----------------------------------------------------------------------
         # Calculate prior consequence value
         # ----------------------------------------------------------------------
-        priorRisk = self._groundInterpFunc( points.reshape(
+        risk = self._groundInterpFunc( points.reshape(
                                 ( self._numElements, self._numCoordinates ) ) )
-        priorRisk = np.reshape( priorRisk, ( self._numPaths,
+        risk = np.reshape( risk, ( self._numPaths,
                                              2 * self.pathMeshElements ) )
 
 
         # ----------------------------------------------------------------------
         # Scale and sum risk
         # ----------------------------------------------------------------------
-        risk = priorRisk + aircraftRisk
         risk += 1e-256 # Baseline risk to allow distance minimisation
 
         # Scale by length of segment
