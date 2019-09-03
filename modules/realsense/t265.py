@@ -10,13 +10,16 @@ class unexpectedDisconnect( Exception):
     pass
 
 class rs_t265:
-    def __init__(self):
+    def __init__(self, posOffset=[0,0,0], rotOffset=[90,90,0]):
         # Setup variables
         self.pipe = None
         self.cfg = None
 
         # Adjust yaw to align north
-        self.rot_Offset = R.from_euler('zyx', [90, 90, 0], degrees=True) # roll, pitch yaw
+        self.pos_offset = posOffset
+        self.rot_offset = rotOffset
+
+        self.ROffset = R.from_euler('zyx', self.rot_offset, degrees=True) # roll, pitch yaw
 
     def __enter__(self):
         self.openConnection()
@@ -68,8 +71,8 @@ class rs_t265:
             rot = R.from_quat( quat )
 
             # Apply pixhawk rotational offset
-            rot = rot * self.rot_Offset
-            pos = self.rot_Offset.apply(pos)
+            rot = rot * self.ROffset
+            pos = self.ROffset.apply(pos)
 
             return pos, rot, conf
 
