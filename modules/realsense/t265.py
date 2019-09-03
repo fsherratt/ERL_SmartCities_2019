@@ -78,3 +78,15 @@ class rs_t265:
     def calcNorthOffset( self, t265Yaw, pixYaw ):
         # Implement some form of gradient descent method to correct for yaw offset
         pass
+
+if __name__ == "__main__":
+    t265Obj = rs_t265()
+
+    with t265Obj:
+        while True:
+            pos, eul, conf = t265Obj.getFrame()
+            # print(i, pos, conf)
+
+            pos, eul = t265Obj.correctOffset( pos, eul )
+
+            print(pos)

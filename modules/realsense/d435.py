@@ -136,3 +136,18 @@ class rs_d435:
         frame[outOfRange] = np.nan
 
         return frame
+
+if __name__ == "__main__":
+    import cv2
+
+    d435Obj = rs_d435( framerate = 30 )
+
+    with d435Obj:
+        while True:
+            frame = d435Obj.getFrame()
+            threeDFrame = d435Obj.deproject_frame(frame)
+
+            cv2.imshow('frameX', threeDFrame[0,:,:])
+            cv2.imshow('frameY', threeDFrame[1,:,:])
+            cv2.imshow('frameZ', threeDFrame[2,:,:])
+            cv2.waitKey(1)
