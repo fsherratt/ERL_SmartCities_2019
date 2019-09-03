@@ -1,6 +1,6 @@
-from modules.MAVLinkThread.mavlinkThread import mavSocket, mavSerial
-from modules import pixhawk
-from modules.realsense import t265
+from MAVLinkThread.mavlinkThread import mavSocket, mavSerial
+import pixhawk
+from realsense import t265
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
@@ -12,8 +12,8 @@ PI_2 = 1.5708
 rotOffset=[-90,-90,0] # Degrees
 positionUpdateRate = 30 # Hz
 
-# comm = mavSocket.mavSocket( ('localhost', 14550) )
-comm = mavSerial.mavSerial( '/dev/ttyUSB0', 921600 )
+comm = mavSocket.mavSocket( ('localhost', 14550) )
+# comm = mavSerial.mavSerial( '/dev/ttyUSB0', 921600 )
 
 pix = pixhawk.pixhawkAbstract( comm, pymavlink )
 pix.srcSystem = 20

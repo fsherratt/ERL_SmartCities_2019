@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import interpolate
+from realsense import d435
 
 class mapper:
     num_coordinate = 3
@@ -64,14 +65,14 @@ class mapper:
         return self.interpFunc(queryPoints)
 
 if __name__ == "__main__":
-    from d435 import rs_d435
-    from t265 import rs_t265
+    
+    from realsense import t265
 
     import cv2
     import time
 
-    t265Obj = rs_t265()
-    d435Obj = rs_d435( framerate = 30 )
+    t265Obj = t265.rs_t265()
+    d435Obj = d435.rs_d435( framerate = 30 )
 
     mapObj = mapper()
     time.sleep(1)

@@ -1,5 +1,5 @@
 from enum import Enum
-from .MAVLinkThread.mavlinkThread import mavThread, mavSerial, mavSocket
+from MAVLinkThread.mavlinkThread import mavThread, mavSerial, mavSocket
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 from pymavlink import mavutil
 
