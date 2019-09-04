@@ -1,5 +1,5 @@
 from utilities import argparser
-from modules import map, navigation, pixhawk
+from modules import map, navigation, pixhawk, position
 
 if __name__ == "__main__":
     parser = argparser.GetParser()
