@@ -5,7 +5,7 @@ from modules.realsense import d435
 class mapper:
     num_coordinate = 3
 
-    def __init__(self):
+    def __init__(self, SITL):
         xRange = [-10, 10]
         yRange = [-10, 10]
         zRange = [-3, 3]
@@ -24,6 +24,19 @@ class mapper:
                                                                self.grid, method = 'linear',
                                                                bounds_error = False,
                                                                fill_value = np.nan )
+
+        if SITL:
+            self.d435Obj = None
+        else:
+            self.connectD435()
+
+    def __del__(self):
+        if self.d435Obj is not None:
+            self.d435Obj.closeConnection()
+
+    def connectD435(self):
+        self.d435Obj = d435.rs_d435( framerate = 30 )
+        self.d435Obj.openConnection()
     
     # --------------------------------------------------------------------------
     # frame_to_global_points
@@ -42,6 +55,18 @@ class mapper:
         points_global += np.tile(pos, (points.shape[0], 1))
 
         return points_global
+
+    def update(pos, rot):
+        # Limit range of depth camera
+        frame = self.d435Obj.range_filter(frame, minRange = 0, maxRange = 30)
+        # Convert to 3D coordinates
+        frame = self.d435Obj.deproject_frame( frame )
+
+        # Convert to global coordinates
+        points_global = self.mapObj.frame_to_global_points(frame, pos, r)
+
+        # Update map
+        mapObj.updateMap(points_global)
 
     # --------------------------------------------------------------------------
     # updateMap
@@ -72,28 +97,15 @@ if __name__ == "__main__":
     import time
 
     t265Obj = t265.rs_t265()
-    d435Obj = d435.rs_d435( framerate = 30 )
 
     mapObj = mapper()
-    time.sleep(1)
 
-    with t265Obj, d435Obj:
+    with t265Obj:
         while True:
             # Get frames of data - points and global 6dof
-            frame = d435Obj.getFrame()
             pos, r, _ = t265Obj.getFrame()
 
-            # Limit range of depth camera
-            frame = d435Obj.range_filter(frame, minRange = 0, maxRange = 30)
-
-            # Convert to 3D coordinates
-            frame = d435Obj.deproject_frame( frame )
-
-            # Convert to global coordinates
-            points_global = mapObj.frame_to_global_points(frame, pos, r)
-
-            # Update map
-            mapObj.updateMap(points_global)
+            mapObj.update(pos,r)
 
             cv2.imshow('map', mapObj.grid / np.max(mapObj.grid))
             cv2.waitkey(1)

@@ -7,7 +7,7 @@ from threading import Thread
 import time
 
 class pixhawkAbstract(mavThread.mavThread, object):
-    def __init__( self, conn, mavLib ):
+    def __init__( self, conn ):
         self._pixhawkTimeOffset = 0
         self._mode = 0
         self._armed = False
@@ -17,7 +17,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         self.seenHeartbeat = False
 
-        super( pixhawkAbstract, self).__init__( conn, mavLib )
+        super( pixhawkAbstract, self).__init__( conn, pymavlink )
 
     # Process Messages
     def _processReadMsg(self, msglist):
@@ -87,11 +87,6 @@ class pixhawkAbstract(mavThread.mavThread, object):
     def mode(self):
         return self._mode
 
-    @property
-    def relativePosition(self):
-        pass
-        # return self._position - self._home
-
     # Send messages
     def sendHeartbeat(self):
         msg = self._mavLib.MAVLink_heartbeat_message(self._mavLib.MAV_TYPE_ONBOARD_CONTROLLER, self._mavLib.MAV_AUTOPILOT_INVALID,0,0,0,1)
@@ -134,6 +129,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
     
     def sendPosition(self, pos, rot):
+        rot = rot.as_euler('xzy', degrees=True)
         msg = self._mavLib.MAVLink_vision_position_estimate_message(self.UNIX_time, pos[0], pos[1], pos[2], 
                                                                 rot[0], rot[1], rot[2])
         self.queueOutputMsg( msg, priority=1) # Highest priority
@@ -174,12 +170,16 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         self.queueOutputMsg(msg)
 
+    def sendGoto(self, pos, yaw):
+        # Send Goto
+        self.sendConditionYaw(yaw)
+
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
     commObj = mavSocket.mavSocket(  listenAddress = ('localhost', 14550) )
     commObj.openPort()
     
-    mavObj = pixhawkAbstract( conn = commObj, mavLib = pymavlink )
+    mavObj = pixhawkAbstract( conn = commObj )
 
     # Start pixhawk connection
     pixThread = Thread( target = mavObj.loop )

@@ -10,7 +10,11 @@ from threading import Thread
 
 class position:
     def __init__(self, t265):
-        self.t265 = t265
+        self.t265 = t265.rs_t265( rotOffset=[-90,-90,0])
+        self.t265.openConnection()
+
+    def __del__(self):
+        self.t265.closeConnection()
 
     def update(self):
         pos, r, conf = t265Obj.getFrame()
@@ -19,11 +23,11 @@ class position:
 
 
 class sitlPosition(mavThread.mavThread):
-    def __init__( self, conn, mavLib ):
+    def __init__( self, conn ):
         self._attitude = [0,0,0]
         self._position = [0,0,0]
 
-        super( sitlPosition, self).__init__( conn, mavLib )
+        super( sitlPosition, self).__init__( conn, pymavlink )
 
 
     def _processReadMsg(self, msglist):
@@ -64,8 +68,7 @@ if __name__ == "__main__":
     posObj = None
     
     if not SITL:
-        t265 = t265.rs_t265( rotOffset=[-90,-90,0])
-        t265.openConnection()
+        
 
         posObj = position( t265 )
 
@@ -73,12 +76,12 @@ if __name__ == "__main__":
         commObj = mavSocket.mavSocket( listenAddress = ('', 14551) )
         commObj.openPort()
 
-        posObj = sitlPosition( conn = commObj, mavLib = pymavlink )
+        posObj = sitlPosition( conn = commObj )
         posObj.srcSystem = 21
 
-        pixThread = Thread( target = posObj.loop )
-        pixThread.daemon = True
-        pixThread.start()
+        posThread = Thread( target = posObj.loop )
+        posThread.daemon = True
+        posThread.start()
 
     try:
         while True:
@@ -87,9 +90,4 @@ if __name__ == "__main__":
             time.sleep(0.05)
 
     except KeyboardInterrupt:
-        pass
-
-    try:
-        t265.closeConnection()
-    except:
         pass

@@ -16,25 +16,7 @@ class navigation:
     def __init__(self):
         self.aircraftPosition = np.asarray((0,0,0)) # x,y,z
         self.targetPosition = np.asarray((0,0,0)) # x,y,z
-
-        print('Number of mesh elements %d' % self._numElements)
-
-    def calcNewChasePoint(self, currPosition, targetPosition):
-        self.setAircraftPosition = currPosition
-        self.setTargetPosition = targetPosition
-
-        pass
-
-
-    # Take current position and target position
-    def setTargetPosition(self, targetPosition):
-        self.targetPosition = np.asarray(targetPosition)
-
-
-    def setAircraftPosition(self, currPosition):
-        self.aircraftPosition = np.asarray(currPosition)
-
-    
+   
     # Produce possible routes between the two
     def calcGotoPoints(self):
         travelVector = self.targetPosition - self.aircraftPosition
@@ -107,11 +89,6 @@ class navigation:
         return points
 
 
-    def getPointRisk(self, meshGrid):
-        pointRisk = np.ones((self._numElements), dtype=np.float)
-        return pointRisk
-
-
     def calculatePathRisk(self, gotoPoints, pointRisk):      
         # Split into routes and sum to give route risk
         pointRisk += 1e-256 # Baseline risk
@@ -136,6 +113,28 @@ class navigation:
 
         return pathRisk
 
+
+    def updatePt1(self, pos, targetPos):
+        self.aircraftPosition = np.asarray(pos)
+        self.targetPosition = np.asarray(targetPos)
+
+        self.gotoPoints = self.calcGotoPoints()
+        meshPoints = self.pathMeshGrid(self.gotoPoints)
+
+        return meshPoints
+
+    def updatePt2(self, pointRisk):
+        pathRisk = self.calculatePathRisk(self.gotoPoints, pointRisk)
+
+        min_path_index = np.nanargmin(pathRisk)
+        min_path_point = self.gotoPoints[min_path_index]
+        min_path_risk = pathRisk[min_path_index]
+
+        yaw = 0
+
+        return min_path_point, yaw, min_path_risk
+
+
 if __name__ == "__main__":
     nav = navigation()
 
@@ -143,18 +142,12 @@ if __name__ == "__main__":
 
     for i in range(1000):
         startTime = time.time()
-        # nav.setAircraftPosition((1,2,3))
-        nav.setTargetPosition((100,0,0))
 
-        gotoPoints = nav.calcGotoPoints()
-        meshPoints = nav.pathMeshGrid(gotoPoints)
-        pointRisk = nav.getPointRisk(meshPoints)
-        pathRisk = nav.calculatePathRisk(gotoPoints, pointRisk)
+        meshPoints = nav.updatePt1([0,0,0], [10,0,0])
 
-        min_path_index = np.nanargmin(pathRisk)
-        min_path_point = gotoPoints[min_path_index]
-        min_path_risk = pathRisk[min_path_index]
-
+        pointRisk = np.ones( meshPoints.shape[0] )
+        nav.updatePt2( pointRisk )
+        
         executionTime = time.time()-startTime
         cummlativeTime += executionTime
         print('%d\t%f' % (i, executionTime))
