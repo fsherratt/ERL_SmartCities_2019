@@ -98,11 +98,11 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
 
     def requestCapabilities(self):
-        msg = self._mavLib.MAVLink_autopilot_version_request_message(1,1)
+        msg = self._mavLib.MAVLink_autopilot_version_request_message(0,0)
         self.queueOutputMsg(msg)
 
     def requestParams(self):
-        msg = self._mavLib.MAVLink_param_request_list_message(1,1)
+        msg = self._mavLib.MAVLink_param_request_list_message(0,0)
         self.queueOutputMsg(msg)
 
     def setArm(self, state):

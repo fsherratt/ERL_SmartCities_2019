@@ -1,73 +1,95 @@
-from modules.MAVLinkThread.mavlinkThread import mavSocket, mavSerial
-from modules import pixhawk
+from modules.MAVLinkThread.mavlinkThread import mavThread, mavSocket
 from modules.realsense import t265
+
+from scipy.spatial.transform import Rotation as R
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
 
 from threading import Thread
 
-PI_2 = 1.5708
+class position:
+    def __init__(self, t265):
+        self.t265 = t265
 
-rotOffset=[-90,-90,0] # Degrees
-positionUpdateRate = 30 # Hz
+    def update(self):
+        pos, r, conf = t265Obj.getFrame()
 
-comm = mavSocket.mavSocket( ('localhost', 14550) )
-# comm = mavSerial.mavSerial( '/dev/ttyUSB0', 921600 )
+        return pos, r, conf
 
-pix = pixhawk.pixhawkAbstract( comm, pymavlink )
-pix.srcSystem = 20
-pix.srcComponent = 0
 
-# Start pixhawk connection
-pixThread = Thread( target = pix.loop )
-pixThread.daemon = True
-pixThread.start()
+class sitlPosition(mavThread.mavThread):
+    def __init__( self, conn, mavLib ):
+        self._attitude = [0,0,0]
+        self._position = [0,0,0]
 
-while not comm.isOpen() or not pix.seenHeartbeat:
-    pix.sendHeartbeat()
-    time.sleep(0.5)
+        super( sitlPosition, self).__init__( conn, mavLib )
 
-print('**Pixhawk Connected**')
 
-lat = 151269321
-lon = 16624301
-alt = 163000
+    def _processReadMsg(self, msglist):
+        for msg in msglist:
+            id = msg.get_msgId()
 
-t265Obj = t265.rs_t265( rotOffset=rotOffset )
+            if id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
+                    self._homePosHandler(msg)
 
-lastHeartbeat = time.time()
+            elif id == self._mavLib.MAVLINK_MSG_ID_LOCAL_POSITION_NED:
+                self._positionHandler(msg)
 
-startTime = time.time()
-setHomeDelay = 10
-homeSet = False
+            elif id == self._mavLib.MAVLINK_MSG_ID_AHRS3 or \
+                 id == self._mavLib.MAVLINK_MSG_ID_AHRS2 or \
+                 id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
+                 self._attitudeHandler(msg)
 
-try:
-    with t265Obj:
-        print('**T265 Connected**')
+            elif id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
+                self._attitudeHandler(msg)
+
+    def _homePosHandler( self, msg ):
+        self._home = [msg.latitude, msg.longitude, msg.altitude]
+
+    def _attitudeHandler(self, msg):
+        self._attitude = [msg.roll, msg.pitch, msg.yaw]
+
+    def _positionHandler(self, msg):
+        self._position = [msg.x, msg.y, msg.z]
+
+    def update(self):
+        r = R.from_euler('xzy', self._attitude, degrees=False)
+        return self._position, r, 3
+
+
+if __name__ == "__main__":
+    SITL = True
+
+    posObj = None
+    
+    if not SITL:
+        t265 = t265.rs_t265( rotOffset=[-90,-90,0])
+        t265.openConnection()
+
+        posObj = position( t265 )
+
+    else:
+        commObj = mavSocket.mavSocket( listenAddress = ('', 14551) )
+        commObj.openPort()
+
+        posObj = sitlPosition( conn = commObj, mavLib = pymavlink )
+        posObj.srcSystem = 21
+
+        pixThread = Thread( target = posObj.loop )
+        pixThread.daemon = True
+        pixThread.start()
+
+    try:
         while True:
-            if not homeSet and time.time() - startTime > setHomeDelay:
-                pix.sendSetGlobalOrigin(lat,lon,alt)
-                pix.sendSetHomePosition(lat,lon,alt)
+            pos, r, _ = posObj.update()
+            print(pos, r.as_euler('xzy', degrees=True))
+            time.sleep(0.05)
 
-                print('Home Position Set')
-                homeSet = True
+    except KeyboardInterrupt:
+        pass
 
-            if time.time() - lastHeartbeat > 0.5:
-                pix.sendHeartbeat()
-
-                lastHeartbeat = time.time()
-            
-            pos, r, _ = t265Obj.getFrame()
-            rot = r.as_euler('xzy', degrees=False)
-
-            pix.sendPosition(pos, rot)
-
-            time.sleep(1/positionUpdateRate)
-
-except KeyboardInterrupt:
-    pass
-
-finally:
-    pix.stopLoop()
-    comm.closePort()
+    try:
+        t265.closeConnection()
+    except:
+        pass
