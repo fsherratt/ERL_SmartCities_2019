@@ -5,28 +5,16 @@ def GetParser():
             description = 'SciRoc Episode 12 argument parser' )
 
     parser.add_argument( '--pix', '-P',
-                     type = str,
-                     help = 'Pixhawk Serial port',
-                     metavar = ('PORT', 'BAUD'),
-                     default = None,
-                     nargs = 2,
-                     required = True)
+                        type = str,
+                        help = 'Pixhawk address - for SITL UDP otherwise serial',
+                        metavar = ('ADDR', 'PORT/BAUD'),
+                        default = None,
+                        nargs = 2 )
 
-    parser.add_argument( '--gnd', '-G',
-                     type = str,
-                     help = 'Ground Station Serial port',
-                     metavar = ('PORT', 'BAUD'),
-                     default = None,
-                     nargs = 2 )
-
-    parser.add_argument( '--disp', '-V',
-                     help = 'Enable displaying of camera image',
-                     default = None,
-                     action = "store_true" )
-
-    parser.add_argument('--save', '-S',
-                    help='Save images from the camera',
-                    default=None,
-                    action="store_true")
+    parser.add_argument( '--SITL', '-s',
+                        help = 'Enable pixhawk SITL',
+                        default = None,
+                        action = "store_true",
+                        required = False  )
 
     return parser
