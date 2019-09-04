@@ -25,6 +25,7 @@ class sitlPosition(mavThread.mavThread):
 
         super( sitlPosition, self).__init__( conn, mavLib )
 
+
     def _processReadMsg(self, msglist):
         for msg in msglist:
             id = msg.get_msgId()
@@ -32,13 +33,13 @@ class sitlPosition(mavThread.mavThread):
             if id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
                     self._homePosHandler(msg)
 
-            elif id == self._mavLib.MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                self._positionHandlerAlt(msg)
-                
-            elif id == self._mavLib.MAVLINK_MSG_ID_AHRS2 or \
-                id == self._mavLib.MAVLINK_MSG_ID_AHRS3:
-                self._attitudeHandler(msg)
-                self._positionHandlerAltitude(msg)
+            elif id == self._mavLib.MAVLINK_MSG_ID_LOCAL_POSITION_NED:
+                self._positionHandler(msg)
+
+            elif id == self._mavLib.MAVLINK_MSG_ID_AHRS3 or \
+                 id == self._mavLib.MAVLINK_MSG_ID_AHRS2 or \
+                 id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
+                 self._attitudeHandler(msg)
 
             elif id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
                 self._attitudeHandler(msg)
@@ -49,11 +50,8 @@ class sitlPosition(mavThread.mavThread):
     def _attitudeHandler(self, msg):
         self._attitude = [msg.roll, msg.pitch, msg.yaw]
 
-    def _positionHandlerAltitude(self, msg):
-        self._position = [msg.lat, msg.lng, msg.altitude]
-
-    def _positionHandlerAlt(self, msg):
-        self._position = [msg.lat, msg.lon, msg.alt]
+    def _positionHandler(self, msg):
+        self._position = [msg.x, msg.y, msg.z]
 
     def update(self):
         r = R.from_euler('xzy', self._attitude, degrees=False)
@@ -76,6 +74,8 @@ if __name__ == "__main__":
         commObj.openPort()
 
         posObj = sitlPosition( conn = commObj, mavLib = pymavlink )
+        posObj.srcSystem = 21
+
         pixThread = Thread( target = posObj.loop )
         pixThread.daemon = True
         pixThread.start()
