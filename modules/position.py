@@ -1,6 +1,6 @@
-from MAVLinkThread.mavlinkThread import mavSocket, mavSerial
-import pixhawk
-from realsense import t265
+from modules.MAVLinkThread.mavlinkThread import mavSocket, mavSerial
+from modules import pixhawk
+from modules.realsense import t265
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time

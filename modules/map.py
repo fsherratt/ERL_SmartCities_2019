@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import interpolate
-from realsense import d435
+from modules.realsense import d435
 
 class mapper:
     num_coordinate = 3
@@ -66,7 +66,7 @@ class mapper:
 
 if __name__ == "__main__":
     
-    from realsense import t265
+    from modules.realsense import t265
 
     import cv2
     import time
