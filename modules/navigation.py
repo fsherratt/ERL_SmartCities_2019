@@ -2,15 +2,16 @@ import numpy as np
 import time
 
 class navigation:
+    percentGotoDist = 0.5
+    minWPDistance = 2
+
     pathMeshElements = 10
     elevationMeshElements = 11 # Number of elevation angles to evaluate
     azimuthMeshElements = 11 # Number of azimuth angles to evaluate
 
-    azimuthRange = np.deg2rad(30)  # +- 30 degree view
-    elevationRange = np.deg2rad(10)
+    azimuthRange = np.deg2rad(110)  # +- 30 degree view
+    elevationRange = np.deg2rad(110)
 
-    _numPaths = elevationMeshElements * azimuthMeshElements
-    _numElements = 2 * _numPaths * pathMeshElements
     _numCoordinates = 3
 
     def __init__(self):
@@ -26,7 +27,10 @@ class navigation:
         # Calculate heading to next WP
         az = np.arctan2(travelVector[1], travelVector[0]) # Azimuth
         el = np.arcsin(travelVector[2] / pathLength) # Elevation
-        r = 10 # Distance away
+
+        r = pathLength * self.percentGotoDist # Distance away
+        if r < self.minWPDistance:
+            r = self.minWPDistance
 
         # Calculate groups of points radiating from aircraft in general
         # direction of the next way point (polar coordinates)
@@ -59,6 +63,8 @@ class navigation:
     # Select route with minimum risk - If risk too high do something sensible
     # Route goes from UAV location -> chase point -> target points
     def pathMeshGrid(self, gotoPoints):
+        numPaths = gotoPoints.shape[0]
+
         # Calculate vector between points aircraft -> goto & goto -> target location
         pathA_vector = ( gotoPoints - self.aircraftPosition )
         pathB_vector = ( self.targetPosition - gotoPoints )
@@ -71,13 +77,13 @@ class navigation:
         ratio = ratio[1:] # remove first element
 
         # Matrix magic to calculate points to get things to correct shapes
-        ratio = np.tile( ratio, 2*self._numPaths )
+        ratio = np.tile( ratio, 2*numPaths )
         ratio = np.tile( ratio, ( self._numCoordinates, 1 ) ).transpose()
 
         # Multiply vectors by linspace to give all points to evaluate - don't double count goto position
         points = np.repeat(path_vectors, self.pathMeshElements, 0) * ratio
         
-        startPointA = np.tile(self.aircraftPosition, (self._numPaths, self.pathMeshElements))
+        startPointA = np.tile(self.aircraftPosition, (numPaths, self.pathMeshElements))
         startPointB = np.tile(gotoPoints, (1, self.pathMeshElements))
         
         path_start = np.column_stack((startPointA, startPointB))
@@ -89,7 +95,8 @@ class navigation:
         return points
 
 
-    def calculatePathRisk(self, gotoPoints, pointRisk):      
+    def calculatePathRisk(self, gotoPoints, pointRisk):
+        numPaths = gotoPoints.shape[0]      
         # Split into routes and sum to give route risk
         pointRisk += 1e-256 # Baseline risk
 
@@ -107,7 +114,7 @@ class navigation:
         pointRisk *= pathDist
 
         # Sum points risks for each path
-        pointRisk = np.reshape(pointRisk, (self._numPaths, -1) )
+        pointRisk = np.reshape(pointRisk, (numPaths, -1) )
 
         pathRisk = np.sum(pointRisk, axis=1)
 
@@ -130,9 +137,10 @@ class navigation:
         min_path_point = self.gotoPoints[min_path_index]
         min_path_risk = pathRisk[min_path_index]
 
-        yaw = 0
+        heading = np.arctan2( (min_path_point[1] - self.aircraftPosition[1]),
+                                (min_path_point[0] - self.aircraftPosition[0]) )
 
-        return min_path_point, yaw, min_path_risk
+        return min_path_point, heading, min_path_risk
 
 
 if __name__ == "__main__":

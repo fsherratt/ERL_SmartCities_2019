@@ -2,6 +2,30 @@ from utilities import argparser
 from modules import map, navigation, pixhawk, position
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
+import time
+
+import numpy as np
+class mission:
+    missionItems = [[10,0,-10], [-10,0,-10]]
+
+    def __init__(self):
+        self.missionItem = 0
+        self.missionItems = np.asarray(self.missionItems)
+
+    def missionProgress(self, currentPos):
+        currentPos = np.asarray(currentPos)
+        wpDist =  np.linalg.norm(currentPos - self.missionItems[self.missionItem])
+
+        if wpDist < 2:
+            self.missionItem += 1
+
+            if self.missionItem >= len(self.missionItems):
+                self.missionItem = 0
+
+            print('Next Mission Item: {}'.format(self.missionItem))
+
+        return self.missionItems[self.missionItem]
+
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -32,7 +56,7 @@ if __name__ == "__main__":
     pixThread.start()
 
     if args.SITL:
-        posComm = mavSocket.mavSocket((args.pix[0], int(args.pix[1])+1))
+        posComm = mavSocket.mavSocket((args.pix[0], 14552))
         posComm.openPort()
         
         posObj = position.sitlPosition(posComm)
@@ -44,8 +68,15 @@ if __name__ == "__main__":
     else:
         posObj = position.position()
 
-    mapObj = map.mapper( args.SITL )
+    if args.SITL:
+        mapObj = map.sitlMapper()
+    else:
+        mapObj = map.mapper()
+
     navObj = navigation.navigation()
+
+    # Mission progress
+    misObj = mission()
 
     print("*** RUNNING ***")
 
@@ -57,10 +88,13 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
-        targetPos = [10,0,0]
         while True:
+            startTime = time.time()
             # Get our current location
             pos, rot, conf = posObj.update()
+
+            # Where are we going?
+            targetPos = misObj.missionProgress(pos)
 
             if not args.SITL:
                 # Tell pixhawk where we are
@@ -71,10 +105,13 @@ if __name__ == "__main__":
             # Plan next move
             meshPoints = navObj.updatePt1(pos, targetPos)
             pointRisk = mapObj.queryMap(meshPoints)
-            goto, yaw, risk = navObj.updatePt2(pointRisk)
+            goto, heading, risk = navObj.updatePt2(pointRisk)
+
+            print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
 
             # Tell pixhawk where to go
-            pixObj.sendGoto(goto, yaw)
+            pixObj.directAircraft(goto, heading)
+            print('Loop time: {:.2f}'.format(time.time()-startTime))
 
     except KeyboardInterrupt:
         pass

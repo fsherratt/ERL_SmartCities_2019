@@ -89,6 +89,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
 
     def setTakeoff(self, alt):
+        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
+        self.queueOutputMsg(msg)
 
     def sendSetGlobalOrigin(self,lat,lon,alt):
         msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,lat,lon,alt)
@@ -112,15 +114,19 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         self.queueOutputMsg(msg)
 
-    def directAircraft(self, pos, heading=0):
+    def directAircraft(self, pos, heading=None):
         ignore = pymavlink.POSITION_TARGET_TYPEMASK_VX_IGNORE + \
                 pymavlink.POSITION_TARGET_TYPEMASK_VY_IGNORE + \
                 pymavlink.POSITION_TARGET_TYPEMASK_VZ_IGNORE + \
                 pymavlink.POSITION_TARGET_TYPEMASK_AX_IGNORE + \
                 pymavlink.POSITION_TARGET_TYPEMASK_AY_IGNORE + \
                 pymavlink.POSITION_TARGET_TYPEMASK_AZ_IGNORE# + \
-                 #pymavlink.POSITION_TARGET_TYPEMASK_YAW_IGNORE + \
-                 #pymavlink.POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE
+        
+        if heading is None:
+            ignore += pymavlink.POSITION_TARGET_TYPEMASK_YAW_IGNORE + \
+                    pymavlink.POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE
+
+            heading = 0
         
         yawRate = 3.14 # rad/s
 
