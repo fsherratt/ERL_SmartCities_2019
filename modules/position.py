@@ -17,7 +17,7 @@ class position:
         self.t265.closeConnection()
 
     def update(self):
-        pos, r, conf = t265Obj.getFrame()
+        pos, r, conf = self.t265.getFrame()
 
         return pos, r, conf
 
@@ -28,7 +28,6 @@ class sitlPosition(mavThread.mavThread):
         self._position = [0,0,0]
 
         super( sitlPosition, self).__init__( conn, pymavlink )
-
 
     def _processReadMsg(self, msglist):
         for msg in msglist:

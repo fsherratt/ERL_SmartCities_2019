@@ -2,17 +2,18 @@ import numpy as np
 from scipy import interpolate
 from modules.realsense import d435
 
+
 class mapper:
     num_coordinate = 3
 
-    def __init__(self, SITL):
-        xRange = [-10, 10]
-        yRange = [-10, 10]
-        zRange = [-3, 3]
+    def __init__(self):
+        xRange = [-20, 20]
+        yRange = [-20, 20]
+        zRange = [-20, 20]
 
-        xDivisions = 100
-        yDivisions = 100
-        zDivisions = 3
+        xDivisions = 10
+        yDivisions = 10
+        zDivisions = 10
 
         self.xBins = np.linspace( xRange[0], xRange[1], xDivisions )
         self.yBins = np.linspace( yRange[0], yRange[1], yDivisions )
@@ -25,10 +26,7 @@ class mapper:
                                                                bounds_error = False,
                                                                fill_value = np.nan )
 
-        if SITL:
-            self.d435Obj = None
-        else:
-            self.connectD435()
+        self.connectD435()
 
     def __del__(self):
         if self.d435Obj is not None:
@@ -88,6 +86,40 @@ class mapper:
     # --------------------------------------------------------------------------
     def queryMap(self, queryPoints):
         return self.interpFunc(queryPoints)
+
+
+class sitlMapper:
+    def __init__(self):
+        xRange = [-25, 25]
+        yRange = [-25, 25]
+        zRange = [-25, 1]
+
+        xDivisions = 10
+        yDivisions = 10
+        zDivisions = 10
+
+        self.xBins = np.linspace( xRange[0], xRange[1], xDivisions )
+        self.yBins = np.linspace( yRange[0], yRange[1], yDivisions )
+        self.zBins = np.linspace( zRange[0], zRange[1], zDivisions )
+
+        self.grid = np.zeros((xDivisions, yDivisions, zDivisions))
+
+        # Add Obstacle
+        self.grid[4:5, :, 4:] = 10
+
+        self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
+                                                               self.grid, method = 'linear',
+                                                               bounds_error = False,
+                                                               fill_value = np.nan )
+    
+    # --------------------------------------------------------------------------
+    # queryMap
+    # param queryPoints - (N,3) list of points to query against map
+    # return (N) list of risk for each point
+    # --------------------------------------------------------------------------
+    def queryMap(self, queryPoints):
+        return self.interpFunc(queryPoints)                   
+
 
 if __name__ == "__main__":
     
