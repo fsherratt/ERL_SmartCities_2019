@@ -43,18 +43,20 @@ if __name__ == "__main__":
         posThread.daemon = True
         posThread.start()
 
-    else:
-        posObj = position.position()
-
+    mapObj = None
+    navObj = None
+    if args.collision_avoidance:
     if args.SITL:
         mapObj = map.sitlMapper()
     else:
         mapObj = map.mapper()
 
-    navObj = navigation.navigation()
+        navObj = navigation.navigation()
 
     # Mission progress
-    misObj = mission.mission()
+    misObj = None
+    if args.mission:
+        misObj = mission.mission()
 
     print("*** RUNNING ***")
 
@@ -72,7 +74,8 @@ if __name__ == "__main__":
             pos, rot, conf = posObj.update()
 
             # Where are we going?
-            targetPos = misObj.missionProgress(pos)
+            if args.mission:
+                targetPos = misObj.missionProgress(pos)
 
             if not args.SITL:
                 # Tell pixhawk where we are
@@ -80,9 +83,10 @@ if __name__ == "__main__":
                 # Update map
                 mapObj.update(pos, rot)
 
-            # Plan next move
-            meshPoints = navObj.updatePt1(pos, targetPos)
-            pointRisk = mapObj.queryMap(meshPoints)
+            if args.collision_avoidance:
+                # Plan next move
+                meshPoints = navObj.updatePt1(pos, targetPos)
+                pointRisk = mapObj.queryMap(meshPoints)
             goto, heading, risk = navObj.updatePt2(pointRisk)
 
             print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))

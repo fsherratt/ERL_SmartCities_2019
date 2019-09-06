@@ -17,4 +17,16 @@ def GetParser():
                         action = "store_true",
                         required = False  )
 
+    parser.add_argument( '--collision-avoidance', '-c',
+                        help = 'Enable collision avoidance',
+                        default = None,
+                        action = "store_true",
+                        required=False)
+
+    parser.add_argument( '--mission', '-m',
+                        help = 'Enable mission progress',
+                        default = None,
+                        action = "store_true",
+                        required=False)
+
     return parser
