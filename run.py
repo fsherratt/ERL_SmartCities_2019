@@ -29,7 +29,7 @@ if __name__ == "__main__":
     pixComm.openPort()
     pixObj = pixhawk.pixhawkAbstract( pixComm )
 
-    pixThread = Thread( target = pixObj.loop )
+    pixThread = Thread( target = pixObj.loop, name='pixhawk' )
     pixThread.daemon = True
     pixThread.start()
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     else:
         posObj = position.position(pixObj)
 
-    posThread = Thread( target = posObj.loop )
+    posThread = Thread( target = posObj.loop, name='position' )
     posThread.daemon = True
     posThread.start()
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
                 # Tell pixhawk where to go
                 pixObj.directAircraft(goto, heading)
-                
+
             print('Loop time: {:.2f}'.format(time.time()-startTime))
 
     except KeyboardInterrupt:
