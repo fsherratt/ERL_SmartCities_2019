@@ -27,10 +27,13 @@ class navigation:
         # Calculate heading to next WP
         az = np.arctan2(travelVector[1], travelVector[0]) # Azimuth
         el = np.arcsin(travelVector[2] / pathLength) # Elevation
-
         r = pathLength * self.percentGotoDist # Distance away
-        if r < self.minWPDistance:
-            r = self.minWPDistance
+
+        # Limit chase point distance
+        if r < self.minCPDistance:
+            r = self.minCPDistance
+        elif r > self.maxCPDistance:
+            r = self.maxCPDistance
 
         # Calculate groups of points radiating from aircraft in general
         # direction of the next way point (polar coordinates)
@@ -56,6 +59,19 @@ class navigation:
         pointA = self.aircraftPosition + np.column_stack((x_a, y_a, z_a))
 
         # Eliminate any point that exceeds competition volume - if a cuboid arena only possible if goto outside volume
+
+
+        xRange = [-25, 25]
+        yRange = [-25, 25]
+        zRange = [-25, 1]
+
+        xValidPoints = np.logical_and(pointA[:, 0] > xRange[0], pointA[:, 0] < xRange[1])
+        yValidPoints = np.logical_and(pointA[:, 1] > yRange[0], pointA[:, 1] < yRange[1])
+        zValidPoints = np.logical_and(pointA[:, 2] > zRange[0], pointA[:, 2] < zRange[1])
+
+        validPoints = np.logical_and(np.logical_and(xValidPoints, yValidPoints), zValidPoints)
+
+        pointA = pointA[ validPoints, : ]
         return pointA
 
 
