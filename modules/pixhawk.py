@@ -149,11 +149,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         rot = rot.as_euler('xzy', degrees=True)
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
                                                                 rot[0], rot[1], rot[2])
-        self.queueOutputMsg( msg, priority=1) # Highest priority
-
-    
-        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
-        self.queueOutputMsg(msg)
+        self.queueOutputMsg(msg, priority=1) # Highest priority
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages

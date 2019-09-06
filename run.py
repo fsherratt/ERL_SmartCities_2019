@@ -3,7 +3,7 @@ from modules import map, navigation, pixhawk, position, mission
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
-
+    
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -39,17 +39,20 @@ if __name__ == "__main__":
         
         posObj = position.sitlPosition(posComm)
 
-        posThread = Thread( target = posObj.loop )
-        posThread.daemon = True
-        posThread.start()
+    else:
+        posObj = position.position(pixObj)
+
+    posThread = Thread( target = posObj.loop )
+    posThread.daemon = True
+    posThread.start()
 
     mapObj = None
     navObj = None
     if args.collision_avoidance:
-    if args.SITL:
-        mapObj = map.sitlMapper()
-    else:
-        mapObj = map.mapper()
+        if args.SITL:
+            mapObj = map.sitlMapper()
+        else:
+            mapObj = map.mapper()
 
         navObj = navigation.navigation()
 
@@ -87,12 +90,13 @@ if __name__ == "__main__":
                 # Plan next move
                 meshPoints = navObj.updatePt1(pos, targetPos)
                 pointRisk = mapObj.queryMap(meshPoints)
-            goto, heading, risk = navObj.updatePt2(pointRisk)
+                goto, heading, risk = navObj.updatePt2(pointRisk)
 
-            print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
+                print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
 
-            # Tell pixhawk where to go
-            pixObj.directAircraft(goto, heading)
+                # Tell pixhawk where to go
+                pixObj.directAircraft(goto, heading)
+                
             print('Loop time: {:.2f}'.format(time.time()-startTime))
 
     except KeyboardInterrupt:

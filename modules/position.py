@@ -9,17 +9,29 @@ import time
 from threading import Thread
 
 class position:
-    def __init__(self, t265):
+    def __init__(self, pixObj):
         self.t265 = t265.rs_t265( rotOffset=[-90,-90,0])
         self.t265.openConnection()
+
+        self.pixObj = pixObj
 
     def __del__(self):
         self.t265.closeConnection()
 
     def update(self):
-        pos, r, conf = self.t265.getFrame()
+        return self._pos, self._r, self._conf
 
-        return pos, r, conf
+    def loop(self):
+        lastUpdate = 0
+
+        while True:
+            self._pos, self._r, self._conf = self.t265.getFrame()
+
+            if time.time() - lastUpdate > 0.05:
+                self.pixObj.sendPosition(self._pos, self._r)
+                lastUpdate = time.time()
+
+            time.sleep(0.01)
 
 
 class sitlPosition(mavThread.mavThread):
