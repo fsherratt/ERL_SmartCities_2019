@@ -27,10 +27,13 @@ class navigation:
         # Calculate heading to next WP
         az = np.arctan2(travelVector[1], travelVector[0]) # Azimuth
         el = np.arcsin(travelVector[2] / pathLength) # Elevation
-
         r = pathLength * self.percentGotoDist # Distance away
-        if r < self.minWPDistance:
-            r = self.minWPDistance
+
+        # Limit chase point distance
+        if r < self.minCPDistance:
+            r = self.minCPDistance
+        elif r > self.maxCPDistance:
+            r = self.maxCPDistance
 
         # Calculate groups of points radiating from aircraft in general
         # direction of the next way point (polar coordinates)
