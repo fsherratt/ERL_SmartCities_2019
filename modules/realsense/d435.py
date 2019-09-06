@@ -4,6 +4,7 @@ import sys
 import scipy
 
 import numpy as np
+from scipy import signal
 
 class unexpectedDisconnect( Exception):
     # Camera unexpectably disconnected
@@ -120,8 +121,8 @@ class rs_d435:
     # Shrink X, Y and Z by a factor so processing is faster
     # --------------------------------------------------------------------------
     def shrink(self, frame, factor=4):
-        frame = scipy.signal.decimate(frame, factor, n=None, ftype='iir', axis=1, zero_phase=True)
-        frame = scipy.signal.decimate(frame, factor, n=None, ftype='iir', axis=0, zero_phase=True)
+        frame = signal.decimate(frame, factor, n=None, ftype='iir', axis=1, zero_phase=True)
+        frame = signal.decimate(frame, factor, n=None, ftype='iir', axis=0, zero_phase=True)
 
         return frame
 
