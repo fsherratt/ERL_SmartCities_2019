@@ -1,6 +1,7 @@
 import pyrealsense2 as rs
 import traceback
 import sys
+import scipy
 
 import numpy as np
 
@@ -92,6 +93,8 @@ class rs_d435:
         self.xDeprojectMatrix = np.tile( self.xDeprojectRow, (self.height, 1) )
         self.yDeprojectMatrix = np.tile( self.yDeprojectCol, (self.width, 1) ).transpose()
 
+        self.xDeprojectMatrix = self.shrink(self.xDeprojectMatrix)
+        self.yDeprojectMatrix = self.shrink(self.yDeprojectMatrix)
 
     # --------------------------------------------------------------------------
     # getFrame
@@ -109,8 +112,19 @@ class rs_d435:
         depth_points = np.asarray( depth.get_data(), np.float32 )
 
         depth_points *= self.scale
-
+        depth_points = self.shrink(depth_points)
         return depth_points
+
+    # --------------------------------------------------------------------------
+    # shrink
+    # Shrink X, Y and Z by a factor so processing is faster
+    # --------------------------------------------------------------------------
+    def shrink(self, frame, factor=4):
+        frame = scipy.signal.decimate(frame, factor, n=None, ftype='iir', axis=1, zero_phase=True)
+        frame = scipy.signal.decimate(frame, factor, n=None, ftype='iir', axis=0, zero_phase=True)
+
+        return frame
+
 
     # --------------------------------------------------------------------------
     # deproject_frame
@@ -123,6 +137,9 @@ class rs_d435:
         Y = np.multiply( frame, self.yDeprojectMatrix )
 
         return np.asanyarray( [X, Y, Z] )
+
+
+
 
     # --------------------------------------------------------------------------
     # range_filter
