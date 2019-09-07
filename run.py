@@ -33,6 +33,12 @@ if __name__ == "__main__":
     pixThread.daemon = True
     pixThread.start()
 
+    while not pixObj.seenHeartbeat and pixComm.isOpen():
+        time.sleep(1)
+
+    print('*** PIXHAWK CONNECTED ***')
+
+
     if args.SITL:
         posComm = mavSocket.mavSocket((args.pix[0], 14552))
         posComm.openPort()
@@ -45,6 +51,15 @@ if __name__ == "__main__":
     posThread = Thread( target = posObj.loop, name='position' )
     posThread.daemon = True
     posThread.start()
+
+    print("*** SET HOME LOCATION ***")
+    home_lat = 151269321       # Somewhere in Africa
+    home_lon = 16624301        # Somewhere in Africa
+    home_alt = 163000 
+
+    pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
+    pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
+
 
     mapObj = None
     navObj = None
@@ -60,7 +75,8 @@ if __name__ == "__main__":
     misObj = None
     if args.mission:
         misObj = mission.mission()
-
+    
+    
     print("*** RUNNING ***")
 
     ''' 
@@ -80,11 +96,9 @@ if __name__ == "__main__":
             if args.mission:
                 targetPos = misObj.missionProgress(pos)
 
-            if not args.SITL:
-                # Tell pixhawk where we are
-                pixObj.sendPosition(pos, rot)
-                # Update map
-                mapObj.update(pos, rot)
+            if not args.SITL and args.collision_avoidance:
+                    # Update map
+                    mapObj.update(pos, rot)
 
             if args.collision_avoidance:
                 # Plan next move
@@ -98,6 +112,7 @@ if __name__ == "__main__":
                 pixObj.directAircraft(goto, heading)
 
             print('Loop time: {:.2f}'.format(time.time()-startTime))
+            time.sleep(0.2)
 
     except KeyboardInterrupt:
         pass
