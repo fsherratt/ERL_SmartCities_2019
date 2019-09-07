@@ -10,10 +10,15 @@ from threading import Thread
 
 class position:
     def __init__(self, pixObj):
-        self.t265 = t265.rs_t265( rotOffset=[-90,-90,0])
+        self.rotOffset = [-90,-90,0]
+        self.t265 = t265.rs_t265( rotOffset=self.rotOffset)
         self.t265.openConnection()
 
         self.pixObj = pixObj
+
+        self._pos = [0,0,0]
+        self._r = R.from_euler('zyx', self.rotOffset, degrees=True)
+        self._conf = 0
 
     def __del__(self):
         self.t265.closeConnection()
@@ -27,7 +32,7 @@ class position:
         while True:
             self._pos, self._r, self._conf = self.t265.getFrame()
 
-            if time.time() - lastUpdate > 0.05:
+            if time.time() - lastUpdate > 0.04:
                 self.pixObj.sendPosition(self._pos, self._r)
                 lastUpdate = time.time()
 
@@ -79,8 +84,6 @@ if __name__ == "__main__":
     posObj = None
     
     if not SITL:
-        
-
         posObj = position( t265 )
 
     else:

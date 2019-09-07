@@ -144,7 +144,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.queueOutputMsg(msg)
 
     def sendPosition(self, pos, rot):
-        UNIX_time = time.time()*1e6
+        UNIX_time = int(time.time()*1e6)
+        # UNIX_time = 0
 
         rot = rot.as_euler('xzy', degrees=True)
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
