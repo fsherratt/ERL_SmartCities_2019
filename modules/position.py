@@ -10,14 +10,13 @@ from threading import Thread
 
 class position:
     def __init__(self, pixObj):
-        self.rotOffset = [-90,-90,0]
-        self.t265 = t265.rs_t265( rotOffset=self.rotOffset)
+        self.t265 = t265.rs_t265()
         self.t265.openConnection()
 
         self.pixObj = pixObj
 
         self._pos = [0,0,0]
-        self._r = R.from_euler('zyx', self.rotOffset, degrees=True)
+        self._r = R.from_euler('zyx', [0,0,0])
         self._conf = 0
 
     def __del__(self):

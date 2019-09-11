@@ -16,6 +16,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.seenHeartbeat = False
         self.lastSentHeartbeat = 0
 
+        self._heading_north_yaw = 0
+
         super( pixhawkAbstract, self).__init__( conn, pymavlink )
 
     def _loopInternals(self):
@@ -32,6 +34,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
             if id == self._mavLib.MAVLINK_MSG_ID_HEARTBEAT:
                 self._heartbeatHandler(msg)
 
+            elif id == self._mavLib.MAVLINK_MSG_ID_ATTITUDE:
+                self._attitudeHandler(msg)
+
             elif id == self._mavLib.MAVLINK_MSG_ID_STATUSTEXT:
                 print(msg)
     
@@ -47,6 +52,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
             self._mode = mavutil.mode_string_v10(msg)
 
             self.seenHeartbeat = True
+
+    def _attitudeHandler(self, msg):
+        self._heading_north_yaw = msg.yaw
 
     # Aircraft state
     @property
@@ -147,9 +155,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
         UNIX_time = int(time.time()*1e6)
         # UNIX_time = 0
 
-        rot = rot.as_euler('xzy', degrees=True)
+        rot = rot.as_euler('xyz') # roll, pitch, yaw
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
-                                                                rot[0], rot[1], rot[2])
+                                                                rot[0], rot[1], self._heading_north_yaw)#rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
 
 if __name__ == "__main__":
