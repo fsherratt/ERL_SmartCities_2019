@@ -94,8 +94,8 @@ class rs_d435:
         self.xDeprojectMatrix = np.tile( self.xDeprojectRow, (self.height, 1) )
         self.yDeprojectMatrix = np.tile( self.yDeprojectCol, (self.width, 1) ).transpose()
 
-        self.xDeprojectMatrix = self.shrink(self.xDeprojectMatrix)
-        self.yDeprojectMatrix = self.shrink(self.yDeprojectMatrix)
+        # self.xDeprojectMatrix = self.shrink(self.xDeprojectMatrix)
+        # self.yDeprojectMatrix = self.shrink(self.yDeprojectMatrix)
 
     # --------------------------------------------------------------------------
     # getFrame
@@ -113,7 +113,7 @@ class rs_d435:
         depth_points = np.asarray( depth.get_data(), np.float32 )
 
         depth_points *= self.scale
-        depth_points = self.shrink(depth_points)
+        # depth_points = self.shrink(depth_points)
         return depth_points
 
     # --------------------------------------------------------------------------
@@ -132,28 +132,22 @@ class rs_d435:
     # Conversion depth frame to 3D local coordiate system in meters
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
-    def deproject_frame( self, frame ):
+    def deproject_frame( self, frame, minRange = 0, maxRange = 10 ):
         Z = frame
         X = np.multiply( frame, self.xDeprojectMatrix )
         Y = np.multiply( frame, self.yDeprojectMatrix )
 
-        return np.asanyarray( [X, Y, Z] )
+        Z = np.reshape(Z, (-1))
+        X = np.reshape(X, (-1))
+        Y = np.reshape(Y, (-1))
 
+        # Conversion into aero-reference frame
+        points = np.column_stack( (Z,X,Y) )
 
+        inRange = np.where( (points[:,0] > minRange) & (points[:,0] < maxRange) )
+        points = points[inRange]
 
-
-    # --------------------------------------------------------------------------
-    # range_filter
-    # Filter out points that are out of range, np.nan is applied to out of range
-    # values
-    # return in range depth frame
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def range_filter( frame, minRange = 0, maxRange = 10 ):
-        outOfRange = np.where( (frame < minRange) | (frame > maxRange) )
-        frame[outOfRange] = np.nan
-
-        return frame
+        return points
 
 if __name__ == "__main__":
     import cv2
