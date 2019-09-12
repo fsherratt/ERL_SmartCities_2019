@@ -9,7 +9,7 @@ class LED:
 
         self.pixels = neopixel.NeoPixel(board.D21, self.num_pixels, auto_write=False)
 
-        self.mode = 0
+        self.mode = 1
         self.newMode = True
     
     def __enter__(self):
@@ -20,44 +20,78 @@ class LED:
 
     def loop(self):
         while True:
+            
             if self.mode == 0:
                 self.flashGreen()
 
-            else:
-                self.rainbow_cycle( 0.02 )
-                self.mode = 0
-                self.newMode = True
-
-            time.sleep(0.02)
+            elif self.mode == 1:
+                self.rainbow_cycle( 0.005 )
+                #self.mode = 0
+                #self.newMode = True
+            elif self.mode == 2:
+                self.pulseGreen()
+                
+            elif self.mode == 3:
+                self.runDownOrange()
+            
+            elif self.mode ==  4:
+                self.runUpBlue()
+                
+            elif self.mode == 5:
+                self.flashRed()    
+            
+            elif self.mode == 6:
+                self.fflashRed()    
 
     def flashGreen(self):
-        if self.newMode:
-            self.i = 0
-
-            self.clear()
-            self.newMode = False
-            
-            self.pixels.fill((0, 255, 0))
-            self.pixels[0] = (0, 0, 0)
-            self.pixels[2] = (0, 0, 0)
-            self.pixels[4] = (0, 0, 0)
-            self.pixels[6] = (0, 0, 0)
+        self.pixels.fill((0, 255, 0))
+        self.pixels.show()
+        time.sleep(0.2)
+        self.clear()
+        time.sleep(0.2)
+    
+    def flashRed(self):
+        self.pixels.fill((255, 0, 0))
+        self.pixels.show()
+        time.sleep(0.2)
+        self.clear()
+        time.sleep(0.2)
+    
+    def fflashRed(self):
+        self.pixels.fill((255, 0, 0))
+        self.pixels.show()
+        time.sleep(0.1)
+        self.clear()
+        time.sleep(0.1)
+    
+    def pulseGreen(self):
+        i=0
+        while i <= 254:
+            self.pixels.fill((0,i,0))
             self.pixels.show()
+            time.sleep(0.001)
+            i+=1   
+        while i >= 0:
+            self.pixels.fill((0,i,0))
+            self.pixels.show()
+            time.sleep(0.001)
+            i-=1
         
-        self.i += 1
-
-        if self.i % 100 == 0:
-            self.newMode = True
-            self.mode = 1
-
-        elif self.i % 50 == 0:
-            self.pixels.fill( (0, 255, 0) )
-            self.pixels[1] = (0, 0, 0)
-            self.pixels[3] = (0, 0, 0)
-            self.pixels[5] = (0, 0, 0)
-            self.pixels[7] = (0, 0, 0)
+    def runDownOrange(self):
+        for i in range(8):
+            self.clear()
+            self.pixels[i] = (255,165,0)
             self.pixels.show()
-
+            time.sleep(0.1)
+    
+    def runUpBlue(self):
+        for i in range(7, -1, -1):
+            self.clear()
+            self.pixels[i] = (0,0,255)
+            self.pixels.show()
+            time.sleep(0.1)
+    
+        
     def rainbow_cycle(self, wait):
         for j in range(255):
             for i in range(self.num_pixels):
