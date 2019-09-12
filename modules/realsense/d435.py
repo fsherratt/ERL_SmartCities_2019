@@ -11,7 +11,7 @@ class unexpectedDisconnect( Exception):
     pass
 
 class rs_d435:
-    def __init__(self, width=640, height=480, framerate=6):
+    def __init__(self, width=640, height=480, framerate=30):
         self.width = width
         self.height = height
 
@@ -41,13 +41,9 @@ class rs_d435:
     def openConnection(self):
         self.pipe = rs.pipeline()
 
-        self.width = 640
-        self.height = 480
-        self.fps = 6
-
         self.cfg = rs.config()
         self.cfg.enable_stream( rs.stream.depth, self.width, self.height, \
-                                rs.format.any, self.framerate )
+                                rs.format.z16, self.framerate )
 
         self.profile = self.pipe.start( self.cfg  )
 
