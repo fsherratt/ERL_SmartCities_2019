@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import interpolate
+from scipy import io
 from modules.realsense import d435
 
 
@@ -124,6 +125,9 @@ class mapper:
         return self.interpFunc(queryPoints)
 
 
+    def saveToMatlab(self, filename):
+        io.savemat( filename, mdict=dict(map=self.grid), do_compression=False)
+
 class sitlMapper:
     def __init__(self):
         xRange = [-25, 25]
@@ -169,38 +173,43 @@ if __name__ == "__main__":
     mapObj = mapper()
 
     with t265Obj:
-        while True:
-            # Get frames of data - points and global 6dof
-            pos, r, _ = t265Obj.getFrame()
-            
-            starttime = time.time()
-            frame = mapObj.update(pos,r)
-            print('Loop Time: {}'.format(time.time()-starttime))
+        try:
+            while True:
+                # Get frames of data - points and global 6dof
+                pos, r, _ = t265Obj.getFrame()
+                
+                starttime = time.time()
+                frame = mapObj.update(pos,r)
+                print('Loop Time: {}'.format(time.time()-starttime))
 
-            posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
-            
-            starttime = time.time()
-            grid = mapObj.grid[:,:,posGridCell[2]] / np.max(mapObj.grid[:,:,posGridCell[2]])
-            empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
+                posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
+                
+                starttime = time.time()
+                grid = mapObj.grid[:,:,posGridCell[2]] / np.max(mapObj.grid[:,:,posGridCell[2]])
+                empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
 
-            img = cv2.merge((grid, empty, empty))
-            img = cv2.transpose(img)
+                img = cv2.merge((grid, empty, empty))
+                img = cv2.transpose(img)
 
-            x = np.digitize( pos[0], mapObj.xBins ) - 1
-            y = np.digitize( pos[1], mapObj.yBins ) - 1
+                x = np.digitize( pos[0], mapObj.xBins ) - 1
+                y = np.digitize( pos[1], mapObj.yBins ) - 1
 
-            img = cv2.circle(img, (x,y), 5, (0,1,0), 2)
+                img = cv2.circle(img, (x,y), 5, (0,1,0), 2)
 
-            vec = [20,0,0]
-            vec = r.apply(vec) # Aero-ref -> Aero-body
+                vec = [20,0,0]
+                vec = r.apply(vec) # Aero-ref -> Aero-body
 
-            vec[0] += x
-            vec[1] += y
+                vec[0] += x
+                vec[1] += y
 
-            img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
+                img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
 
-            cv2.imshow('frame', frame)
-            cv2.imshow('map', img )
-            cv2.waitKey(1)
-            
-            print('')
+                cv2.imshow('frame', frame)
+                cv2.imshow('map', img )
+                cv2.waitKey(1)
+                
+                print('')
+        except KeyboardInterrupt:
+            pass
+
+    mapObj.saveToMatlab( 'TestMap.mat' )
