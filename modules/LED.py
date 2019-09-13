@@ -1,5 +1,3 @@
-import board
-import neopixel
 import time
 from enum import Enum
 
@@ -12,8 +10,18 @@ class mode(Enum):
     MUCHERROR = 5 
     COLLISION_AVOID_ON = 6
 
+class sitlLED:
+    def setMode():
+        pass
+
+    def loop():
+        pass
+
 class LED:
     def __init__(self):
+        import board
+        import neopixel
+
         self.num_pixels = 8
         self.pin = board.D21
 
