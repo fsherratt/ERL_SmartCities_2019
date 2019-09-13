@@ -96,9 +96,9 @@ if __name__ == "__main__":
             if args.mission:
                 targetPos = misObj.missionProgress(pos)
 
-            if not args.SITL and args.collision_avoidance:
-                    # Update map
-                    mapObj.update(pos, rot)
+            if args.mapping:
+                # Update map
+                mapObj.update(pos, rot)
 
             if args.collision_avoidance:
                 # Plan next move
