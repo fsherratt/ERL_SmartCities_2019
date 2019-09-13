@@ -11,10 +11,16 @@ class mode(Enum):
     COLLISION_AVOID_ON = 6
 
 class sitlLED:
-    def setMode():
+    def __enter__(self):
+        pass
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+    
+    def setMode(self, mode):
         pass
 
-    def loop():
+    def loop(self):
         pass
 
 class LED:
@@ -184,17 +190,17 @@ if __name__ == '__main__':
         ledThread.start()
 
         while True:
-            ledObj.mode = mode.INITIALISE
+            ledObj.setMode(mode.INITIALISE)
             time.sleep(3)
-            ledObj.mode = mode.RUNNING
+            ledObj.setMode(mode.RUNNING)
             time.sleep(3)
-            ledObj.mode = mode.TAKEOFF
+            ledObj.setMode(mode.TAKEOFF)
             time.sleep(3)
-            ledObj.mode = mode.COLLISION_AVOID_ON
+            ledObj.setMode(mode.COLLISION_AVOID_ON)
             time.sleep(3)
-            ledObj.mode = mode.LANDING
+            ledObj.setMode(mode.LANDING)
             time.sleep(3)
-            ledObj.mode = mode.ERROR
+            ledObj.setMode(mode.ERROR)
             time.sleep(3) 
-            ledObj.mode = mode.MUCHERROR 
+            ledObj.setMode(mode.MUCHERROR)
             time.sleep(3)
