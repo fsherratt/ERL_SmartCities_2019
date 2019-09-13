@@ -28,6 +28,9 @@ class LED:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.clear()
 
+    def setMode(self, mode):
+        self.mode = mode
+
     def loop(self):
         while True:
             if self.mode == mode.INITIALISE:

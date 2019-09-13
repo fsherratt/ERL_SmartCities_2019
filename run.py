@@ -1,5 +1,5 @@
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission
+from modules import map, navigation, pixhawk, position, mission, LED
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
@@ -19,6 +19,9 @@ if __name__ == "__main__":
         * Navigator - Always the same
         * MK:DataHub - Either on/off        
     '''
+    ledObj = LED.LED()
+    ledObj.setMode(LED.mode.INITIALISE)
+
     pixAddr = (args.pix[0], int(args.pix[1]))
 
     if args.SITL:
@@ -78,6 +81,7 @@ if __name__ == "__main__":
     
     
     print("*** RUNNING ***")
+    ledObj.setMode(LED.mode.RUNNING)
 
     ''' 
     Read incoming data and share to relavent objects
@@ -116,6 +120,9 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         pass
+
+    except:
+        ledObj.setMode(LED.mode.ERROR)
 
     print("*** STOPPED ***")
 
