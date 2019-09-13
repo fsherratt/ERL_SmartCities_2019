@@ -1,24 +1,34 @@
 import numpy as np
 import time
+'''
+meshPoints, considered_points = navObj.updatePt1(pos, targetPos, stuckness)
+pointRisk = mapObj.queryMap(meshPoints)
+goto, heading, risk = navObj.updatePt2(pointRisk)
+'''
 
 class navigation:
     percentGotoDist = 0.5
-    minWPDistance = 2
+    minCPDistance = 2
+    maxCPDistance = 10
 
     pathMeshElements = 10
-    elevationMeshElements = 11 # Number of elevation angles to evaluate
-    azimuthMeshElements = 11 # Number of azimuth angles to evaluate
+    elevationMeshElements = 11 # Number of elevation angles to evaluate #11
+    azimuthMeshElements = 13 # Number of azimuth angles to evaluate
+    num_pts = elevationMeshElements*azimuthMeshElements # Number of points total to evaluate
 
-    azimuthRange = np.deg2rad(110)  # +- 30 degree view
-    elevationRange = np.deg2rad(110)
+
+    azimuthRange = np.deg2rad(130)  # +- 30 degree view
+    elevationRange = np.deg2rad(110) #110
 
     _numCoordinates = 3
 
     def __init__(self):
         self.aircraftPosition = np.asarray((0,0,0)) # x,y,z
+        self.aircraftPositionOld = np.asarray((0, 0, 0))  # x,y,z
         self.targetPosition = np.asarray((0,0,0)) # x,y,z
-   
-    # Produce possible routes between the two
+        self.heading = 0
+        self.stuckness = 0
+    # Produce possible positions to fly to on the way to a waypoint
     def calcGotoPoints(self):
         travelVector = self.targetPosition - self.aircraftPosition
         pathLength = np.linalg.norm(travelVector)
@@ -27,13 +37,6 @@ class navigation:
         # Calculate heading to next WP
         az = np.arctan2(travelVector[1], travelVector[0]) # Azimuth
         el = np.arcsin(travelVector[2] / pathLength) # Elevation
-        r = pathLength * self.percentGotoDist # Distance away
-
-        # Limit chase point distance
-        if r < self.minCPDistance:
-            r = self.minCPDistance
-        elif r > self.maxCPDistance:
-            r = self.maxCPDistance
 
         # Calculate groups of points radiating from aircraft in general
         # direction of the next way point (polar coordinates)
@@ -51,19 +54,21 @@ class navigation:
         el = np.reshape(el, (-1))
         az = np.reshape(az, (-1))
 
+        # generate vector of random distances to look ahead
+        r = np.random.uniform(low=self.minCPDistance, high=max(pathLength, 10), size=(self.num_pts,))
+
         # Convert from spherical to cartesian
         x_a = r * np.cos(el) * np.cos(az)
         y_a = r * np.cos(el) * np.sin(az)
         z_a = r * np.sin(el)
 
+        # Create matrix of positions to fly to on the way to next waypoint
         pointA = self.aircraftPosition + np.column_stack((x_a, y_a, z_a))
 
         # Eliminate any point that exceeds competition volume - if a cuboid arena only possible if goto outside volume
-
-
-        xRange = [-25, 25]
-        yRange = [-25, 25]
-        zRange = [-25, 1]
+        xRange = [-20, 20]
+        yRange = [-20, 20]
+        zRange = [-10, -1]
 
         xValidPoints = np.logical_and(pointA[:, 0] > xRange[0], pointA[:, 0] < xRange[1])
         yValidPoints = np.logical_and(pointA[:, 1] > yRange[0], pointA[:, 1] < yRange[1])
@@ -74,7 +79,6 @@ class navigation:
         pointA = pointA[ validPoints, : ]
         return pointA
 
-
     # Provide points along each route to evaluate risk at
     # Select route with minimum risk - If risk too high do something sensible
     # Route goes from UAV location -> chase point -> target points
@@ -82,11 +86,11 @@ class navigation:
         numPaths = gotoPoints.shape[0]
 
         # Calculate vector between points aircraft -> goto & goto -> target location
-        pathA_vector = ( gotoPoints - self.aircraftPosition )
-        pathB_vector = ( self.targetPosition - gotoPoints )
+        pathA_vector = (gotoPoints - self.aircraftPosition)
+        pathB_vector = (self.targetPosition - gotoPoints)
 
         path_vectors = np.column_stack((pathA_vector, pathB_vector))
-        path_vectors = np.reshape( path_vectors, (-1, self._numCoordinates) )
+        path_vectors = np.reshape(path_vectors, (-1, self._numCoordinates))
 
         # Linspace for number of points to evaluate. e.g. 10%, 20%, 30%...
         ratio = np.linspace( 0, 1, self.pathMeshElements + 1 )
@@ -110,41 +114,63 @@ class navigation:
 
         return points
 
+    def calculatePathRisk(self, gotoPoints, pointRisk, searchR=5):
+        numPaths = gotoPoints.shape[0]
+        pointRisk = np.reshape(pointRisk, (numPaths, -1))
 
-    def calculatePathRisk(self, gotoPoints, pointRisk):
-        numPaths = gotoPoints.shape[0]      
+        self.Euclideanpoints = np.reshape(self.Euclideanpoints, (numPaths, -1))
+
+        # Create a threshold distance for risk on leg B
+        #DistanceThreshold = searchR + (1 - self.stuckness) * (np.max(self.Euclideanpoints) - searchR)
+        DistanceThreshold = 8
+
         # Split into routes and sum to give route risk
-        pointRisk += 1e-256 # Baseline risk
+        pointARisk = pointRisk[:, :self.pathMeshElements]
+        pointBRisk = pointRisk[:, self.pathMeshElements:]
 
         # Normalise based on route distance -> shorter routes are prefered
-        pathADist = np.linalg.norm(gotoPoints - self.aircraftPosition,axis=1)
-        pathADist = np.tile(pathADist, (self.pathMeshElements,1)).transpose()
+        pathADist = np.linalg.norm(gotoPoints - self.aircraftPosition, axis=1)
+        pathADist = np.tile(pathADist, (self.pathMeshElements, 1)).transpose()
 
         pathBDist = np.linalg.norm(self.targetPosition - gotoPoints, axis=1)
-        pathBDist = np.tile(pathBDist, (self.pathMeshElements,1)).transpose()
+        pathBDist = np.tile(pathBDist, (self.pathMeshElements, 1)).transpose()
+
+        # Remove leg A
+        self.Euclideanpoints = self.Euclideanpoints[:, self.pathMeshElements:]
+
+        # Threshold based on distance
+        self.Euclideanpoints[self.Euclideanpoints <= DistanceThreshold] = 1
+        self.Euclideanpoints[self.Euclideanpoints != 1] = 0
+
+        # ignore any point risks outside threshold within legB
+        pointBRisk *= self.Euclideanpoints
 
         pathDist = np.column_stack((pathADist, pathBDist))
-        pathDist = np.reshape(pathDist, (-1))
-        pathDist /= self.pathMeshElements
+        pointRisk = np.column_stack((pointARisk, pointBRisk))
 
+        pointRisk += 1e-255
         pointRisk *= pathDist
-
         # Sum points risks for each path
-        pointRisk = np.reshape(pointRisk, (numPaths, -1) )
 
         pathRisk = np.sum(pointRisk, axis=1)
 
         return pathRisk
 
 
-    def updatePt1(self, pos, targetPos):
+    def updatePt1(self, pos, targetPos, stuckness):
         self.aircraftPosition = np.asarray(pos)
         self.targetPosition = np.asarray(targetPos)
+        self.stuckness = stuckness
 
         self.gotoPoints = self.calcGotoPoints()
+
         meshPoints = self.pathMeshGrid(self.gotoPoints)
 
-        return meshPoints
+        considered_points = (np.round(self.gotoPoints[:, 0:2]))
+
+        self.Euclideanpoints = np.linalg.norm((meshPoints-np.tile(self.aircraftPosition, (meshPoints.shape[0], 1))), axis=1)
+
+        return meshPoints, considered_points
 
     def updatePt2(self, pointRisk):
         pathRisk = self.calculatePathRisk(self.gotoPoints, pointRisk)
@@ -153,10 +179,11 @@ class navigation:
         min_path_point = self.gotoPoints[min_path_index]
         min_path_risk = pathRisk[min_path_index]
 
-        heading = np.arctan2( (min_path_point[1] - self.aircraftPosition[1]),
-                                (min_path_point[0] - self.aircraftPosition[0]) )
 
-        return min_path_point, heading, min_path_risk
+        self.heading = np.arctan2((min_path_point[1] - self.aircraftPosition[1]),
+                                  (min_path_point[0] - self.aircraftPosition[0]))
+
+        return min_path_point, self.heading, min_path_risk
 
 
 if __name__ == "__main__":
