@@ -1,6 +1,16 @@
 import board
 import neopixel
 import time
+from enum import Enum
+
+class mode(Enum):
+    INITIALISE = 0 
+    RUNNING = 1
+    TAKEOFF = 2 
+    LANDING = 3
+    ERROR = 4
+    MUCHERROR = 5 
+    COLLISION_AVOID_ON = 6
 
 class LED:
     def __init__(self):
@@ -9,7 +19,7 @@ class LED:
 
         self.pixels = neopixel.NeoPixel(board.D21, self.num_pixels, auto_write=False)
 
-        self.mode = 1
+        self.mode = mode.INITIALISE
         self.newMode = True
 
     def __enter__(self):
@@ -20,51 +30,65 @@ class LED:
 
     def loop(self):
         while True:
+            if self.mode == mode.INITIALISE:
+                self.rainbowCycle()
 
-            if self.mode == 0:
-                self.flashGreen()
-
-            elif self.mode == 1:
-                self.rainbow_cycle( 0.005 )
-                #self.mode = 0
-                #self.newMode = True
-            elif self.mode == 2:
+            elif self.mode == mode.RUNNING:
                 self.pulseGreen()
 
-            elif self.mode == 3:
-                self.runDownOrange()
+            elif self.mode == mode.TAKEOFF:
+                self.takeOff()
+                
+            elif self.mode ==  mode.LANDING:
+                self.landing()
 
-            elif self.mode ==  4:
-                self.runUpBlue()
-
-            elif self.mode == 5:
+            elif self.mode == mode.ERROR:
                 self.flashRed()
 
-            elif self.mode == 6:
-                self.fflashRed()
-
-    def flash(self, RGB, sleepTime):
+            elif self.mode == mode.MUCHERROR:
+                self.fastFlashRed()
+            
+            elif self.mode == mode.COLLISION_AVOID_ON:
+                self.alternatingPurple()
+                
+            elif self.mode == 7:
+                self.flashGreen()
+                
+    def flashAll(self, RGB, wait):
         self.pixels.fill((RGB))
         self.pixels.show()
-        time.sleep(sleepTime)
+        time.sleep(wait)
         self.clear()
-        time.sleep(sleepTime)
+        time.sleep(wait)
 
     def flashGreen(self):
         RGB = (0,255,0)
-        sleepTime = 0.2
-        self.flash();
+        wait = 0.2
+        self.flashAll(RGB, wait);
 
     def flashRed(self):
         RGB = (255,0,0)
-        sleepTime = 0.2
-        self.flash();
+        wait = 0.2
+        self.flashAll(RGB, wait);
 
-    def fflashRed(self):
+    def fastFlashRed(self):
         RGB = (255,0,0)
-        sleepTime = 0.1
-        self.flash();
-
+        wait = 0.1
+        self.flashAll(RGB, wait);
+    
+    def alternatingPurple(self):
+        self.clear()
+        RGB = (128,0,128)
+        for i in range(0, 8, 2):
+            self.pixels[i] = RGB
+            self.pixels.show()
+        time.sleep(0.2)    
+        self.clear()
+        for i in range(1, 8, 2):
+            self.pixels[i] = RGB
+            self.pixels.show()
+        time.sleep(0.2)
+        
     def pulseGreen(self):
         i=0
         while i <= 254:
@@ -77,23 +101,33 @@ class LED:
             self.pixels.show()
             time.sleep(0.001)
             i-=1
-
-    def runDownOrange(self):
+    
+    def singlePixelFlash(self, RGB, wait, i):
+        self.clear()
+        self.pixels[i] = RGB
+        self.pixels.show()
+        time.sleep(wait)
+    
+    def runDown(self, RGB, wait):
         for i in range(8):
-            self.clear()
-            self.pixels[i] = (255,165,0)
-            self.pixels.show()
-            time.sleep(0.1)
+            self.singlePixelFlash(RGB, wait, i)
 
-    def runUpBlue(self):
+    def runUp(self, RGB, wait):
         for i in range(7, -1, -1):
-            self.clear()
-            self.pixels[i] = (0,0,255)
-            self.pixels.show()
-            time.sleep(0.1)
+            self.singlePixelFlash(RGB, wait, i)
+            
+    def landing(self):
+        RGB = (255,50,0) #orange
+        wait = 0.1
+        self.runDown(RGB, wait)        
+            
+    def takeOff(self):
+        RGB = (0,0,255) #orange
+        wait = 0.1
+        self.runUp(RGB, wait)
 
-
-    def rainbow_cycle(self, wait):
+    def rainbowCycle(self):
+        wait = 0.005
         for j in range(255):
             for i in range(self.num_pixels):
                 pixel_index = (i * 256 // self.num_pixels) + j
@@ -139,13 +173,17 @@ if __name__ == '__main__':
         ledThread.start()
 
         while True:
-            ledObj.mode = 1
-            time.sleep(5)
-            ledObj.mode = 0
+            ledObj.mode = mode.INITIALISE
             time.sleep(3)
-            ledObj.mode = 5
-            time.sleep(2)
-            ledObj.mode = 3
-            time.sleep(2)
-            ledObj.mode = 4
-            time.sleep(2)
+            ledObj.mode = mode.RUNNING
+            time.sleep(3)
+            ledObj.mode = mode.TAKEOFF
+            time.sleep(3)
+            ledObj.mode = mode.COLLISION_AVOID_ON
+            time.sleep(3)
+            ledObj.mode = mode.LANDING
+            time.sleep(3)
+            ledObj.mode = mode.ERROR
+            time.sleep(3) 
+            ledObj.mode = mode.MUCHERROR 
+            time.sleep(3)
