@@ -11,7 +11,7 @@ class LED:
 
         self.mode = 1
         self.newMode = True
-    
+
     def __enter__(self):
         pass
 
@@ -20,7 +20,7 @@ class LED:
 
     def loop(self):
         while True:
-            
+
             if self.mode == 0:
                 self.flashGreen()
 
@@ -30,68 +30,69 @@ class LED:
                 #self.newMode = True
             elif self.mode == 2:
                 self.pulseGreen()
-                
+
             elif self.mode == 3:
                 self.runDownOrange()
-            
+
             elif self.mode ==  4:
                 self.runUpBlue()
-                
+
             elif self.mode == 5:
-                self.flashRed()    
-            
+                self.flashRed()
+
             elif self.mode == 6:
-                self.fflashRed()    
+                self.fflashRed()
+
+    def flash(self, RGB, sleepTime):
+        self.pixels.fill((RGB))
+        self.pixels.show()
+        time.sleep(sleepTime)
+        self.clear()
+        time.sleep(sleepTime)
 
     def flashGreen(self):
-        self.pixels.fill((0, 255, 0))
-        self.pixels.show()
-        time.sleep(0.2)
-        self.clear()
-        time.sleep(0.2)
-    
+        RGB = (0,255,0)
+        sleepTime = 0.2
+        self.flash();
+
     def flashRed(self):
-        self.pixels.fill((255, 0, 0))
-        self.pixels.show()
-        time.sleep(0.2)
-        self.clear()
-        time.sleep(0.2)
-    
+        RGB = (255,0,0)
+        sleepTime = 0.2
+        self.flash();
+
     def fflashRed(self):
-        self.pixels.fill((255, 0, 0))
-        self.pixels.show()
-        time.sleep(0.1)
-        self.clear()
-        time.sleep(0.1)
-    
+        RGB = (255,0,0)
+        sleepTime = 0.1
+        self.flash();
+
     def pulseGreen(self):
         i=0
         while i <= 254:
             self.pixels.fill((0,i,0))
             self.pixels.show()
             time.sleep(0.001)
-            i+=1   
+            i+=1
         while i >= 0:
             self.pixels.fill((0,i,0))
             self.pixels.show()
             time.sleep(0.001)
             i-=1
-        
+
     def runDownOrange(self):
         for i in range(8):
             self.clear()
             self.pixels[i] = (255,165,0)
             self.pixels.show()
             time.sleep(0.1)
-    
+
     def runUpBlue(self):
         for i in range(7, -1, -1):
             self.clear()
             self.pixels[i] = (0,0,255)
             self.pixels.show()
             time.sleep(0.1)
-    
-        
+
+
     def rainbow_cycle(self, wait):
         for j in range(255):
             for i in range(self.num_pixels):
@@ -136,7 +137,7 @@ if __name__ == '__main__':
 
     with ledObj:
         ledThread.start()
-        
+
         while True:
             ledObj.mode = 1
             time.sleep(5)
@@ -148,4 +149,3 @@ if __name__ == '__main__':
             time.sleep(2)
             ledObj.mode = 4
             time.sleep(2)
-
