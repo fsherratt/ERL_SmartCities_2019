@@ -1,25 +1,35 @@
 import numpy as np
 from scipy import interpolate
+from scipy import io
 from modules.realsense import d435
 
 
 class mapper:
     num_coordinate = 3
 
+    xRange = [-50, 50]
+    yRange = [-50, 50]
+    zRange = [-5, 20]
+
+    localMapRange = 10
+
+    voxelSize = 0.2
+    voxelMaxWeight = 1000
+    voxelWeightDecay = 20
+
+    xDivisions = int((xRange[1] - xRange[0]) / voxelSize)
+    yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
+    zDivisions = int((zRange[1] - zRange[0]) / voxelSize)
+
+    cameraMinRange = 0.1
+    cameraMaxRange = 6
+
     def __init__(self):
-        xRange = [-20, 20]
-        yRange = [-20, 20]
-        zRange = [-20, 20]
+        self.xBins = np.linspace( self.xRange[0], self.xRange[1], self.xDivisions )
+        self.yBins = np.linspace( self.yRange[0], self.yRange[1], self.yDivisions )
+        self.zBins = np.linspace( self.zRange[0], self.zRange[1], self.zDivisions )
 
-        xDivisions = 10
-        yDivisions = 10
-        zDivisions = 10
-
-        self.xBins = np.linspace( xRange[0], xRange[1], xDivisions )
-        self.yBins = np.linspace( yRange[0], yRange[1], yDivisions )
-        self.zBins = np.linspace( zRange[0], zRange[1], zDivisions )
-
-        self.grid = np.zeros((xDivisions, yDivisions, zDivisions))
+        self.grid = np.zeros((self.xDivisions, self.yDivisions, self.zDivisions), dtype=np.int16)
 
         self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
                                                                self.grid, method = 'linear',
@@ -33,7 +43,7 @@ class mapper:
             self.d435Obj.closeConnection()
 
     def connectD435(self):
-        self.d435Obj = d435.rs_d435( framerate = 30 )
+        self.d435Obj = d435.rs_d435(framerate=90, width=480, height=270)
         self.d435Obj.openConnection()
     
     # --------------------------------------------------------------------------
@@ -43,41 +53,68 @@ class mapper:
     # param r - scipy local->global rotation object
     # return Null
     # --------------------------------------------------------------------------
-    def frame_to_global_points( self, frame, pos, r ):
-        # Produce list of valid points
-        points = np.reshape(frame, (self.num_coordinate, -1)).transpose()
-        points = points[ ~np.isnan(points[:, 2]), :]
-
+    def local_to_global_points( self, local_points, pos, r ):
         # Transform into global coordinate frame
-        points_global = r.apply( points )
-        points_global += np.tile(pos, (points.shape[0], 1))
+        points_global = r.apply(local_points)
+        points_global = np.add(points_global, pos)
 
         return points_global
 
-    def update(pos, rot):
-        # Limit range of depth camera
-        frame = self.d435Obj.range_filter(frame, minRange = 0, maxRange = 30)
-        # Convert to 3D coordinates
-        frame = self.d435Obj.deproject_frame( frame )
+    # --------------------------------------------------------------------------
+    # updateMap
+    # param pos - (N,3) list of points to add to the map
+    # param rot - 
+    # return Null
+    # --------------------------------------------------------------------------
+    def update(self, pos, rot):
+        frame = self.d435Obj.getFrame()
 
-        # Convert to global coordinates
-        points_global = self.mapObj.frame_to_global_points(frame, pos, r)
+        # Add to map
+        points = self.d435Obj.deproject_frame( frame, 
+                                                minRange = self.cameraMinRange, 
+                                                maxRange = self.cameraMaxRange )
+        points = self.local_to_global_points(points, pos, r)     
+        mapObj.updateMap(points, pos)
 
-        # Update map
-        mapObj.updateMap(points_global)
+        return frame
+
+    def digitizePoints(self, points):
+        xSort = np.digitize( points[:, 0], self.xBins )
+        ySort = np.digitize( points[:, 1], self.yBins )
+        zSort = np.digitize( points[:, 2], self.zBins )
+
+        return [xSort, ySort, zSort]
 
     # --------------------------------------------------------------------------
     # updateMap
     # param points - (N,3) list of points to qadd to the map
     # return Null
     # --------------------------------------------------------------------------
-    def updateMap(self, points):
+    def updateMap(self, points, pos):
         # Update map
-        xSort = np.digitize( points[:, 0], self.xBins ) - 1
-        ySort = np.digitize( points[:, 1], self.yBins ) - 1
-        zSort = np.digitize( points[:, 2], self.zBins ) - 1
+        gridPoints = self.digitizePoints(points)
+        np.add.at(self.grid, gridPoints, 1)
 
-        np.add.at(self.grid, [xSort, ySort, zSort], 1)
+        activeGridCorners = np.asarray([pos - [self.localMapRange,
+                                               self.localMapRange,
+                                               self.localMapRange], 
+                                        pos + [self.localMapRange,
+                                               self.localMapRange,
+                                               self.localMapRange]])
+        activeGridCorners = self.digitizePoints(activeGridCorners)
+
+        activeGrid = self.grid[activeGridCorners[0][0]:activeGridCorners[0][1], 
+                            activeGridCorners[1][0]:activeGridCorners[1][1], 
+                            activeGridCorners[2][0]:activeGridCorners[2][1]]
+
+        activeGrid = np.where(activeGrid < self.voxelMaxWeight, 
+                              activeGrid - self.voxelWeightDecay, # If True
+                              activeGrid) # If False
+        activeGrid = np.clip(activeGrid, a_min=0, a_max=self.voxelMaxWeight)
+
+        self.grid[activeGridCorners[0][0]:activeGridCorners[0][1], 
+                activeGridCorners[1][0]:activeGridCorners[1][1], 
+                activeGridCorners[2][0]:activeGridCorners[2][1]] = activeGrid
     
     # --------------------------------------------------------------------------
     # queryMap
@@ -87,6 +124,9 @@ class mapper:
     def queryMap(self, queryPoints):
         return self.interpFunc(queryPoints)
 
+
+    def saveToMatlab(self, filename):
+        io.savemat( filename, mdict=dict(map=self.grid), do_compression=False)
 
 class sitlMapper:
     def __init__(self):
@@ -133,13 +173,43 @@ if __name__ == "__main__":
     mapObj = mapper()
 
     with t265Obj:
-        while True:
-            # Get frames of data - points and global 6dof
-            pos, r, _ = t265Obj.getFrame()
+        try:
+            while True:
+                # Get frames of data - points and global 6dof
+                pos, r, _ = t265Obj.getFrame()
+                
+                starttime = time.time()
+                frame = mapObj.update(pos,r)
+                print('Loop Time: {}'.format(time.time()-starttime))
 
-            mapObj.update(pos,r)
+                posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
+                
+                starttime = time.time()
+                grid = mapObj.grid[:,:,posGridCell[2]] / np.max(mapObj.grid[:,:,posGridCell[2]])
+                empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
 
-            cv2.imshow('map', mapObj.grid / np.max(mapObj.grid))
-            cv2.waitkey(1)
+                img = cv2.merge((grid, empty, empty))
+                img = cv2.transpose(img)
 
-            time.sleep(1)
+                x = np.digitize( pos[0], mapObj.xBins ) - 1
+                y = np.digitize( pos[1], mapObj.yBins ) - 1
+
+                img = cv2.circle(img, (x,y), 5, (0,1,0), 2)
+
+                vec = [20,0,0]
+                vec = r.apply(vec) # Aero-ref -> Aero-body
+
+                vec[0] += x
+                vec[1] += y
+
+                img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
+
+                cv2.imshow('frame', frame)
+                cv2.imshow('map', img )
+                cv2.waitKey(1)
+                
+                print('')
+        except KeyboardInterrupt:
+            pass
+
+    mapObj.saveToMatlab( 'TestMap.mat' )

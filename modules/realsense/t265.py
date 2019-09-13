@@ -69,7 +69,10 @@ class rs_t265:
 
             # Calculate Euler angles from Quat - Quat is WXYZ
             rot = R.from_quat( quat )
-            rot = self.ROffset * rot * self.ROffset.inv()
+            # Convert from camera body to aero body
+            rot = rot * self.ROffset.inv()
+            # Change reference frame to aero ref
+            rot = self.ROffset * rot
 
             # Apply pixhawk rotational offset
             pos = self.ROffset.apply(pos)
