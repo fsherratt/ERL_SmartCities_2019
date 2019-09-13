@@ -19,7 +19,14 @@ if __name__ == "__main__":
         * Navigator - Always the same
         * MK:DataHub - Either on/off        
     '''
-    ledObj = LED.LED()
+    if args.SITL:
+        ledObj = LED.sitlLED()
+    else:
+        ledObj = LED.LED()
+
+        ledThread = threading.Thread(target=ledObj.loop)
+        ledThread.daemon = True
+    
     ledObj.setMode(LED.mode.INITIALISE)
 
     pixAddr = (args.pix[0], int(args.pix[1]))
