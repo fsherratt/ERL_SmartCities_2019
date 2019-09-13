@@ -6,13 +6,22 @@ from modules.realsense import d435
 class mapper:
     num_coordinate = 3
 
-    xDivisions = 500
-    yDivisions = 500
-    zDivisions = 100
-
-    xRange = [-10, 10]
-    yRange = [-10, 10]
+    xRange = [-50, 50]
+    yRange = [-50, 50]
     zRange = [-5, 20]
+
+    localMapRange = 10
+
+    voxelSize = 0.2
+    voxelMaxWeight = 1000
+    voxelWeightDecay = 20
+
+    xDivisions = int((xRange[1] - xRange[0]) / voxelSize)
+    yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
+    zDivisions = int((zRange[1] - zRange[0]) / voxelSize)
+
+    cameraMinRange = 0.1
+    cameraMaxRange = 6
 
     def __init__(self):
         self.xBins = np.linspace( self.xRange[0], self.xRange[1], self.xDivisions )
@@ -50,32 +59,61 @@ class mapper:
 
         return points_global
 
+    # --------------------------------------------------------------------------
+    # updateMap
+    # param pos - (N,3) list of points to add to the map
+    # param rot - 
+    # return Null
+    # --------------------------------------------------------------------------
     def update(self, pos, rot):
         frame = self.d435Obj.getFrame()
 
         # Add to map
-        points = self.d435Obj.deproject_frame( frame, minRange = 0.1, maxRange = 10 )
-        points_global = self.local_to_global_points(points, pos, r)     
-        mapObj.updateMap(points_global)
+        points = self.d435Obj.deproject_frame( frame, 
+                                                minRange = self.cameraMinRange, 
+                                                maxRange = self.cameraMaxRange )
+        points = self.local_to_global_points(points, pos, r)     
+        mapObj.updateMap(points, pos)
 
         return frame
+
+    def digitizePoints(self, points):
+        xSort = np.digitize( points[:, 0], self.xBins )
+        ySort = np.digitize( points[:, 1], self.yBins )
+        zSort = np.digitize( points[:, 2], self.zBins )
+
+        return [xSort, ySort, zSort]
 
     # --------------------------------------------------------------------------
     # updateMap
     # param points - (N,3) list of points to qadd to the map
     # return Null
     # --------------------------------------------------------------------------
-    def updateMap(self, points):
+    def updateMap(self, points, pos):
         # Update map
-        xSort = np.digitize( points[:, 0], self.xBins ) - 1
-        ySort = np.digitize( points[:, 1], self.yBins ) - 1
-        zSort = np.digitize( points[:, 2], self.zBins ) - 1
+        gridPoints = self.digitizePoints(points)
+        np.add.at(self.grid, gridPoints, 1)
 
-        np.add.at(self.grid, [xSort, ySort, zSort], 1)
+        activeGridCorners = np.asarray([pos - [self.localMapRange,
+                                               self.localMapRange,
+                                               self.localMapRange], 
+                                        pos + [self.localMapRange,
+                                               self.localMapRange,
+                                               self.localMapRange]])
+        activeGridCorners = self.digitizePoints(activeGridCorners)
 
-        # Filter
-        self.grid = np.where(self.grid < 200, self.grid - 5, self.grid)
-        self.grid = np.clip(self.grid, a_min=0, a_max=200)
+        activeGrid = self.grid[activeGridCorners[0][0]:activeGridCorners[0][1], 
+                            activeGridCorners[1][0]:activeGridCorners[1][1], 
+                            activeGridCorners[2][0]:activeGridCorners[2][1]]
+
+        activeGrid = np.where(activeGrid < self.voxelMaxWeight, 
+                              activeGrid - self.voxelWeightDecay, # If True
+                              activeGrid) # If False
+        activeGrid = np.clip(activeGrid, a_min=0, a_max=self.voxelMaxWeight)
+
+        self.grid[activeGridCorners[0][0]:activeGridCorners[0][1], 
+                activeGridCorners[1][0]:activeGridCorners[1][1], 
+                activeGridCorners[2][0]:activeGridCorners[2][1]] = activeGrid
     
     # --------------------------------------------------------------------------
     # queryMap
@@ -138,9 +176,11 @@ if __name__ == "__main__":
             starttime = time.time()
             frame = mapObj.update(pos,r)
             print('Loop Time: {}'.format(time.time()-starttime))
+
+            posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
             
             starttime = time.time()
-            grid = np.sum(mapObj.grid[:,:,20:40], axis=2) / np.max(mapObj.grid)
+            grid = mapObj.grid[:,:,posGridCell[2]] / np.max(mapObj.grid[:,:,posGridCell[2]])
             empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
 
             img = cv2.merge((grid, empty, empty))
