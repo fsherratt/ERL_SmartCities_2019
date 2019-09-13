@@ -23,6 +23,10 @@ if __name__ == "__main__":
         ledObj = LED.sitlLED()
     else:
         ledObj = LED.LED()
+
+        ledThread = threading.Thread(target=ledObj.loop)
+        ledThread.daemon = True
+    
     ledObj.setMode(LED.mode.INITIALISE)
 
     pixAddr = (args.pix[0], int(args.pix[1]))
