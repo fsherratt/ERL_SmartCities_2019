@@ -46,7 +46,7 @@ class mapper:
     def local_to_global_points( self, local_points, pos, r ):
         # Transform into global coordinate frame
         points_global = r.apply(local_points)
-        points_global += np.add(points_global, pos)
+        points_global = np.add(points_global, pos)
 
         return points_global
 
