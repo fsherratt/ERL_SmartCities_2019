@@ -43,7 +43,7 @@ class mapper:
             self.d435Obj.closeConnection()
 
     def connectD435(self):
-        self.d435Obj = d435.rs_d435(framerate=90, width=480, height=270)
+        self.d435Obj = d435.rs_d435(framerate=60, width=480, height=270)
         self.d435Obj.openConnection()
     
     # --------------------------------------------------------------------------

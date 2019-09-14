@@ -1,3 +1,5 @@
+#! .venv/bin/python3
+
 from utilities import argparser
 from modules import map, navigation, pixhawk, position, mission, LED
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
@@ -24,8 +26,9 @@ if __name__ == "__main__":
     else:
         ledObj = LED.LED()
 
-        ledThread = threading.Thread(target=ledObj.loop)
+        ledThread = Thread(target=ledObj.loop)
         ledThread.daemon = True
+        ledThread.start()
     
     ledObj.setMode(LED.mode.INITIALISE)
 
@@ -70,15 +73,14 @@ if __name__ == "__main__":
     pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
     pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
 
-
     mapObj = None
+    if args.mapping:
+        mapObj = map.mapper()
+    elif args.SITL:
+        mapObj = map.sitlMapper()
+
     navObj = None
     if args.collision_avoidance:
-        if args.SITL:
-            mapObj = map.sitlMapper()
-        else:
-            mapObj = map.mapper()
-
         navObj = navigation.navigation()
 
     # Mission progress
@@ -132,6 +134,8 @@ if __name__ == "__main__":
         ledObj.setMode(LED.mode.ERROR)
 
     print("*** STOPPED ***")
+
+    ledObj.clear()
 
     pixObj.stopLoop()
     pixComm.closePort()
