@@ -160,6 +160,24 @@ class pixhawkAbstract(mavThread.mavThread, object):
                                                                 rot[0], rot[1], self._heading_north_yaw)#rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
 
+    def sendPlayTune(self, tune, tune2=b''):
+        # Tx set temp
+        # > Up Octave
+        # < Down Octave
+        # # Sharp
+        # ?x - Note length
+        # ' ' - Pause crotchet
+        # P - semibreve
+        # L Bar length
+        # MF - Final
+        # MB - Loop
+        # MS - Sticato
+        # ML - Legato
+        # O - set octave
+        # N - ???
+        msg = pymavlink.MAVLink_play_tune_message(0, 0, tune, tune2)
+        self.queueOutputMsg(msg)
+
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
     commObj = mavSocket.mavSocket(  listenAddress = ('', 14551) )
@@ -180,18 +198,10 @@ if __name__ == "__main__":
         
     print('***CONNECTED***')
 
-    mavObj.requestCapabilities()
-
-    mavObj.setModeGuided()
-    
     try:
         while True:
-            print('Go To: {}'.format([10,0,-10]))
-            mavObj.directAircraft([10,0,-10], heading=0)
-            time.sleep(10)
-
-            print('Go To: {}'.format([-10,0,-10]))
-            mavObj.directAircraft([-10,0,-10], heading=3.14)
+            tune = b'MFMST255L4< F#2 A  >C#2 <A2 F# D#D#D#2'
+            mavObj.sendPlayTune(b'', tune)
             time.sleep(10)
         
     except KeyboardInterrupt:
