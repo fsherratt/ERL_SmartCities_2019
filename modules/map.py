@@ -43,7 +43,7 @@ class mapper:
             self.d435Obj.closeConnection()
 
     def connectD435(self):
-        self.d435Obj = d435.rs_d435(framerate=90, width=480, height=270)
+        self.d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
         self.d435Obj.openConnection()
     
     # --------------------------------------------------------------------------
@@ -67,7 +67,7 @@ class mapper:
     # return Null
     # --------------------------------------------------------------------------
     def update(self, pos, rot):
-        frame = self.d435Obj.getFrame()
+        frame, rgbImg = self.d435Obj.getFrame()
 
         # Add to map
         points = self.d435Obj.deproject_frame( frame, 
@@ -76,7 +76,7 @@ class mapper:
         points = self.local_to_global_points(points, pos, r)     
         mapObj.updateMap(points, pos)
 
-        return frame
+        return frame, rgbImg
 
     def digitizePoints(self, points):
         xSort = np.digitize( points[:, 0], self.xBins )
@@ -204,7 +204,10 @@ if __name__ == "__main__":
 
                 img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
 
-                cv2.imshow('frame', frame)
+
+                depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), 
+                                        cv2.COLORMAP_JET)
+                cv2.imshow('frame', depth)
                 cv2.imshow('map', img )
                 cv2.waitKey(1)
                 
