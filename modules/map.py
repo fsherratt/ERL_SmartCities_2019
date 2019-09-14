@@ -73,8 +73,8 @@ class mapper:
         points = self.d435Obj.deproject_frame( frame, 
                                                 minRange = self.cameraMinRange, 
                                                 maxRange = self.cameraMaxRange )
-        points = self.local_to_global_points(points, pos, r)     
-        mapObj.updateMap(points, pos)
+        points = self.local_to_global_points(points, pos, rot)     
+        self.updateMap(points, pos)
 
         return frame
 
