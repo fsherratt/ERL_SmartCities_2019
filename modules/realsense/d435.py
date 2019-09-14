@@ -105,13 +105,12 @@ class rs_d435:
         # Get depth data
         depth_frame = frames.get_depth_frame()
         color_frame = frames.get_color_frame()
-        if not depth:
+        if not depth_frame:
             return None
 
         depth_points = np.asarray( depth_frame.get_data(), dtype=np.float32 )
         color_image = np.asanyarray(color_frame.get_data(), dtype=np.uint8)
 
-        depth_points *= self.scale
         # depth_points = self.shrink(depth_points)
         return depth_points, color_image
 
@@ -132,6 +131,7 @@ class rs_d435:
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
     def deproject_frame( self, frame, minRange = 0, maxRange = 10 ):
+        frame = frame * self.scale
         Z = frame
         X = np.multiply( frame, self.xDeprojectMatrix )
         Y = np.multiply( frame, self.yDeprojectMatrix )

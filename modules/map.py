@@ -164,13 +164,17 @@ class sitlMapper:
 if __name__ == "__main__":
     
     from modules.realsense import t265
+    from modules import telemetry
 
     import cv2
+    import base64
     import time
+    import threading
 
     t265Obj = t265.rs_t265()
 
     mapObj = mapper()
+    telemObj = telemetry.telem(50007, remote=True)
 
     with t265Obj:
         try:
@@ -179,7 +183,7 @@ if __name__ == "__main__":
                 pos, r, _ = t265Obj.getFrame()
                 
                 starttime = time.time()
-                frame = mapObj.update(pos,r)
+                frame, rgbImg = mapObj.update(pos,r)
                 print('Loop Time: {}'.format(time.time()-starttime))
 
                 posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
@@ -204,15 +208,28 @@ if __name__ == "__main__":
 
                 img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
 
-
                 depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), 
                                         cv2.COLORMAP_JET)
-                cv2.imshow('frame', depth)
-                cv2.imshow('map', img )
-                cv2.waitKey(1)
-                
-                print('')
+
+                buffer = cv2.imencode('.jpg', rgbImg)[1]
+                data_encode = np.array(buffer)
+                telemObj.sendObject(data_encode, 'RGBFrame')
+
+                buffer = cv2.imencode('.jpg', depth)[1]
+                data_encode = np.array(buffer)
+                telemObj.sendObject(data_encode, 'DepthFrame')
+
+                buffer = cv2.imencode('.jpg', img)[1]
+                data_encode = np.array(buffer)
+                telemObj.sendObject(data_encode, 'Map')
+
+                # cv2.imshow('frame', depth)
+                # cv2.imshow('map', img )
+                # cv2.waitKey(1)
+
+                time.sleep(0.5)
+
         except KeyboardInterrupt:
             pass
 
-    mapObj.saveToMatlab( 'TestMap.mat' )
+    # mapObj.saveToMatlab( 'TestMap.mat' )
