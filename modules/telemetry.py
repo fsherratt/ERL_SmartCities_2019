@@ -1,92 +1,131 @@
-from modules.MAVLinkThread.mavlinkThread.mavSocket import mavSocket
+import time
+import socket
+import select
+import struct
 import pickle
 
-import numpy as np
-import time
-import threading
-
-import base64
 import cv2
 
 class telem():
-    _MAX_DATA_LEN = 60000
+    _PORT = 50006
+    _MAX_READ_LEN = 60000
+    _TIMEOUT = 1
 
-    def __init__(self, port, remote=True):
-        if remote :
-            self.sockObj = mavSocket( broadcastAddress=('255.255.255.255', port))
-        else:
-            self.sockObj = mavSocket( listenAddress=('', port))
-        
-        self.sockObj.openPort()
+    def __init__(self, server=True):
+        self.addr = ('127.0.01', self._PORT)
 
-        self.seq = 0
-        self.lastId = -1
-        self.lastSeq = 0
-        self.objBuffer = b''
+        self.sockObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sockObj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sockObj.settimeout(2)
 
-    def close(self):
-        self.sockObj.closePort()
+    def startServer(self):
+        self.sockObj.bind(self.addr)
+        self.sockObj.listen()
 
-    def sendObject(self, dataObj, objName):
-        data_string = pickle.dumps(dataObj, protocol=pickle.HIGHEST_PROTOCOL)
-
-        data_len = len(data_string)
-
-        data_to_send = data_len
-        seq = 0
-        
-        # Split data into transmittable chunks
-        while data_to_send > 0:
-            if data_to_send > self._MAX_DATA_LEN:
-                data_chunk = data_string[seq*self._MAX_DATA_LEN:(seq+1)*self._MAX_DATA_LEN]
-                data_to_send -= self._MAX_DATA_LEN
-            else:
-                data_chunk = data_string[seq*self._MAX_DATA_LEN:]
-                data_to_send = 0
-
-            chunk_string = pickle.dumps((objName, data_len, seq, data_chunk), protocol=pickle.HIGHEST_PROTOCOL)
-            self.sockObj.write(chunk_string)
-
-            seq += 1
-
-    def loop(self):
         while True:
-            data_string = self.sockObj.read()
-
-            if data_string == b'':
-                time.sleep(0.5)
-                continue
-
+            # Wait for incoming connection
             try:
-                dataObj = pickle.loads(data_string)
-            except pickle.UnpicklingError:
-                pass
+                self.conn, addr = self.sockObj.accept()
+                print('Connected to: {}'.format(addr))
+                return
+
+            except BlockingIOError:
+                time.sleep(1)
+
+    def startClient(self):
+        self.sockObj.connect(self.addr)
+
+    def sendData(self, data):
+        byteData = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
+        self.sendByteData(byteData)
+
+    def sendByteData(self, byteData):
+        try:
+            writable = select.select([], [self.conn], [], self._TIMEOUT)[1]
+
+            msg =  b'$' + struct.pack('>I', len(byteData)) + b':' + byteData
+
+            for conn in writable:
+                conn.sendall(msg)
+
+        except ValueError:
+            return
+
+        except BrokenPipeError:
+            print('Connection Closed')
+            self.conn.close()
+
+    def readMsg(self):
+        try:
+            readable = select.select([self.sockObj], [], [], self._TIMEOUT)[0]
             
-            print('ID: {} Name: {}\t Seq: {}\t Len: {}\n'.format(dataObj[3], dataObj[0], dataObj[2], len(dataObj[4])))
-            
-            if self.lastId != dataObj[3] and dataObj[2] == 0:
-                self.objBuffer = dataObj[4]
-                self.lastId = dataObj[3]
-                self.lastSeq = dataObj[2]
+            for conn in readable:
+                # Syncronize stream
+                msg = conn.recv(1)
+                while msg != b'$':
+                    msg = conn.recv(1)
 
-            elif self.lastSeq == dataObj[2] - 1:
-                self.objBuffer = self.objBuffer + dataObj[4]
-                self.lastSeq = dataObj[2]
+                # Get message length
+                msg_len = struct.unpack('>I', conn.recv(4))[0]
+
+                # Wait for all data to be returned
+                if conn.recv(1) == b':':
+                    msg = b''
+                    while len(msg) < msg_len:
+
+                        bytesIn = msg_len - len(msg)
+                        if bytesIn > self._MAX_READ_LEN:
+                            bytesIn = self._MAX_READ_LEN
+
+                        try:
+                            msg += conn.recv(bytesIn)
+                        except BlockingIOError:
+                            time.sleep(0.1)
+
+                    return msg
+
+        except (socket.timeout, ValueError):
+            pass
+
+        return None
 
 
-            if len(self.objBuffer) == dataObj[1]:
-                img = pickle.loads(self.objBuffer)
-                nparr = np.fromstring(img, np.uint8)
-                img = cv2.imdecode(img, cv2.IMREAD_COLOR)
-                cv2.imshow(dataObj[0], img/np.max(img))
-                cv2.waitKey(1)
-                
 if __name__ == "__main__":
-    localTelem  = telem( 50007, remote=False)
+    import threading
 
-    try:
-        localTelem.loop()
-    except KeyboardInterrupt:
-        pass
+    remoteTelem = telem()
+    localTelem = telem()
 
-    localTelem.close()
+    remoteThread = threading.Thread(target=remoteTelem.startServer)
+    remoteThread.start()
+
+    localTelem.startClient()
+
+    remoteThread.join()
+
+    # localTelem.sockObj.close()
+
+    testImage = cv2.imread('/Users/freddiesherratt/Desktop/ERL_SmartCities_2019/modules/test.jpg', 0)
+
+    totalTime = 0
+    loops = 100
+    for _ in range(loops):
+        startTime = time.time()
+
+        remoteThread = threading.Thread(target=remoteTelem.sendData, args=[testImage])
+        remoteThread.start()
+
+        img = localTelem.readMsg()
+        
+        remoteThread.join()
+
+        totalTime += time.time() - startTime
+
+    print(totalTime/loops)
+
+    img = pickle.loads(img)
+
+    cv2.imshow('Sent', img)
+    cv2.waitKey(100)
+
+    localTelem.sockObj.close()

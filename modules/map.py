@@ -208,24 +208,11 @@ if __name__ == "__main__":
 
                 img = cv2.line(img, (x,y), (int(vec[0]), int(vec[1])), (0,0,1), 2)
 
-                depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), 
-                                        cv2.COLORMAP_JET)
+                depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
 
-                buffer = cv2.imencode('.jpg', rgbImg)[1]
-                data_encode = np.array(buffer)
-                telemObj.sendObject(data_encode, 'RGBFrame')
-
-                buffer = cv2.imencode('.jpg', depth)[1]
-                data_encode = np.array(buffer)
-                telemObj.sendObject(data_encode, 'DepthFrame')
-
-                buffer = cv2.imencode('.jpg', img)[1]
-                data_encode = np.array(buffer)
-                telemObj.sendObject(data_encode, 'Map')
-
-                # cv2.imshow('frame', depth)
-                # cv2.imshow('map', img )
-                # cv2.waitKey(1)
+                cv2.imshow('frame', depth)
+                cv2.imshow('map', img )
+                cv2.waitKey(1)
 
                 time.sleep(0.5)
 
