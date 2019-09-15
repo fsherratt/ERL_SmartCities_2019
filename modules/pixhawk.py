@@ -16,7 +16,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.seenHeartbeat = False
         self.lastSentHeartbeat = 0
 
-        self._heading_north_yaw = 0
+        self._heading_north_yaw = None
 
         super( pixhawkAbstract, self).__init__( conn, pymavlink )
 
@@ -55,6 +55,10 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
     def _attitudeHandler(self, msg):
         self._heading_north_yaw = msg.yaw
+
+    @property
+    def compass_heading(self):
+        return self._heading_north_yaw
 
     # Aircraft state
     @property
@@ -157,7 +161,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         rot = rot.as_euler('xyz') # roll, pitch, yaw
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
-                                                                rot[0], rot[1], self._heading_north_yaw)#rot[2])
+                                                                rot[0], rot[1], rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
 
     def sendPlayTune(self, tune, tune2=b''):

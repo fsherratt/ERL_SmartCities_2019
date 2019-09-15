@@ -2,6 +2,7 @@ from modules.MAVLinkThread.mavlinkThread import mavThread, mavSocket
 from modules.realsense import t265
 
 from scipy.spatial.transform import Rotation as R
+import numpy as np
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
@@ -15,9 +16,18 @@ class position:
 
         self.pixObj = pixObj
 
-        self._pos = [0,0,0]
-        self._r = R.from_euler('zyx', [0,0,0])
+        self._pos = np.asarray([0,0,0], dtype=np.float)
+        self._r = R.from_euler('xyz', [0,0,0])
         self._conf = 0
+
+        self.running = True
+        self.north_offset = None
+
+    def setNorthOffset(self, north_offset):
+        if north_offset is not None and self.north_offset is None:
+            t265_yaw = self._r.as_euler('xyz')[2]
+            north_offset -= t265_yaw 
+            self.north_offset = R.from_euler('xyz', [0,0,north_offset])
 
     def __del__(self):
         self.t265.closeConnection()
@@ -30,9 +40,15 @@ class position:
 
         while True:
             self._pos, self._r, self._conf = self.t265.getFrame()
+            self.setNorthOffset( self.pixObj.compass_heading )
 
+            # Convert from FRD to NED coordinate system
+            if self.north_offset is not None:
+                self._pos = self.north_offset.apply(self._pos)
+                self._r = self._r * self.north_offset
+            
             if time.time() - lastUpdate > 0.04:
-                self.pixObj.sendPosition(self._pos, self._r)
+                self.pixObj.sendPosition(copy.deepcopy(self._pos), copy.deepcopy(self._r))
                 lastUpdate = time.time()
 
             time.sleep(0.01)

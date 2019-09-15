@@ -63,7 +63,7 @@ class rs_t265:
         if pose:
             data = pose.get_pose_data()
 
-            pos = [data.translation.x, data.translation.y, data.translation.z]
+            pos = np.asarray([data.translation.x, data.translation.y, data.translation.z],dtype=np.float)
             quat = [data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w]
             conf = data.tracker_confidence
 
