@@ -38,7 +38,7 @@ class position:
     def loop(self):
         lastUpdate = 0
 
-        while True:
+        while self.running:
             self._pos, self._r, self._conf = self.t265.getFrame()
             self.setNorthOffset( self.pixObj.compass_heading )
 
@@ -52,6 +52,9 @@ class position:
                 lastUpdate = time.time()
 
             time.sleep(0.01)
+
+    def close(self):
+        self.running = False
 
 
 class sitlPosition(mavThread.mavThread):
