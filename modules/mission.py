@@ -1,7 +1,7 @@
 import numpy as np
 
 class mission:
-    missionItems = [[10,0,-10], [-10,0,-10]]
+    missionItems = [[-15,-15,-5], [15,-15,-5], [15, 15,-5], [-15, 15,-5]]
 
     def __init__(self):
         self.missionItem = 0
@@ -17,6 +17,6 @@ class mission:
             if self.missionItem >= len(self.missionItems):
                 self.missionItem = 0
 
-            print('Next Mission Item: {}'.format(self.missionItem))
+            print('NEXT MISSION ITEM: {}'.format(self.missionItem))
 
         return self.missionItems[self.missionItem]

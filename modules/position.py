@@ -6,7 +6,7 @@ import numpy as np
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
-
+import numpy as np
 from threading import Thread
 
 class position:
@@ -62,6 +62,9 @@ class sitlPosition(mavThread.mavThread):
         self._attitude = [0,0,0]
         self._position = [0,0,0]
 
+        self.stuckness = 0
+        self.speed_avg_len = 10
+        self.historical_speed = np.zeros(self.speed_avg_len)
         super( sitlPosition, self).__init__( conn, pymavlink )
 
     def _processReadMsg(self, msglist):
@@ -90,11 +93,25 @@ class sitlPosition(mavThread.mavThread):
 
     def _positionHandler(self, msg):
         self._position = [msg.x, msg.y, msg.z]
+        self._velocity = [msg.vx, msg.vy, msg.vz]
+
 
     def update(self):
         r = R.from_euler('xzy', self._attitude, degrees=False)
         return self._position, r, 3
 
+    def calc_stuckness(self):
+        speed = np.linalg.norm(self._velocity)
+
+        self.stuckness = self.stuckness+0.04*np.tanh(1/(0.5-speed))
+
+        if self.stuckness >= 1:
+            self.stuckness=1
+        if self.stuckness <= 0:
+            self.stuckness=0
+
+        print("speed = ", np.round(speed,1), "stuckness = ",np.round(self.stuckness,1))
+        return self.stuckness
 
 if __name__ == "__main__":
     SITL = True

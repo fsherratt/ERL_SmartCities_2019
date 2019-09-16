@@ -5,7 +5,6 @@ from modules import map, navigation, pixhawk, position, mission, LED
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
-    
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -51,13 +50,10 @@ if __name__ == "__main__":
 
     print('*** PIXHAWK CONNECTED ***')
 
-
     if args.SITL:
         posComm = mavSocket.mavSocket((args.pix[0], 14552))
         posComm.openPort()
-        
         posObj = position.sitlPosition(posComm)
-
     else:
         posObj = position.position(pixObj)
 
@@ -74,6 +70,7 @@ if __name__ == "__main__":
     pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
 
     mapObj = None
+
     if args.mapping:
         mapObj = map.mapper()
     elif args.SITL:
@@ -100,10 +97,13 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
+
         while True:
             startTime = time.time()
+
             # Get our current location
             pos, rot, conf = posObj.update()
+
 
             # Where are we going?
             if args.mission:
@@ -114,18 +114,23 @@ if __name__ == "__main__":
                 mapObj.update(pos, rot)
 
             if args.collision_avoidance:
-                # Plan next move
+                # Plan next move but consider sticking to last move
                 meshPoints = navObj.updatePt1(pos, targetPos)
                 pointRisk = mapObj.queryMap(meshPoints)
                 goto, heading, risk = navObj.updatePt2(pointRisk)
 
                 print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-
+                
                 # Tell pixhawk where to go
                 pixObj.directAircraft(goto, heading)
 
-            print('Loop time: {:.2f}'.format(time.time()-startTime))
+            print('Loop time: {:.2f}'.format(loop_time))
+
+
             time.sleep(0.2)
+
+
+            loop_time = time.time() - startTime
 
     except KeyboardInterrupt:
         pass
