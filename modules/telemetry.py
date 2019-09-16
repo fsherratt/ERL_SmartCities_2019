@@ -13,6 +13,7 @@ class airTelemetry():
         
     def start(self):
         self.telemThread = threading.Thread(target=self.telemInterface.startServer, name='Air_Telemetry')
+        self.telemThread.daemon = True
         self.telemThread.start()
 
     def stop(self):
@@ -28,7 +29,12 @@ class airTelemetry():
         if not self.connected():
             return
         
-        self.telemInterface.sendData(image)
+        try:
+            self.telemInterface.sendData(image)
+
+        except BrokenPipeError:
+            # Start listen for new connections if socket closed
+            self.start()
 
 
 class tcpInterface():
