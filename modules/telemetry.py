@@ -136,39 +136,23 @@ if __name__ == "__main__":
     import threading
 
     remoteTelem = telem()
-    localTelem = telem(hostname='127.0.0.1')
-
-    remoteThread = threading.Thread(target=remoteTelem.startServer)
-    remoteThread.start()
-
-    time.sleep(10)
-    localTelem.startClient()
-
-    remoteThread.join()
+    remoteTelem.startServer()
 
     # localTelem.sockObj.close()
 
     testImage = cv2.imread('/Users/freddiesherratt/Desktop/ERL_SmartCities_2019/modules/test.jpg', 0)
 
     totalTime = 0
-    loops = 100
-    for _ in range(loops):
+    loops = 5
+    for i in range(loops):
+        print(i)
         startTime = time.time()
-
-        remoteThread = threading.Thread(target=remoteTelem.sendData, args=[testImage])
-        remoteThread.start()
-
-        img = localTelem.readMsg()
-        
-        remoteThread.join()
+        remoteTelem.sendData(testImage)
+        remoteTelem.close()
+        time.sleep(1)
 
         totalTime += time.time() - startTime
 
     print(totalTime/loops)
 
-    img = pickle.loads(img)
-
-    cv2.imshow('Sent', img)
-    cv2.waitKey(1000)
-
-    localTelem.sockObj.close()
+    remoteTelem.close()
