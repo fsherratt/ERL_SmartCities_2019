@@ -13,6 +13,10 @@ class telem():
 
     def __init__(self, hostname=''):
         self.hostname = hostname
+
+        self.sockObj = None
+        self.conn = None
+
         pass
     
     def _createSocket(self):
@@ -39,6 +43,15 @@ class telem():
             
             else:
                 return
+
+    def close(self):
+        if self.sockObj is not None:
+            self.sockObj.close()
+        
+        if self.conn is not None:
+            self.conn.close()
+
+        print('*** Connection Closed ***')
 
     def startClient(self):
         self.addr = (self.hostname, self._PORT)
