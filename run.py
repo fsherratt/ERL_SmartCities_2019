@@ -1,3 +1,5 @@
+#! .venv/bin/python3
+
 from utilities import argparser
 from modules import map, navigation, pixhawk, position, mission, LED, telemetry
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
@@ -27,6 +29,7 @@ if __name__ == "__main__":
         ledObj = LED.LED()
         ledThread = Thread(target=ledObj.loop, name='LED')
         ledThread.daemon = True
+        ledThread.start()
     
     ledObj.setMode(LED.mode.INITIALISE)
 
@@ -53,13 +56,10 @@ if __name__ == "__main__":
 
     print('*** PIXHAWK CONNECTED ***')
 
-
     if args.SITL:
         posComm = mavSocket.mavSocket((args.pix[0], 14552))
         posComm.openPort()
-        
         posObj = position.sitlPosition(posComm)
-
     else:
         posObj = position.position(pixObj)
 
@@ -75,6 +75,7 @@ if __name__ == "__main__":
     pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
     pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
 
+    mapObj = None
 
     mapObj = None
     if args.SITL:
@@ -104,10 +105,13 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
+
         while True:
             startTime = time.time()
+
             # Get our current location
             pos, rot, conf = posObj.update()
+
 
             # Where are we going?
             if args.mission:
@@ -123,18 +127,23 @@ if __name__ == "__main__":
                     telemObj.sendImage(rgbImg)
 
             if args.collision_avoidance:
-                # Plan next move
+                # Plan next move but consider sticking to last move
                 meshPoints = navObj.updatePt1(pos, targetPos)
                 pointRisk = mapObj.queryMap(meshPoints)
                 goto, heading, risk = navObj.updatePt2(pointRisk)
 
                 print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-
+                
                 # Tell pixhawk where to go
                 pixObj.directAircraft(goto, heading)
 
-            print('Loop time: {:.2f}'.format(time.time()-startTime))
+            print('Loop time: {:.2f}'.format(loop_time))
+
+
             time.sleep(0.2)
+
+
+            loop_time = time.time() - startTime
 
     except KeyboardInterrupt:
         pass
@@ -144,6 +153,8 @@ if __name__ == "__main__":
         ledObj.setMode(LED.mode.ERROR)
 
     print("*** STOPPED ***")
+
+    ledObj.clear()
 
     pixObj.stopLoop()
     pixComm.closePort()

@@ -16,7 +16,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         self.seenHeartbeat = False
         self.lastSentHeartbeat = 0
 
-        self._heading_north_yaw = 0
+        self._heading_north_yaw = None
 
         super( pixhawkAbstract, self).__init__( conn, pymavlink )
 
@@ -55,6 +55,10 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
     def _attitudeHandler(self, msg):
         self._heading_north_yaw = msg.yaw
+
+    @property
+    def compass_heading(self):
+        return self._heading_north_yaw
 
     # Aircraft state
     @property
@@ -136,7 +140,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
             heading = 0
         
-        yawRate = 3.14 # rad/s
+        yawRate = 0.5 # rad/s
 
         # for global frames SET_POSITION_TARGET_GLOBAL_INT
         msg = pymavlink.MAVLink_set_position_target_local_ned_message(0,0,0,
@@ -157,8 +161,26 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         rot = rot.as_euler('xyz') # roll, pitch, yaw
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
-                                                                rot[0], rot[1], self._heading_north_yaw)#rot[2])
+                                                                rot[0], rot[1], rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
+
+    def sendPlayTune(self, tune, tune2=b''):
+        # Tx set temp
+        # > Up Octave
+        # < Down Octave
+        # # Sharp
+        # ?x - Note length
+        # ' ' - Pause crotchet
+        # P - semibreve
+        # L Bar length
+        # MF - Final
+        # MB - Loop
+        # MS - Sticato
+        # ML - Legato
+        # O - set octave
+        # N - ???
+        msg = pymavlink.MAVLink_play_tune_message(0, 0, tune, tune2)
+        self.queueOutputMsg(msg)
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
@@ -180,18 +202,10 @@ if __name__ == "__main__":
         
     print('***CONNECTED***')
 
-    mavObj.requestCapabilities()
-
-    mavObj.setModeGuided()
-    
     try:
         while True:
-            print('Go To: {}'.format([10,0,-10]))
-            mavObj.directAircraft([10,0,-10], heading=0)
-            time.sleep(10)
-
-            print('Go To: {}'.format([-10,0,-10]))
-            mavObj.directAircraft([-10,0,-10], heading=3.14)
+            tune = b'MFMST255L4< F#2 A  >C#2 <A2 F# D#D#D#2'
+            mavObj.sendPlayTune(b'', tune)
             time.sleep(10)
         
     except KeyboardInterrupt:

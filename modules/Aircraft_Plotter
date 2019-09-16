@@ -1,0 +1,22 @@
+import numpy as np
+import cv2
+
+def plot_map(gotoPoints, position, map, flip = 0):
+    if not cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1:
+        cv2.namedWindow('rgb_img', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('rgb_img', 100, 100)
+
+    considered_points = (np.round(gotoPoints[:, 0:2]))
+    pos = position
+    pts = np.zeros((41,41))
+    for i in range(len(considered_points)):
+        pts[int(considered_points[i][0]+20)][int(considered_points[i][1])+20] = 1
+    pospts = np.zeros((41, 41))
+    pospts[round(pos[0])+20][round(pos[1])+20] = 1
+    map = np.sum(map.grid, axis=2)
+    img = np.asarray([map / np.max(map)]).reshape(41,41)
+    img2 = cv2.merge((pts,img,pospts))
+    if flip:
+        img2 = cv2.flip(img2, 0)
+    cv2.imshow('rgb_img', img2)
+    cv2.waitKey(1)

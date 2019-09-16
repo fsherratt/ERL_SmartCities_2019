@@ -109,28 +109,58 @@ class mapper:
 
 class sitlMapper:
     def __init__(self):
-        xRange = [-25, 25]
-        yRange = [-25, 25]
-        zRange = [-25, 1]
+        xRange = [-20, 20]
+        yRange = [-20, 20]
+        zRange = [-10, 0]
 
-        xDivisions = 10
-        yDivisions = 10
-        zDivisions = 10
+        xDivisions = 41
+        yDivisions = 41
+        zDivisions = 20
 
         self.xBins = np.linspace( xRange[0], xRange[1], xDivisions )
         self.yBins = np.linspace( yRange[0], yRange[1], yDivisions )
         self.zBins = np.linspace( zRange[0], zRange[1], zDivisions )
 
+        self.posOld = np.asarray([0,0,0])
         self.grid = np.zeros((xDivisions, yDivisions, zDivisions))
 
         # Add Obstacle
-        self.grid[4:5, :, 4:] = 10
+        #north east down
+
+        #self.grid[20, :, 5:14] = 1
+        map_on =1
+        obstacle = 1
+        if map_on == 1:
+            self.grid[10:12, 3:11, 0:12] = obstacle    #1
+            self.grid[7:18, 14:17, :] = obstacle       #2
+            self.grid[18:20, 6:19, :] = obstacle       #3
+            self.grid[25:28, 0:12, 8:20] = obstacle    #4
+            self.grid[28:41, 17:20, :] = obstacle      #5
+            self.grid[28:31, 26:41, 0:12] = obstacle   #6
+            self.grid[0:14, 24:26, 5:15] = obstacle    #7
+            self.grid[18:20, 23:36, :] = obstacle      #8
+
+            self.grid[10:12, 3:11, :] = obstacle  # 1
+            self.grid[25:28, 0:12, :] = obstacle  # 4
+            self.grid[28:31, 26:41, :] = obstacle  # 6
+            self.grid[0:14, 24:26, :] = obstacle  # 7
+
+        if map_on == 2:
+            self.grid[:29, :2, :] = obstacle  # 1
+            self.grid[10:29, 5:9, :] = obstacle  # 2
+            self.grid[28:39, 8:11, :] = obstacle  # 3
+            self.grid[36, 8:39, :] = obstacle  # 4
+            self.grid[9:27, 13:16, :] = obstacle  # 5
+            self.grid[15:32, 28:, :] = obstacle  # 6
 
         self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
                                                                self.grid, method = 'linear',
                                                                bounds_error = False,
                                                                fill_value = np.nan )
-    
+    # could try nearest interp method = 'nearest' -faster but at what cost
+
+
+
     # --------------------------------------------------------------------------
     # queryMap
     # param queryPoints - (N,3) list of points to query against map
@@ -198,4 +228,4 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             pass
 
-    # mapObj.saveToMatlab( 'TestMap.mat' )
+    mapObj.saveToMatlab( 'TestMap.mat' )

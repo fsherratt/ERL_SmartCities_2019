@@ -36,6 +36,8 @@ class LED:
         self.mode = mode.INITIALISE
         self.newMode = True
 
+        self.running = True
+
     def __enter__(self):
         pass
 
@@ -45,8 +47,11 @@ class LED:
     def setMode(self, mode):
         self.mode = mode
 
+    def close(self):
+        self.running = False
+
     def loop(self):
-        while True:
+        while self.running:
             if self.mode == mode.INITIALISE:
                 self.rainbowCycle()
 
@@ -70,7 +75,9 @@ class LED:
                 
             elif self.mode == 7:
                 self.flashGreen()
-                
+
+        self.clear()
+
     def flashAll(self, RGB, wait):
         self.pixels.fill((RGB))
         self.pixels.show()
