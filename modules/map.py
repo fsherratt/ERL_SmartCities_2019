@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import interpolate
 from scipy import io
-from modules.realsense import d435
-
 
 class mapper:
     num_coordinate = 3
@@ -21,9 +19,6 @@ class mapper:
     yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
     zDivisions = int((zRange[1] - zRange[0]) / voxelSize)
 
-    cameraMinRange = 0.1
-    cameraMaxRange = 6
-
     def __init__(self):
         self.xBins = np.linspace( self.xRange[0], self.xRange[1], self.xDivisions )
         self.yBins = np.linspace( self.yRange[0], self.yRange[1], self.yDivisions )
@@ -35,16 +30,7 @@ class mapper:
                                                                self.grid, method = 'linear',
                                                                bounds_error = False,
                                                                fill_value = np.nan )
-
-        self.connectD435()
-
-    def __del__(self):
-        if self.d435Obj is not None:
-            self.d435Obj.closeConnection()
-
-    def connectD435(self):
-        self.d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
-        self.d435Obj.openConnection()
+        
     
     # --------------------------------------------------------------------------
     # frame_to_global_points
@@ -66,17 +52,11 @@ class mapper:
     # param rot - 
     # return Null
     # --------------------------------------------------------------------------
-    def update(self, pos, rot):
-        frame, rgbImg = self.d435Obj.getFrame()
-
+    def update(self, points, pos, rot):
         # Add to map
-        points = self.d435Obj.deproject_frame( frame, 
-                                                minRange = self.cameraMinRange, 
-                                                maxRange = self.cameraMaxRange )
+        
         points = self.local_to_global_points(points, pos, r)     
         mapObj.updateMap(points, pos)
-
-        return frame, rgbImg
 
     def digitizePoints(self, points):
         xSort = np.digitize( points[:, 0], self.xBins )

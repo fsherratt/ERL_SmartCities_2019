@@ -1,6 +1,7 @@
 from utilities import argparser
 from modules import map, navigation, pixhawk, position, mission, LED
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
+from modules.realsense import d435
 from threading import Thread
 import time
     
@@ -78,6 +79,8 @@ if __name__ == "__main__":
             mapObj = map.sitlMapper()
         else:
             mapObj = map.mapper()
+            d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
+            d435Obj.openConnection()
 
         navObj = navigation.navigation()
 
@@ -85,7 +88,6 @@ if __name__ == "__main__":
     misObj = None
     if args.mission:
         misObj = mission.mission()
-    
     
     print("*** RUNNING ***")
     ledObj.setMode(LED.mode.RUNNING)
@@ -109,7 +111,11 @@ if __name__ == "__main__":
 
             if args.mapping:
                 # Update map
-                mapObj.update(pos, rot)
+                frame, rgbImg = d435Obj.getFrame()
+                points = self.d435Obj.deproject_frame( frame, 
+                                                minRange = 0.1, 
+                                                maxRange = 6 )
+                mapObj.update(frame, pos, rot)
 
             if args.collision_avoidance:
                 # Plan next move
@@ -135,6 +141,9 @@ if __name__ == "__main__":
 
     pixObj.stopLoop()
     pixComm.closePort()
+
+    if args.mapping:
+        d435Obj.closeConnection()
 
     if args.SITL:
         posObj.stopLoop()
