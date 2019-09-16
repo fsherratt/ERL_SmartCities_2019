@@ -96,6 +96,7 @@ class tcpInterface():
             else:
                 self.running = True
                 print( '*** Telemetry Connected ***')
+                return
 
     def sendData(self, data):
         byteData = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
