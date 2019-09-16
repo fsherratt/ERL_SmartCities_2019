@@ -3,10 +3,35 @@ import socket
 import select
 import struct
 import pickle
+import threading
 
 import cv2
 
-class telem():
+class airTelemetry():
+    def __init__(self, hostname=''):
+        self.telemInterface = tcpInterface(hostname=hostname)
+        
+    def start(self):
+        self.telemThread = threading.Thread(target=self.telemInterface.startServer, name='Air_Telemetry')
+        self.telemThread.start()
+
+    def stop(self):
+        self.telemInterface.close()
+    
+    def connected(self):
+        if self.telemThread.isAlive() or not self.telemInterface.running:
+            return False
+        
+        return True
+
+    def sendImage(self, image):
+        if not self.connected():
+            return
+        
+        self.telemInterface.sendData(image)
+
+
+class tcpInterface():
     _PORT = 50006
     _MAX_READ_LEN = 60000
     _TIMEOUT = 1
@@ -16,6 +41,8 @@ class telem():
 
         self.sockObj = None
         self.conn = None
+
+        self.running = False
 
         pass
     
@@ -42,6 +69,7 @@ class telem():
                 time.sleep(1)
             
             else:
+                self.running = True
                 return
 
     def close(self):
@@ -66,7 +94,8 @@ class telem():
                 time.sleep(1)
 
             else:
-                return
+                self.running = True
+                print( '*** Telemetry Connected ***')
 
     def sendData(self, data):
         byteData = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
@@ -118,8 +147,9 @@ class telem():
                             msg += conn.recv(bytesIn)
                         except BlockingIOError:
                             time.sleep(0.1)
-
-                    return msg
+                    
+                    data = pickle.loads(msg)
+                    return data
 
         except (ValueError):
             if self.sockObj.fileno() == -1:
@@ -135,24 +165,22 @@ class telem():
 if __name__ == "__main__":
     import threading
 
-    remoteTelem = telem()
-    remoteTelem.startServer()
+    remoteTelem = airTelemetry()
+    remoteTelem.start()
 
-    # localTelem.sockObj.close()
+    while not remoteTelem.connected():
+        time.sleep(1)
 
     testImage = cv2.imread('/Users/freddiesherratt/Desktop/ERL_SmartCities_2019/modules/test.jpg', 0)
 
     totalTime = 0
     loops = 5
     for i in range(loops):
-        print(i)
+        print(i+1)
         startTime = time.time()
-        remoteTelem.sendData(testImage)
-        remoteTelem.close()
-        time.sleep(1)
-
+        remoteTelem.sendImage(testImage)
         totalTime += time.time() - startTime
 
     print(totalTime/loops)
 
-    remoteTelem.close()
+    remoteTelem.stop()
