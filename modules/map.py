@@ -175,7 +175,7 @@ class sitlMapper:
             self.grid[15:32, 28:, :] = obstacle  # 6
 
         self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
-                                                               self.grid, method = 'nearest',
+                                                               self.grid, method = 'linear',
                                                                bounds_error = False,
                                                                fill_value = np.nan )
     # could try nearest interp method = 'nearest' -faster but at what cost
