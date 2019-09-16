@@ -10,16 +10,16 @@ class unexpectedDisconnect( Exception):
     pass
 
 class rs_t265:
-    def __init__(self, posOffset=[0,0,0], rotOffset=[90,90,0]):
+    def __init__(self):
+        
         # Setup variables
         self.pipe = None
         self.cfg = None
 
         # Adjust yaw to align north
-        self.pos_offset = posOffset
-        self.rot_offset = rotOffset
+        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]]
 
-        self.ROffset = R.from_euler('zyx', self.rot_offset, degrees=True) # roll, pitch yaw
+        self.ROffset = R.from_dcm(self.rot_offset)
 
     def __enter__(self):
         self.openConnection()
@@ -63,12 +63,16 @@ class rs_t265:
         if pose:
             data = pose.get_pose_data()
 
-            pos = [data.translation.x, data.translation.y, data.translation.z]
+            pos = np.asarray([data.translation.x, data.translation.y, data.translation.z],dtype=np.float)
             quat = [data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w]
             conf = data.tracker_confidence
 
             # Calculate Euler angles from Quat - Quat is WXYZ
             rot = R.from_quat( quat )
+            # Convert from camera body to aero body
+            rot = rot * self.ROffset.inv()
+            # Change reference frame to aero ref
+            rot = self.ROffset * rot
 
             # Apply pixhawk rotational offset
             pos = self.ROffset.apply(pos)
@@ -82,13 +86,17 @@ class rs_t265:
         pass
 
 if __name__ == "__main__":
+    import time
+
     t265Obj = rs_t265()
 
     with t265Obj:
         while True:
-            pos, eul, conf = t265Obj.getFrame()
+            pos, r, conf = t265Obj.getFrame()
+            eul = r.as_euler('xyz', degrees=True)
+
             # print(i, pos, conf)
 
-            pos, eul = t265Obj.correctOffset( pos, eul )
+            print( 'Pos: {}\t Eul: {}'.format(pos, eul) )
 
-            print(pos)
+            time.sleep(0.5)

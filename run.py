@@ -1,5 +1,7 @@
+#! .venv/bin/python3
+
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission
+from modules import map, navigation, pixhawk, position, mission, LED
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
@@ -18,6 +20,17 @@ if __name__ == "__main__":
         * Navigator - Always the same
         * MK:DataHub - Either on/off        
     '''
+    if args.SITL:
+        ledObj = LED.sitlLED()
+    else:
+        ledObj = LED.LED()
+
+        ledThread = Thread(target=ledObj.loop)
+        ledThread.daemon = True
+        ledThread.start()
+    
+    ledObj.setMode(LED.mode.INITIALISE)
+
     pixAddr = (args.pix[0], int(args.pix[1]))
 
     if args.SITL:
@@ -56,15 +69,15 @@ if __name__ == "__main__":
     pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
     pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
 
-
     mapObj = None
 
-    if args.collision_avoidance:
-        if args.SITL:
-            mapObj = map.sitlMapper()
-        else:
-            mapObj = map.mapper()
+    if args.mapping:
+        mapObj = map.mapper()
+    elif args.SITL:
+        mapObj = map.sitlMapper()
 
+    navObj = None
+    if args.collision_avoidance:
         navObj = navigation.navigation()
 
     # Mission progress
@@ -74,6 +87,7 @@ if __name__ == "__main__":
     
     
     print("*** RUNNING ***")
+    ledObj.setMode(LED.mode.RUNNING)
 
     ''' 
     Read incoming data and share to relavent objects
@@ -95,9 +109,9 @@ if __name__ == "__main__":
             if args.mission:
                 targetPos = misObj.missionProgress(pos)
 
-            if not args.SITL and args.collision_avoidance:
-                    # Update map
-                    mapObj.update(pos, rot)
+            if args.mapping:
+                # Update map
+                mapObj.update(pos, rot)
 
             if args.collision_avoidance:
                 # Plan next move but consider sticking to last move
@@ -118,7 +132,12 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
 
+    except:
+        ledObj.setMode(LED.mode.ERROR)
+
     print("*** STOPPED ***")
+
+    ledObj.clear()
 
     pixObj.stopLoop()
     pixComm.closePort()

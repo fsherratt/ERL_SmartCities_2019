@@ -2,6 +2,7 @@ from modules.MAVLinkThread.mavlinkThread import mavThread, mavSocket
 from modules.realsense import t265
 
 from scipy.spatial.transform import Rotation as R
+import numpy as np
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
@@ -10,15 +11,23 @@ from threading import Thread
 
 class position:
     def __init__(self, pixObj):
-        self.rotOffset = [-90,-90,0]
-        self.t265 = t265.rs_t265( rotOffset=self.rotOffset)
+        self.t265 = t265.rs_t265()
         self.t265.openConnection()
 
         self.pixObj = pixObj
 
-        self._pos = [0,0,0]
-        self._r = R.from_euler('zyx', self.rotOffset, degrees=True)
+        self._pos = np.asarray([0,0,0], dtype=np.float)
+        self._r = R.from_euler('xyz', [0,0,0])
         self._conf = 0
+
+        self.running = True
+        self.north_offset = None
+
+    def setNorthOffset(self, north_offset):
+        if north_offset is not None and self.north_offset is None:
+            t265_yaw = self._r.as_euler('xyz')[2]
+            north_offset -= t265_yaw 
+            self.north_offset = R.from_euler('xyz', [0,0,north_offset])
 
     def __del__(self):
         self.t265.closeConnection()
@@ -29,14 +38,23 @@ class position:
     def loop(self):
         lastUpdate = 0
 
-        while True:
+        while self.running:
             self._pos, self._r, self._conf = self.t265.getFrame()
+            self.setNorthOffset( self.pixObj.compass_heading )
 
+            # Convert from FRD to NED coordinate system
+            if self.north_offset is not None:
+                self._pos = self.north_offset.apply(self._pos)
+                self._r = self._r * self.north_offset
+            
             if time.time() - lastUpdate > 0.04:
-                self.pixObj.sendPosition(self._pos, self._r)
+                self.pixObj.sendPosition(copy.deepcopy(self._pos), copy.deepcopy(self._r))
                 lastUpdate = time.time()
 
             time.sleep(0.01)
+
+    def close(self):
+        self.running = False
 
 
 class sitlPosition(mavThread.mavThread):
