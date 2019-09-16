@@ -77,15 +77,15 @@ if __name__ == "__main__":
 
 
     mapObj = None
+    if args.SITL:
+        mapObj = map.sitlMapper()
+    elif args.mapping:
+        mapObj = map.mapper()
+        d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
+        d435Obj.openConnection()
+
     navObj = None
     if args.collision_avoidance:
-        if args.SITL:
-            mapObj = map.sitlMapper()
-        else:
-            mapObj = map.mapper()
-            d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
-            d435Obj.openConnection()
-
         navObj = navigation.navigation()
 
     # Mission progress
