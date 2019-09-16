@@ -1,7 +1,7 @@
 import numpy as np
 import time
 '''
-meshPoints, considered_points = navObj.updatePt1(pos, targetPos, stuckness)
+meshPoints = navObj.updatePt1(pos, targetPos)
 pointRisk = mapObj.queryMap(meshPoints)
 goto, heading, risk = navObj.updatePt2(pointRisk)
 '''
@@ -19,12 +19,11 @@ class navigation:
 
     _numCoordinates = 3
 
-    def __init__(self):
+    def __init__(self, min_x, max_x, min_y, max_y):
         self.aircraftPosition = np.asarray((0,0,0)) # x,y,z
-        self.aircraftPositionOld = np.asarray((0, 0, 0))  # x,y,z
         self.targetPosition = np.asarray((0,0,0)) # x,y,z
         self.heading = 0
-        self.stuckness = 0
+        self.DistanceThreshold = 8
 
     # Produce possible positions to fly to on the way to a waypoint
     def calcGotoPoints(self):
@@ -109,7 +108,7 @@ class navigation:
         points += path_start
         return points
 
-    def calculatePathRisk(self, gotoPoints, pointRisk, DistanceThreshold = 8):
+    def calculatePathRisk(self, gotoPoints, pointRisk):
         numPaths = gotoPoints.shape[0]
         pointRisk = np.reshape(pointRisk, (numPaths, -1))
         self.Euclideanpoints = np.reshape(self.Euclideanpoints, (numPaths, -1))
@@ -126,7 +125,7 @@ class navigation:
         self.Euclideanpoints = self.Euclideanpoints[:, self.pathMeshElements:]
 
         # Threshold based on distance
-        self.Euclideanpoints[self.Euclideanpoints <= DistanceThreshold] = 1
+        self.Euclideanpoints[self.Euclideanpoints <= self.DistanceThreshold] = 1
         self.Euclideanpoints[self.Euclideanpoints != 1] = 0
 
         # ignore any point risks outside threshold within legB
@@ -148,21 +147,20 @@ class navigation:
 
         return pathRisk
 
-    def updatePt1(self, pos, targetPos, stuckness):
+    def updatePt1(self, pos, targetPos):
         self.aircraftPosition = np.asarray(pos)
         self.targetPosition = np.asarray(targetPos)
-        self.stuckness = stuckness
 
         self.gotoPoints = self.calcGotoPoints()
 
         #this operation is slow
         meshPoints = self.pathMeshGrid(self.gotoPoints)
 
-        considered_points = (np.round(self.gotoPoints[:, 0:2]))
+
 
         self.Euclideanpoints = np.linalg.norm(meshPoints - self.aircraftPosition[np.newaxis, :], axis=1)
 
-        return meshPoints, considered_points
+        return meshPoints
 
     def updatePt2(self, pointRisk):
         pathRisk = self.calculatePathRisk(self.gotoPoints, pointRisk)
