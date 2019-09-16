@@ -120,6 +120,9 @@ if __name__ == "__main__":
                 goto, heading, risk = navObj.updatePt2(pointRisk)
 
                 print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
+                
+                # Tell pixhawk where to go
+                pixObj.directAircraft(goto, heading)
 
             print('Loop time: {:.2f}'.format(loop_time))
 
