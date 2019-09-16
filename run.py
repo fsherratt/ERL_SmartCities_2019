@@ -133,7 +133,7 @@ if __name__ == "__main__":
             map = np.sum(mapObj.grid, axis=2)
             img = np.asarray([map / np.max(map)]).reshape(41,41)
             img2 = cv2.merge((pts,img,pospts))
-            img2 = cv2.flip(img2, 0)
+            #img2 = cv2.flip(img2, 0)
             cv2.imshow('rgb_img', img2)
             cv2.waitKey(1)
             #mapObj.positionHistory(pos)

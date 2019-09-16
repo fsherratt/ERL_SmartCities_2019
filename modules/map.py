@@ -126,8 +126,14 @@ class sitlMapper:
             self.grid[28:31, 26:41, :] = obstacle  # 6
             self.grid[0:14, 24:26, :] = obstacle  # 7
 
+        if map_on == 2:
+            self.grid[:29, :2, :] = obstacle  # 1
+            self.grid[10:29, 5:9, :] = obstacle  # 2
+            self.grid[28:39, 8:11, :] = obstacle  # 3
+            self.grid[36, 8:39, :] = obstacle  # 4
+            self.grid[9:27, 13:16, :] = obstacle  # 5
+            self.grid[15:32, 28:, :] = obstacle  # 6
 
-            #self.grid[17:19, 7:15, :] = 0
         self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
                                                                self.grid, method = 'linear',
                                                                bounds_error = False,
