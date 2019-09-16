@@ -4,7 +4,7 @@ import pickle
 import cv2
 
 if __name__ == "__main__":
-    localTelem  = telemetry.tcpInterface( hostname='Freddies-MacBook-Pro.local')
+    localTelem  = telemetry.tcpInterface( hostname='ERL-1.local')
     localTelem.startClient()
 
     while True:

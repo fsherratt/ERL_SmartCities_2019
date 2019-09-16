@@ -1,10 +1,11 @@
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission, LED
+from modules import map, navigation, pixhawk, position, mission, LED, telemetry
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from modules.realsense import d435
 from threading import Thread
 import time
-    
+import traceback
+import sys
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -24,11 +25,14 @@ if __name__ == "__main__":
         ledObj = LED.sitlLED()
     else:
         ledObj = LED.LED()
-
-        ledThread = threading.Thread(target=ledObj.loop)
+        ledThread = Thread(target=ledObj.loop, name='LED')
         ledThread.daemon = True
     
     ledObj.setMode(LED.mode.INITIALISE)
+
+    if args.telemetry:
+        telemObj = telemetry.airTelemetry()
+        telemObj.start()
 
     pixAddr = (args.pix[0], int(args.pix[1]))
 
@@ -112,10 +116,11 @@ if __name__ == "__main__":
             if args.mapping:
                 # Update map
                 frame, rgbImg = d435Obj.getFrame()
-                points = self.d435Obj.deproject_frame( frame, 
-                                                minRange = 0.1, 
-                                                maxRange = 6 )
-                mapObj.update(frame, pos, rot)
+                points = d435Obj.deproject_frame(frame)
+                mapObj.update(points, pos, rot)
+
+                if args.telemetry:
+                    telemObj.sendImage(rgbImg)
 
             if args.collision_avoidance:
                 # Plan next move
@@ -135,6 +140,7 @@ if __name__ == "__main__":
         pass
 
     except:
+        traceback.print_exc(file=sys.stdout)
         ledObj.setMode(LED.mode.ERROR)
 
     print("*** STOPPED ***")

@@ -54,9 +54,8 @@ class mapper:
     # --------------------------------------------------------------------------
     def update(self, points, pos, rot):
         # Add to map
-        
-        points = self.local_to_global_points(points, pos, r)     
-        mapObj.updateMap(points, pos)
+        points = self.local_to_global_points(points, pos, rot)     
+        self.updateMap(points, pos)
 
     def digitizePoints(self, points):
         xSort = np.digitize( points[:, 0], self.xBins )

@@ -32,8 +32,9 @@ class airTelemetry():
         try:
             self.telemInterface.sendData(image)
 
-        except BrokenPipeError:
+        except (BrokenPipeError, ConnectionResetError):
             # Start listen for new connections if socket closed
+            self.telemInterface.close()
             self.start()
 
 

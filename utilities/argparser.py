@@ -34,5 +34,11 @@ def GetParser():
                         default = None,
                         action = "store_true",
                         required=False)
+    
+    parser.add_argument( '--telemetry', '-T',
+                        help = 'Enable Telemetry',
+                        default = None,
+                        action = "store_true",
+                        required=False)
 
     return parser
