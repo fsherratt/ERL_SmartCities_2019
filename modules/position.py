@@ -2,10 +2,11 @@ from modules.MAVLinkThread.mavlinkThread import mavThread, mavSocket
 from modules.realsense import t265
 
 from scipy.spatial.transform import Rotation as R
+import numpy as np
 
 import pymavlink.dialects.v20.ardupilotmega as pymavlink
 import time
-
+import numpy as np
 from threading import Thread
 
 class position:
@@ -15,9 +16,18 @@ class position:
 
         self.pixObj = pixObj
 
-        self._pos = [0,0,0]
-        self._r = R.from_euler('zyx', [0,0,0])
+        self._pos = np.asarray([0,0,0], dtype=np.float)
+        self._r = R.from_euler('xyz', [0,0,0])
         self._conf = 0
+
+        self.running = True
+        self.north_offset = None
+
+    def setNorthOffset(self, north_offset):
+        if north_offset is not None and self.north_offset is None:
+            t265_yaw = self._r.as_euler('xyz')[2]
+            north_offset -= t265_yaw 
+            self.north_offset = R.from_euler('xyz', [0,0,north_offset])
 
     def __del__(self):
         self.t265.closeConnection()
@@ -28,14 +38,23 @@ class position:
     def loop(self):
         lastUpdate = 0
 
-        while True:
+        while self.running:
             self._pos, self._r, self._conf = self.t265.getFrame()
+            self.setNorthOffset( self.pixObj.compass_heading )
 
+            # Convert from FRD to NED coordinate system
+            if self.north_offset is not None:
+                self._pos = self.north_offset.apply(self._pos)
+                self._r = self._r * self.north_offset
+            
             if time.time() - lastUpdate > 0.04:
-                self.pixObj.sendPosition(self._pos, self._r)
+                self.pixObj.sendPosition(copy.deepcopy(self._pos), copy.deepcopy(self._r))
                 lastUpdate = time.time()
 
             time.sleep(0.01)
+
+    def close(self):
+        self.running = False
 
 
 class sitlPosition(mavThread.mavThread):
@@ -43,6 +62,9 @@ class sitlPosition(mavThread.mavThread):
         self._attitude = [0,0,0]
         self._position = [0,0,0]
 
+        self.stuckness = 0
+        self.speed_avg_len = 10
+        self.historical_speed = np.zeros(self.speed_avg_len)
         super( sitlPosition, self).__init__( conn, pymavlink )
 
     def _processReadMsg(self, msglist):
@@ -71,11 +93,25 @@ class sitlPosition(mavThread.mavThread):
 
     def _positionHandler(self, msg):
         self._position = [msg.x, msg.y, msg.z]
+        self._velocity = [msg.vx, msg.vy, msg.vz]
+
 
     def update(self):
         r = R.from_euler('xzy', self._attitude, degrees=False)
         return self._position, r, 3
 
+    def calc_stuckness(self):
+        speed = np.linalg.norm(self._velocity)
+
+        self.stuckness = self.stuckness+0.04*np.tanh(1/(0.5-speed))
+
+        if self.stuckness >= 1:
+            self.stuckness=1
+        if self.stuckness <= 0:
+            self.stuckness=0
+
+        print("speed = ", np.round(speed,1), "stuckness = ",np.round(self.stuckness,1))
+        return self.stuckness
 
 if __name__ == "__main__":
     SITL = True

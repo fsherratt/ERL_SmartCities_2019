@@ -1,9 +1,12 @@
+#! .venv/bin/python3
+
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission
+from modules import map, navigation, pixhawk, position, mission, LED, Aircraft_Plotter
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
-    
+import traceback
+import sys
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -19,6 +22,17 @@ if __name__ == "__main__":
         * Navigator - Always the same
         * MK:DataHub - Either on/off        
     '''
+    if args.SITL:
+        ledObj = LED.sitlLED()
+    else:
+        ledObj = LED.LED()
+
+        ledThread = Thread(target=ledObj.loop)
+        ledThread.daemon = True
+        ledThread.start()
+    
+    ledObj.setMode(LED.mode.INITIALISE)
+
     pixAddr = (args.pix[0], int(args.pix[1]))
 
     if args.SITL:
@@ -38,13 +52,10 @@ if __name__ == "__main__":
 
     print('*** PIXHAWK CONNECTED ***')
 
-
     if args.SITL:
         posComm = mavSocket.mavSocket((args.pix[0], 14552))
         posComm.openPort()
-        
         posObj = position.sitlPosition(posComm)
-
     else:
         posObj = position.position(pixObj)
 
@@ -53,31 +64,29 @@ if __name__ == "__main__":
     posThread.start()
 
     print("*** SET HOME LOCATION ***")
-    home_lat = 151269321       # Somewhere in Africa
-    home_lon = 16624301        # Somewhere in Africa
-    home_alt = 163000 
 
-    pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
-    pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
-
+    pixObj.sendSetGlobalOrigin()
+    pixObj.sendSetHomePosition()
 
     mapObj = None
+
+    if args.mapping:
+        mapObj = map.mapper()
+    elif args.SITL:
+        mapObj = map.sitlMapper()
+
     navObj = None
     if args.collision_avoidance:
-        if args.SITL:
-            mapObj = map.sitlMapper()
-        else:
-            mapObj = map.mapper()
-
         navObj = navigation.navigation()
 
     # Mission progress
     misObj = None
     if args.mission:
-        misObj = mission.mission()
+        misObj = mission.mission(pixObj)
     
     
     print("*** RUNNING ***")
+    ledObj.setMode(LED.mode.RUNNING)
 
     ''' 
     Read incoming data and share to relavent objects
@@ -87,37 +96,55 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
+
         while True:
             startTime = time.time()
+
             # Get our current location
             pos, rot, conf = posObj.update()
 
+
             # Where are we going?
             if args.mission:
-                targetPos = misObj.missionProgress(pos)
+                collision_avoidance, targetPos = misObj.missionProgress(pos)
 
-            if not args.SITL and args.collision_avoidance:
-                    # Update map
-                    mapObj.update(pos, rot)
+            if args.mapping:
+                # Update map
+                mapObj.update(pos, rot)
 
-            if args.collision_avoidance:
-                # Plan next move
-                meshPoints = navObj.updatePt1(pos, targetPos)
-                pointRisk = mapObj.queryMap(meshPoints)
-                goto, heading, risk = navObj.updatePt2(pointRisk)
+            if collision_avoidance:
+                try:
+                    # Plan next move but consider sticking to last move
+                    meshPoints = navObj.updatePt1(pos, targetPos)
+                    pointRisk = mapObj.queryMap(meshPoints)
+                    goto, heading, risk = navObj.updatePt2(pointRisk)
 
-                print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
+                    #print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
 
-                # Tell pixhawk where to go
-                pixObj.directAircraft(goto, heading)
+                    # Tell pixhawk where to go
+                    pixObj.directAircraft(goto, heading)
+                except ValueError:
+                    pass
+                Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
+            loop_time = time.time() - startTime
+            #print('update frequency: {:.2f}'.format(1/loop_time))
 
-            print('Loop time: {:.2f}'.format(time.time()-startTime))
+
             time.sleep(0.2)
+
+
+            loop_time = time.time() - startTime
 
     except KeyboardInterrupt:
         pass
 
+    except:
+        ledObj.setMode(LED.mode.ERROR)
+        traceback.print_exc(file=sys.stdout)
+
     print("*** STOPPED ***")
+
+    ledObj.clear()
 
     pixObj.stopLoop()
     pixComm.closePort()

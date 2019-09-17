@@ -63,13 +63,16 @@ class rs_t265:
         if pose:
             data = pose.get_pose_data()
 
-            pos = [data.translation.x, data.translation.y, data.translation.z]
+            pos = np.asarray([data.translation.x, data.translation.y, data.translation.z],dtype=np.float)
             quat = [data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w]
             conf = data.tracker_confidence
 
             # Calculate Euler angles from Quat - Quat is WXYZ
             rot = R.from_quat( quat )
-            rot = self.ROffset * rot * self.ROffset.inv()
+            # Convert from camera body to aero body
+            rot = rot * self.ROffset.inv()
+            # Change reference frame to aero ref
+            rot = self.ROffset * rot
 
             # Apply pixhawk rotational offset
             pos = self.ROffset.apply(pos)
