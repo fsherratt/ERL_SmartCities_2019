@@ -26,239 +26,233 @@ class request(Enum):
   GETIMAGE = 11
   PUTIMAGE = 12
   POSTIMAGE = 13
-# from io import StringIO
-
-currentTimeID = str(int(time.time()*1000000))
-currentTime = str(time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(int(int(time.time())))))
-
-###Variables to get  from other parts of the interface. #####
-StatusMessage = "test message to be changed"
-currentStatus = "Loading"
-droneX = 0
-droneY = 0
-droneZ = 0
-
-getImageFile = 'some1.jpeg'
-###end data from other parts of interface #####
-
-#encoding the image for apiObj.Put/PostImage()
-with open(getImageFile, mode='rb') as file: 
-  img = file.read()
-encodedImage = json.dumps(base64.b64encode(img).decode("utf-8"))
-
-
-## Constant Variables 
-teamid ='bathdrones'
-teamkey = 'd22ec71d-af83-4cd6-847c-ea5031870d9b'
-baseurl = "https://api.mksmart.org/sciroc-competition/"
-robotName = "Gary"
-ID = teamid + "-" + robotName + "-" + currentTimeID
-
-#Json Data
-Status_Info = {
-  "@id": ID,
-  "@type": "RobotStatus",
-  "message": "loading",
-  "episode": "EPISODE12",
-  "team": "bathdrones",
-  "timestamp": currentTime,
-  "x": droneX, 
-  "y": droneY,
-  "z": droneZ
-}
-
-Robot_Location = {
-  "@id": ID,
-  "@type": "RobotLocation",
-  "episode": "EPISODE12", 
-  "team": "string",
-  "timestamp": currentTime,
-  "x": droneX, 
-  "y": droneY,
-  "z": droneZ
-}
-
-Patient= {
-  "@id": ID,
-  "@type": "Patient",
-  "x": droneX, 
-  "y": droneY,
-  "z": droneZ
-}
-
-ImageReport = {
-  "@id": ID,
-  "@type": "ImageReport",
-  "team": "bathdrones",
-  "timestamp": currentTime,
-  "x": 0,
-  "y": 0,
-  "z": 0,
-  "base64": encodedImage,
-  "format": "image/jpeg"
-  }
-
 
 class API:
+  teamid ='bathdrones'
+  teamkey = 'd22ec71d-af83-4cd6-847c-ea5031870d9b'
+  baseurl = "https://api.mksmart.org/sciroc-competition/"
+  robotName = "Gary"
+  episode = "EPISODE12"
+
   def __init__(self):
-    pass
+    self.position = [0,0,0]
+    self.status = 'Loading'
+    
+  def ID(self):
+    return self.teamid + "-" + self.robotName + "-" + self.currentTimeID
+  
+  def currentTimeID(self):
+    return str(int(time.time()*1000000))
+
+  def currentTime(self):
+    return str(time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(int(int(time.time())))))
+
+  def Status_Info(self):
+    Status_Info = {
+      "@id": self.ID(),
+      "@type": "RobotStatus",
+      "message": self.status,
+      "episode": self.episode,
+      "team": self.teamid,
+      "timestamp": self.currentTime(),
+      "x": self.position[0], 
+      "y": self.position[1],
+      "z": self.position[2]
+    }
+    return Status_Info
+
+  def Robot_Location(self):
+    Robot_Location = {
+      "@id": self.ID(),
+      "@type": "RobotLocation",
+      "episode": self.episode, 
+      "team": self.teamid,
+      "timestamp": self.currentTime(),
+      "x": self.position[0], 
+      "y": self.position[1],
+      "z": self.position[2]
+    }
+    return Robot_Location
+
+  def ImageReport(self, img):
+    encodedImage = json.dumps(base64.b64encode(img).decode("utf-8"))
+
+    ImageReport = {
+      "@id": self.ID(),
+      "@type": "ImageReport",
+      "team": self.teamid,
+      "timestamp": self.currentTime(),
+      "x": self.position[0], 
+      "y": self.position[1],
+      "z": self.position[2],
+      "base64": encodedImage,
+      "format": "image/jpeg"
+    }
+    return ImageReport
+
 
   def PrintData(self,response):
     print("Server Status: "+str(response.status_code) +"\n")
     #print(response.text)
 
   def POST(self,url, payload):
-    response = requests.request("POST",url, data=payload, auth=HTTPBasicAuth(teamkey, ''))
+    response = requests.request("POST",url, data=payload, auth=HTTPBasicAuth(self.teamkey, ''))
     self.PrintData(response)
 
   def PUT(self,url, payload):
-    response = requests.request("PUT",url, data=payload, auth=HTTPBasicAuth(teamkey, ''))
+    response = requests.request("PUT",url, data=payload, auth=HTTPBasicAuth(self.teamkey, ''))
     self.PrintData(response)
 
   def GET(self,url):
-    response = requests.request("GET",url, auth=HTTPBasicAuth(teamkey, ''))
+    response = requests.request("GET",url, auth=HTTPBasicAuth(self.teamkey, ''))
     self.PrintData(response)
     getData = json.loads(response.text)[0]
-    pprint.pprint(getData)
     return getData
     
   ##StatusBlock
   def GetRobotStatusList(self):
-    url = baseurl +  teamid + '/sciroc-robot-status/'
+    url = self.baseurl + self.teamid + '/sciroc-robot-status/'
     self.GET(url)
 
   def GetRobotStatus(self, getID):
-    url = baseurl +  teamid + '/sciroc-robot-status/' + getID 
-    self.GET(url)
+    url = self.baseurl + self.teamid + '/sciroc-robot-status/' + getID 
+    result = self.GET(url)
+    return result
   
   def PutRobotStatus(self):
-    payload = json.dumps(Status_Info)
-    url = baseurl +  teamid + "/sciroc-robot-status/" + ID
+    payload = json.dumps(self.Status_Info())
+    url = self.baseurl + self.teamid + "/sciroc-robot-status/" + self.ID()
     self.PUT(url, payload)
 
   def PostRobotStatus(self):
-    payload = json.dumps(Status_Info)
-    url = baseurl +  teamid + "/sciroc-robot-status/" + ID
+    payload = json.dumps(self.Status_Info())
+    url = self.baseurl + self.teamid + "/sciroc-robot-status/" + self.ID()
     self.POST(url,payload)
   
   ##Location Block
   def GetLocationList(self):
-    url = baseurl +  teamid + "/sciroc-robot-location/"
-    self.GET(url)
+    url = self.baseurl + self.teamid + "/sciroc-robot-location/"
+    result = self.GET(url)
+    return result
 
   def GetLocation(self, getID):
-    url = baseurl +  teamid +"/sciroc-robot-location/" + getID
-    self.GET(url)
+    url = self.baseurl +  self.teamid +"/sciroc-robot-location/" + getID
+    result = self.GET(url)
+    return result
 
   def PutLocation(self):
-    url = baseurl +  teamid +"/sciroc-robot-location/" + ID
-    payload = json.dumps(Robot_Location)
+    url = self.baseurl + self.teamid +"/sciroc-robot-location/" + self.ID()
+    payload = json.dumps(self.Robot_Location())
     self.PUT(url,payload)
  
   def PostLocation(self):
-    url = baseurl +  teamid + "/sciroc-robot-location/" + ID
-    payload = json.dumps(Robot_Location)
+    url = self.baseurl +  teamid + "/sciroc-robot-location/" + self.ID()
+    payload = json.dumps(self.Robot_Location())
     self.POST(url,payload)
 
   ##Patient Block
   def GetPatientList(self):
-    url = baseurl + "/master/sciroc-episode12-patient/"
-    getData = self.GET(url)
-
-    print("ID is = "+str(getData["@id"]))
+    url = self.baseurl + "/master/sciroc-episode12-patient/"
+    result = self.GET(url)
+    return result
+    # print("ID is = "+str(getData["@id"]))
 
 
   def GetPatient(self, getID):
-    url = baseurl + "/master/sciroc-episode12-patient/" + getID 
+    url = self.baseurl + "/master/sciroc-episode12-patient/" + getID 
     self.GET(url)
-    getData = self.GET(url)
+    result = self.GET(url)
     patientX = getData["x"]
     patientY = getData["y"]
     patientZ = getData["z"]
-    return patientX, patientY, patientZ
+    return result, patientX, patientY, patientZ
 
   ##Image Block
   def GetImageList(self):
-    url = baseurl +  teamid + "/sciroc-episode12-image/"
+    url = self.baseurl + self.teamid + "/sciroc-episode12-image/"
     #payload = json.dumps(ImageReport)
-    self.GET(url)
+    result = self.GET(url)
+    return result
 
   def GetImage(self, getID):
-    url = baseurl +  teamid + "/sciroc-episode12-image/" + getID 
-    getData = self.GET(url)
-    getImageData = getData["base64"]
+    url = self.baseurl + self.teamid + "/sciroc-episode12-image/" + getID 
+    result = self.GET(url)
+    getImageData = result["base64"]
     #print(getImageData)
     decodedImage = base64.b64decode(getImageData)
     img = cv2.imdecode(np.frombuffer(decodedImage, dtype=np.uint8), 1)
     cv2.imshow("img",img)
     cv2.waitKey(1000)
+    return result
+    
 
-  def PutImage(self):
-    url = baseurl +  teamid + "/sciroc-episode12-image/" + ID 
-    payload = json.dumps(ImageReport)
+  def PutImage(self, img):
+    url = self.baseurl + self.teamid + "/sciroc-episode12-image/" + self.ID() 
+    payload = json.dumps(self.ImageReport(img))
     self.PUT(url, payload)
 
-  def PostImage(self):
-    url = baseurl +  teamid + "/sciroc-episode12-image/" + ID 
-    payload = json.dumps(ImageReport)
+  def PostImage(self, img):
+    url = self.baseurl + self.teamid + "/sciroc-episode12-image/" + self.ID() 
+    payload = json.dumps(self.ImageReport(img))
     self.POST(url, payload)
 
 
-apiObj = API()
-request = request.GETROBOTSTATUSLIST
-
-
-if request == request.GETROBOTSTATUSLIST:
-  apiObj.GetRobotStatusList()
-
-elif request == request.GETROBOTSTATUS:
-  getID = 'someInputID'
-  apiObj.GetRobotStatus(getID)
-
-elif request == request.PUTROBOTSTATUS:
-  apiObj.PutRobotStatus()
-
-elif request == request.POSTROBOTSTATUS:
-  apiObj.PostRobotStatus()
-
-elif request == request.GETLOCATIONLIST:
-  apiObj.GetRobotStatusList()
-
-elif request == request.GETLOCATION:
-  getID = 'someInputID'
-  apiObj.GetLocation(getID)
-
-elif request == request.PUTLOCATION:
-  apiObj.PutLocation()
+if __name__ == "__main__":
+  apiObj = API()
   
-elif request == request.POSTLOCATION:
-  apiObj.PostLocation()
-  
-elif request == request.GETPATIENTLIST:
-  apiObj.GetPatientList()
-  
-elif request == request.GETPATIENT:
-  getID = 'someInputID'
-  apiObj.GetPatient(getID)
-  
-elif request == request.GETIMAGELIST:
-  apiObj.GetImageList()
-  
-elif request == request.GETIMAGE:
-  getID = 'someInputID'
-  apiObj.GetImage(getID)
-  
-elif request == request.PUTIMAGE:
-  apiObj.PutImage()
-  
-elif request == request.POSTIMAGE:
-  apiObj.PostImage()
-  
+  getID = '1568675071332568'
 
-#apiObj.GetPatient(getID)
+  requiredData = request.GETIMAGELIST
+
+  if requiredData == request.GETROBOTSTATUSLIST:
+    apiObj.GetRobotStatusList()
+
+  elif requiredData == request.GETROBOTSTATUS:
+    apiObj.GetRobotStatus(getID)
+
+  elif requiredData == request.PUTROBOTSTATUS:
+    apiObj.PutRobotStatus()
+
+  elif requiredData == request.POSTROBOTSTATUS:
+    apiObj.PostRobotStatus()
+
+  elif requiredData == request.GETLOCATIONLIST:
+    apiObj.GetLocationList()
+
+  elif requiredData == request.GETLOCATION:
+    apiObj.GetLocation(getID)
+
+  elif requiredData == request.PUTLOCATION:
+    apiObj.PutLocation()
+    
+  elif requiredData == request.POSTLOCATION:
+    apiObj.PostLocation()
+    
+  elif requiredData == request.GETPATIENTLIST:
+    apiObj.GetPatientList()
+    
+  elif requiredData == request.GETPATIENT:
+    apiObj.GetPatient(getID)
+    
+  elif requiredData == request.GETIMAGELIST:
+    apiObj.GetImageList()
+    
+  elif requiredData == request.GETIMAGE:
+    apiObj.GetImage(getID)
+    
+  elif requiredData == request.PUTIMAGE:
+    with open(getImageFile, mode='rb') as file: 
+      img = file.read()
+    apiObj.PutImage()
+    
+  elif requiredData == request.POSTIMAGE:
+    apiObj.PostImage()
+    
+
+  #apiObj.GetPatient(getID)
 
 
-# print(currentTimeID)
+  # print(currentTimeID)
 
 
 
