@@ -3,12 +3,11 @@ import time
 class mission:
     missionItems = [[-15, -15, -5], [15, -15, -5], [15, 15, -5], [-15, 15, -5], [0, 0, 0]]
     update_rate = 5
-    def __init__(self, pixObj, posObj):
+    def __init__(self, pixObj):
         self.missionItem = 0
         self.missionItems = np.asarray(self.missionItems)
         self.state = 0
         self.pixObj = pixObj
-        self.posObj = posObj
         self.collision_avoidance = 0
         self.start = 0
         self.landed_pos = 0

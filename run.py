@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # Mission progress
     misObj = None
     if args.mission:
-        misObj = mission.mission(pixObj, posObj)
+        misObj = mission.mission(pixObj)
     
     
     print("*** RUNNING ***")
