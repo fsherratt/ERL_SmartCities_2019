@@ -4,8 +4,15 @@ import select
 import struct
 import pickle
 import threading
+import enum
 
 import cv2
+
+class DataType(enum.Enum):
+    TELEM_RGB_IMAGE = 0
+    TELEM_DEPTH_FRAME = 1
+    TELEM_POSITION = 2
+    TELEM_TARGET = 3
 
 class airTelemetry():
     def __init__(self, hostname=''):
@@ -25,15 +32,15 @@ class airTelemetry():
         
         return True
 
-    def sendImage(self, image):
+    def sendData(self, name, data):
         if not self.connected():
             return
         
         try:
-            self.telemInterface.sendData(image)
-
-        except (BrokenPipeError, ConnectionResetError):
+            self.telemInterface.sendData((name, data))
+           
             # Start listen for new connections if socket closed
+        except (BrokenPipeError, ConnectionResetError):
             self.telemInterface.close()
             self.start()
 

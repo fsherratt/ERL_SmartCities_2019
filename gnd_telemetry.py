@@ -8,15 +8,23 @@ if __name__ == "__main__":
     localTelem.startClient()
 
     while True:
-        img = localTelem.readMsg()
+        msg = localTelem.readMsg()
         
-        if img is None:
-            print('*** No Data ***')
+        if msg is None:
             time.sleep(0.5)
             continue
+        
+        if msg[0] == telemetry.DataType.TELEM_RGB_IMAGE:
+            cv2.imshow('RGB', msg[1])
+            cv2.waitKey(1)
+        
+        elif msg[0] == telemetry.DataType.TELEM_DEPTH_FRAME:
+            cv2.imshow('Depth', msg[1])
 
-        cv2.imshow('Sent', img)
-        cv2.waitKey(500)
+        elif msg[0] == telemetry.DataType.TELEM_POSITION:
+            print(msg[1])
+
+        elif 
         time.sleep(0.5)
 
     localTelem.close()

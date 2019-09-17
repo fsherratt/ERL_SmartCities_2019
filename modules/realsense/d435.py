@@ -11,6 +11,9 @@ class unexpectedDisconnect( Exception):
     pass
 
 class rs_d435:
+    min_range = 0.1
+    max_range = 10
+
     def __init__(self, width=640, height=480, framerate=30):
         self.width = width
         self.height = height
@@ -130,7 +133,7 @@ class rs_d435:
     # Conversion depth frame to 3D local coordiate system in meters
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
-    def deproject_frame( self, frame, minRange = 0, maxRange = 10 ):
+    def deproject_frame( self, frame ):
         frame = frame * self.scale
         Z = frame
         X = np.multiply( frame, self.xDeprojectMatrix )
@@ -143,7 +146,7 @@ class rs_d435:
         # Conversion into aero-reference frame
         points = np.column_stack( (Z,X,Y) )
 
-        inRange = np.where( (points[:,0] > minRange) & (points[:,0] < maxRange) )
+        inRange = np.where( (points[:,0] > self.min_range) & (points[:,0] < self.max_range) )
         points = points[inRange]
 
         return points

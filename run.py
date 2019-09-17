@@ -124,7 +124,8 @@ if __name__ == "__main__":
                 mapObj.update(points, pos, rot)
 
                 if args.telemetry:
-                    telemObj.sendImage(rgbImg)
+                    telemObj.sendData(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
+                    telemObj.sendData(telemetry.DataType.TELEM_DEPTH_FRAME, frame)
 
             if args.collision_avoidance:
                 # Plan next move but consider sticking to last move
@@ -165,6 +166,9 @@ if __name__ == "__main__":
     if args.SITL:
         posObj.stopLoop()
         posComm.closePort()
+
+    if args.telemetry:
+        telemObj.stop()
 
     print("*** BYE ***")
             

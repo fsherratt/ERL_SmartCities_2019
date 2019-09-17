@@ -41,4 +41,10 @@ def GetParser():
                         action = "store_true",
                         required=False)
 
+    parser.add_argument( '--telemetry', '-T',
+                        help = 'Enable mapping',
+                        default = None,
+                        action = "store_true",
+                        required=False)
+
     return parser
