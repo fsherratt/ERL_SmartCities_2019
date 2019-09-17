@@ -63,14 +63,10 @@ if __name__ == "__main__":
     posThread.daemon = True
     posThread.start()
 
-    if not args.SITL:
-        print("*** SET HOME LOCATION ***")
-        home_lat = 151269321       # Somewhere in Africa
-        home_lon = 16624301        # Somewhere in Africa
-        home_alt = 163000
+    print("*** SET HOME LOCATION ***")
 
-        pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
-        pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
+    pixObj.sendSetGlobalOrigin()
+    pixObj.sendSetHomePosition()
 
     mapObj = None
 
@@ -86,7 +82,7 @@ if __name__ == "__main__":
     # Mission progress
     misObj = None
     if args.mission:
-        misObj = mission.mission(pixObj)
+        misObj = mission.mission(pixObj, posObj)
     
     
     print("*** RUNNING ***")

@@ -149,7 +149,7 @@ class sitlMapper:
         # north east down
 
         # self.grid[20, :, 5:14] = 1
-        map_on = 0
+        map_on = 1
         obstacle = 1
         if map_on == 1:
             self.grid[10:12, 3:11, 0:12] = obstacle  # 1
