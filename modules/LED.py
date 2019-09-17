@@ -23,6 +23,9 @@ class sitlLED:
     def loop(self):
         pass
 
+    def clear(self):
+        pass
+
 class LED:
     def __init__(self):
         import board

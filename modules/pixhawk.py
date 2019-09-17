@@ -7,6 +7,10 @@ from threading import Thread
 import time
 
 class pixhawkAbstract(mavThread.mavThread, object):
+    home_lat = 151261321 # Somewhere in Africa
+    home_lon = 16624301  # Somewhere in Africa
+    home_alt = 163000
+
     def __init__( self, conn ):
         self._pixhawkTimeOffset = 0
         self._mode = 0
@@ -26,6 +30,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         if time.time() - self.lastSentHeartbeat > 0.5:
             self.sendHeartbeat()
             self.lastSentHeartbeat = time.time()
+            self.getHomePosition()
 
     # Process Messages
     def _processReadMsg(self, msglist):
@@ -39,7 +44,10 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
             elif id == self._mavLib.MAVLINK_MSG_ID_STATUSTEXT:
                 print(msg)
-    
+
+            elif id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
+                self._homeHandler(msg)
+
     def _heartbeatHandler(self, msg): 
         if not msg.autopilot == self._mavLib.MAV_AUTOPILOT_INVALID:
             # Arm State
@@ -55,6 +63,13 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
     def _attitudeHandler(self, msg):
         self._heading_north_yaw = msg.yaw
+
+    def _homeHandler(self, msg):
+        self._home = [msg.x, msg.y, msg.z]
+
+    @property
+    def home(self):
+        return self._home
 
     @property
     def compass_heading(self):
@@ -104,11 +119,11 @@ class pixhawkAbstract(mavThread.mavThread, object):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
 
-    def sendSetGlobalOrigin(self,lat,lon,alt):
-        msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,lat,lon,alt)
+    def sendSetGlobalOrigin(self):
+        msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,self.home_lat, self.home_lon, self.home_alt)
         self.queueOutputMsg(msg)
 
-    def sendSetHomePosition(self,lat,lon,alt):
+    def sendSetHomePosition(self):
         x = 0
         y = 0
         z = 0
@@ -116,14 +131,19 @@ class pixhawkAbstract(mavThread.mavThread, object):
         approach_x = 0
         approach_y = 0
         approach_z = 1
-
+        '''
         msg = self._mavLib.MAVLink_set_home_position_message(0,
-            lat,lon,alt,
+            self.home_lat, self.home_lon, self.home_alt,
             x,y,z,q,
             approach_x,
             approach_y,
             approach_z)
+        '''
+        msg = pymavlink.MAVLink_command_long_message(0, 0, pymavlink.MAV_CMD_GET_HOME_POSITION, 0, 0, 0, 0, 0, self.home_lat, self.home_lon, self.home_alt)
+        self.queueOutputMsg(msg)
 
+    def getHomePosition(self):
+        msg = pymavlink.MAVLink_command_long_message(0, 0, pymavlink.MAV_CMD_GET_HOME_POSITION, 0, 0, 0, 0, 0, 0, 0, 0)
         self.queueOutputMsg(msg)
 
     def directAircraft(self, pos, heading=None):

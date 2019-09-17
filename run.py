@@ -1,10 +1,12 @@
 #! .venv/bin/python3
 
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission, LED
+from modules import map, navigation, pixhawk, position, mission, LED, Aircraft_Plotter
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from threading import Thread
 import time
+import traceback
+import sys
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -62,12 +64,9 @@ if __name__ == "__main__":
     posThread.start()
 
     print("*** SET HOME LOCATION ***")
-    home_lat = 151269321       # Somewhere in Africa
-    home_lon = 16624301        # Somewhere in Africa
-    home_alt = 163000 
 
-    pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
-    pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
+    pixObj.sendSetGlobalOrigin()
+    pixObj.sendSetHomePosition()
 
     mapObj = None
 
@@ -83,7 +82,7 @@ if __name__ == "__main__":
     # Mission progress
     misObj = None
     if args.mission:
-        misObj = mission.mission()
+        misObj = mission.mission(pixObj)
     
     
     print("*** RUNNING ***")
@@ -107,24 +106,28 @@ if __name__ == "__main__":
 
             # Where are we going?
             if args.mission:
-                targetPos = misObj.missionProgress(pos)
+                collision_avoidance, targetPos = misObj.missionProgress(pos)
 
             if args.mapping:
                 # Update map
                 mapObj.update(pos, rot)
 
-            if args.collision_avoidance:
-                # Plan next move but consider sticking to last move
-                meshPoints = navObj.updatePt1(pos, targetPos)
-                pointRisk = mapObj.queryMap(meshPoints)
-                goto, heading, risk = navObj.updatePt2(pointRisk)
+            if collision_avoidance:
+                try:
+                    # Plan next move but consider sticking to last move
+                    meshPoints = navObj.updatePt1(pos, targetPos)
+                    pointRisk = mapObj.queryMap(meshPoints)
+                    goto, heading, risk = navObj.updatePt2(pointRisk)
 
-                print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-                
-                # Tell pixhawk where to go
-                pixObj.directAircraft(goto, heading)
+                    #print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
 
-            print('Loop time: {:.2f}'.format(loop_time))
+                    # Tell pixhawk where to go
+                    pixObj.directAircraft(goto, heading)
+                except ValueError:
+                    pass
+                Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
+            loop_time = time.time() - startTime
+            #print('update frequency: {:.2f}'.format(1/loop_time))
 
 
             time.sleep(0.2)
@@ -137,6 +140,7 @@ if __name__ == "__main__":
 
     except:
         ledObj.setMode(LED.mode.ERROR)
+        traceback.print_exc(file=sys.stdout)
 
     print("*** STOPPED ***")
 

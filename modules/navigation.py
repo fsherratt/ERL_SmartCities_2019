@@ -12,14 +12,18 @@ class navigation:
     maxCPDistance = 10
     pathMeshElements = 10
     elevationMeshElements = 11 # Number of elevation angles to evaluate #11
-    azimuthMeshElements = 13 # Number of azimuth angles to evaluate
+    azimuthMeshElements = 11 # Number of azimuth angles to evaluate
     num_pts = elevationMeshElements*azimuthMeshElements # Number of points total to evaluate
-    azimuthRange = np.deg2rad(130)  # +- 30 degree view
+    azimuthRange = np.deg2rad(110)  # +- 30 degree view
     elevationRange = np.deg2rad(110) #110
 
     _numCoordinates = 3
 
-    def __init__(self, min_x, max_x, min_y, max_y):
+    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-1, max_z=-10):
+        self.xRange = [min_x, max_x]
+        self.yRange = [min_y, max_y]
+        self.zRange = [min_z, max_z]
+
         self.aircraftPosition = np.asarray((0,0,0)) # x,y,z
         self.targetPosition = np.asarray((0,0,0)) # x,y,z
         self.heading = 0
@@ -63,13 +67,13 @@ class navigation:
         pointA = self.aircraftPosition + np.column_stack((x_a, y_a, z_a))
 
         # Eliminate any point that exceeds competition volume - if a cuboid arena only possible if goto outside volume
-        xRange = [-20, 20]
-        yRange = [-20, 20]
-        zRange = [-10, -1]
+        self.xRange = [-20, 20]
+        self.yRange = [-20, 20]
+        self.zRange = [-10, -1]
 
-        xValidPoints = np.logical_and(pointA[:, 0] > xRange[0], pointA[:, 0] < xRange[1])
-        yValidPoints = np.logical_and(pointA[:, 1] > yRange[0], pointA[:, 1] < yRange[1])
-        zValidPoints = np.logical_and(pointA[:, 2] > zRange[0], pointA[:, 2] < zRange[1])
+        xValidPoints = np.logical_and(pointA[:, 0] > self.xRange[0], pointA[:, 0] < self.xRange[1])
+        yValidPoints = np.logical_and(pointA[:, 1] > self.yRange[0], pointA[:, 1] < self.yRange[1])
+        zValidPoints = np.logical_and(pointA[:, 2] > self.zRange[0], pointA[:, 2] < self.zRange[1])
 
         validPoints = np.logical_and(np.logical_and(xValidPoints, yValidPoints), zValidPoints)
 
@@ -106,12 +110,15 @@ class navigation:
 
         # Add to vector
         points += path_start
+
+        self.Euclideanpoints = np.linalg.norm(points - self.aircraftPosition[np.newaxis, :], axis=1)
+        self.Euclideanpoints = np.reshape(self.Euclideanpoints, (numPaths, -1))
         return points
 
     def calculatePathRisk(self, gotoPoints, pointRisk):
         numPaths = gotoPoints.shape[0]
         pointRisk = np.reshape(pointRisk, (numPaths, -1))
-        self.Euclideanpoints = np.reshape(self.Euclideanpoints, (numPaths, -1))
+
 
         # Split into routes and sum to give route risk
         pointARisk = pointRisk[:, :self.pathMeshElements]
@@ -155,10 +162,6 @@ class navigation:
 
         #this operation is slow
         meshPoints = self.pathMeshGrid(self.gotoPoints)
-
-
-
-        self.Euclideanpoints = np.linalg.norm(meshPoints - self.aircraftPosition[np.newaxis, :], axis=1)
 
         return meshPoints
 
