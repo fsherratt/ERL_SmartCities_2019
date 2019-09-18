@@ -1,6 +1,5 @@
 import requests
-from requests.auth import HTTPBasicAuth
-# import datetime
+from requests.auth import HTTPBasicAuth 
 import time
 import json
 import base64
@@ -27,6 +26,8 @@ class request(Enum):
   PUTIMAGE = 12
   POSTIMAGE = 13
 
+
+
 class API:
   teamid ='bathdrones'
   teamkey = 'd22ec71d-af83-4cd6-847c-ea5031870d9b'
@@ -39,7 +40,7 @@ class API:
     self.status = 'Loading'
     
   def ID(self):
-    return self.teamid + "-" + self.robotName + "-" + self.currentTimeID
+    return self.teamid + "-" + self.robotName + "-" + self.currentTimeID()
   
   def currentTimeID(self):
     return str(int(time.time()*1000000))
@@ -75,8 +76,7 @@ class API:
     return Robot_Location
 
   def ImageReport(self, img):
-    encodedImage = json.dumps(base64.b64encode(img).decode("utf-8"))
-
+    
     ImageReport = {
       "@id": self.ID(),
       "@type": "ImageReport",
@@ -85,7 +85,7 @@ class API:
       "x": self.position[0], 
       "y": self.position[1],
       "z": self.position[2],
-      "base64": encodedImage,
+      "base64": "data:image/png;base64," + img,
       "format": "image/jpeg"
     }
     return ImageReport
@@ -185,10 +185,10 @@ class API:
     cv2.waitKey(1000)
     return result
     
-
   def PutImage(self, img):
     url = self.baseurl + self.teamid + "/sciroc-episode12-image/" + self.ID() 
     payload = json.dumps(self.ImageReport(img))
+    print(payload)
     self.PUT(url, payload)
 
   def PostImage(self, img):
@@ -200,10 +200,18 @@ class API:
 if __name__ == "__main__":
   apiObj = API()
   
+  getImageData = 'some1.jpeg'
   getID = '1568675071332568'
 
-  requiredData = request.GETIMAGELIST
+  imgFile = '/Users/omro/Dev/ERL_SmartCities_2019/modules/some1.jpeg'
+  with open(imgFile, mode='rb') as file:
+    img = file.read()
 
+  encodedImage = base64.b64encode(img).decode('utf-8')
+  apiObj.PutImage(encodedImage)
+
+
+  '''
   if requiredData == request.GETROBOTSTATUSLIST:
     apiObj.GetRobotStatusList()
 
@@ -247,12 +255,5 @@ if __name__ == "__main__":
     
   elif requiredData == request.POSTIMAGE:
     apiObj.PostImage()
-    
-
-  #apiObj.GetPatient(getID)
-
-
-  # print(currentTimeID)
-
-
+  '''
 
