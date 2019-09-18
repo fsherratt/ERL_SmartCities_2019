@@ -17,7 +17,8 @@ class rs_t265:
         self.cfg = None
 
         # Adjust yaw to align north
-        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]]
+        # self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
+        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]] # Downfacing, USB to right
 
         self.ROffset = R.from_dcm(self.rot_offset)
 
