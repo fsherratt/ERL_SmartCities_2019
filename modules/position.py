@@ -48,7 +48,7 @@ class position:
                 self._r = self._r * self.north_offset
             
             if time.time() - lastUpdate > 0.04:
-                self.pixObj.sendPosition(copy.deepcopy(self._pos), copy.deepcopy(self._r))
+                self.pixObj.sendPosition(self._pos, self._r)
                 lastUpdate = time.time()
 
             time.sleep(0.01)

@@ -8,6 +8,9 @@ import time
 import traceback
 import sys
 
+import numpy as np
+np.set_printoptions(precision=3, suppress=True)
+
 if __name__ == "__main__":
     print("*** STARTING ***")
     
@@ -44,7 +47,7 @@ if __name__ == "__main__":
     pixObj = pixhawk.pixhawkAbstract( pixComm )
 
     pixThread = Thread( target = pixObj.loop, name='pixhawk' )
-    pixThread.daemon = True
+    # pixThread.daemon = True
     pixThread.start()
 
     while not pixObj.seenHeartbeat and pixComm.isOpen():
@@ -96,23 +99,22 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
-
+        mission_collision_avoidance = False
         while True:
             startTime = time.time()
 
             # Get our current location
             pos, rot, conf = posObj.update()
 
-
             # Where are we going?
             if args.mission:
-                collision_avoidance, targetPos = misObj.missionProgress(pos)
+                mission_collision_avoidance, targetPos = misObj.missionProgress(pos)
 
             if args.mapping:
                 # Update map
                 mapObj.update(pos, rot)
 
-            if collision_avoidance:
+            if mission_collision_avoidance:
                 try:
                     # Plan next move but consider sticking to last move
                     meshPoints = navObj.updatePt1(pos, targetPos)
@@ -126,17 +128,18 @@ if __name__ == "__main__":
                 except ValueError:
                     pass
                 Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
-            loop_time = time.time() - startTime
-            #print('update frequency: {:.2f}'.format(1/loop_time))
-
-
+            
+            
             time.sleep(0.2)
-
-
             loop_time = time.time() - startTime
+            print('update frequency: {:.2f}'.format(1/loop_time))
+            print('pos {}, conf {}'.format(pos, conf))
+
 
     except KeyboardInterrupt:
-        pass
+        if args.mapping:
+            print('*** Save Map ***')
+            mapObj.saveToMatlab('map.mat')
 
     except:
         ledObj.setMode(LED.mode.ERROR)
@@ -147,11 +150,13 @@ if __name__ == "__main__":
     ledObj.clear()
 
     pixObj.stopLoop()
+    pixThread.join()
     pixComm.closePort()
 
     if args.SITL:
         posObj.stopLoop()
         posComm.closePort()
 
+    ledObj.close()
+
     print("*** BYE ***")
-            

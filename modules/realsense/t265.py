@@ -17,9 +17,13 @@ class rs_t265:
         self.cfg = None
 
         # Adjust yaw to align north
-        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]]
-
+        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
         self.ROffset = R.from_dcm(self.rot_offset)
+
+        # self.H_aeroRef_T265Ref = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
+        # self.H_T265body_aeroBody = [[0,1,0],[1,0,0],[0,0,-1]]
+        # self.H_aeroRef_T265Ref = R.from_dcm(self.H_aeroRef_T265Ref)
+        # self.H_T265body_aeroBody = R.from_dcm(self.H_T265body_aeroBody)
 
     def __enter__(self):
         self.openConnection()
@@ -69,13 +73,14 @@ class rs_t265:
 
             # Calculate Euler angles from Quat - Quat is WXYZ
             rot = R.from_quat( quat )
-            # Convert from camera body to aero body
-            rot = rot * self.ROffset.inv()
-            # Change reference frame to aero ref
-            rot = self.ROffset * rot
+
+            # Convert from camera body to aero body and reference frame to aero ref
+            rot = self.ROffset * rot * self.ROffset.inv()
+            # rot = self.H_aeroRef_T265Ref * rot * self.H_T265body_aeroBody
 
             # Apply pixhawk rotational offset
             pos = self.ROffset.apply(pos)
+            # pos = [-pos[2], pos[0], -pos[1]]
 
             return pos, rot, conf
 
