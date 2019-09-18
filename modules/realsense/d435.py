@@ -11,6 +11,9 @@ class unexpectedDisconnect( Exception):
     pass
 
 class rs_d435:
+    min_range = 0.1
+    max_range = 10
+
     def __init__(self, width=640, height=480, framerate=30):
         self.width = width
         self.height = height
@@ -44,6 +47,7 @@ class rs_d435:
         self.cfg = rs.config()
         self.cfg.enable_stream( rs.stream.depth, self.width, self.height, \
                                 rs.format.z16, self.framerate )
+        self.cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, self.framerate)
 
         self.profile = self.pipe.start( self.cfg  )
 
@@ -102,15 +106,16 @@ class rs_d435:
         frames = self.pipe.wait_for_frames()
 
         # Get depth data
-        depth = frames.get_depth_frame()
-        if not depth:
+        depth_frame = frames.get_depth_frame()
+        color_frame = frames.get_color_frame()
+        if not depth_frame:
             return None
 
-        depth_points = np.asarray( depth.get_data(), np.float32 )
+        depth_points = np.asarray( depth_frame.get_data(), dtype=np.float32 )
+        color_image = np.asanyarray(color_frame.get_data(), dtype=np.uint8)
 
-        depth_points *= self.scale
         # depth_points = self.shrink(depth_points)
-        return depth_points
+        return depth_points, color_image
 
     # --------------------------------------------------------------------------
     # shrink
@@ -128,7 +133,8 @@ class rs_d435:
     # Conversion depth frame to 3D local coordiate system in meters
     # return [[x,y,z]] coordinates of depth pixels
     # --------------------------------------------------------------------------
-    def deproject_frame( self, frame, minRange = 0, maxRange = 10 ):
+    def deproject_frame( self, frame ):
+        frame = frame * self.scale
         Z = frame
         X = np.multiply( frame, self.xDeprojectMatrix )
         Y = np.multiply( frame, self.yDeprojectMatrix )
@@ -140,7 +146,7 @@ class rs_d435:
         # Conversion into aero-reference frame
         points = np.column_stack( (Z,X,Y) )
 
-        inRange = np.where( (points[:,0] > minRange) & (points[:,0] < maxRange) )
+        inRange = np.where( (points[:,0] > self.min_range) & (points[:,0] < self.max_range) )
         points = points[inRange]
 
         return points

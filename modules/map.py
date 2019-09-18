@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import interpolate
 from scipy import io
-from modules.realsense import d435
-
 
 class mapper:
     num_coordinate = 3
@@ -21,9 +19,6 @@ class mapper:
     yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
     zDivisions = int((zRange[1] - zRange[0]) / voxelSize)
 
-    cameraMinRange = 0.1
-    cameraMaxRange = 6
-
     def __init__(self):
         self.xBins = np.linspace(self.xRange[0], self.xRange[1], self.xDivisions)
         self.yBins = np.linspace(self.yRange[0], self.yRange[1], self.yDivisions)
@@ -31,20 +26,10 @@ class mapper:
 
         self.grid = np.zeros((self.xDivisions, self.yDivisions, self.zDivisions), dtype=np.int16)
 
-        self.interpFunc = interpolate.RegularGridInterpolator((self.xBins, self.yBins, self.zBins),
-                                                              self.grid, method='linear',
-                                                              bounds_error=False,
-                                                              fill_value=np.nan)
-
-        self.connectD435()
-
-    def __del__(self):
-        if self.d435Obj is not None:
-            self.d435Obj.closeConnection()
-
-    def connectD435(self):
-        self.d435Obj = d435.rs_d435(framerate=60, width=480, height=270)
-        self.d435Obj.openConnection()
+        self.interpFunc = interpolate.RegularGridInterpolator( (self.xBins, self.yBins, self.zBins),
+                                                               self.grid, method = 'linear',
+                                                               bounds_error = False,
+                                                               fill_value = np.nan )
 
     # --------------------------------------------------------------------------
     # frame_to_global_points
@@ -66,17 +51,10 @@ class mapper:
     # param rot -
     # return Null
     # --------------------------------------------------------------------------
-    def update(self, pos, rot):
-        frame = self.d435Obj.getFrame()
-
+    def update(self, points, pos, rot):
         # Add to map
-        points = self.d435Obj.deproject_frame(frame,
-                                              minRange=self.cameraMinRange,
-                                              maxRange=self.cameraMaxRange)
-        points = self.local_to_global_points(points, pos, rot)
+        points = self.local_to_global_points(points, pos, rot)     
         self.updateMap(points, pos)
-
-        return frame
 
     def digitizePoints(self, points):
         xSort = np.digitize(points[:, 0], self.xBins)
@@ -193,13 +171,17 @@ class sitlMapper:
 if __name__ == "__main__":
 
     from modules.realsense import t265
+    from modules import telemetry
 
     import cv2
+    import base64
     import time
+    import threading
 
     t265Obj = t265.rs_t265()
 
     mapObj = mapper()
+    telemObj = telemetry.telem(50007, remote=True)
 
     with t265Obj:
         try:
@@ -208,10 +190,9 @@ if __name__ == "__main__":
                 pos, r, _ = t265Obj.getFrame()
 
                 starttime = time.time()
-                frame = mapObj.update(pos, r)
-                print('Loop Time: {}'.format(time.time() - starttime))
 
-                posGridCell = mapObj.digitizePoints(pos[np.newaxis, :])
+                frame, rgbImg = mapObj.update(pos,r)
+                print('Loop Time: {}'.format(time.time()-starttime))
 
                 starttime = time.time()
                 grid = mapObj.grid[:, :, posGridCell[2]] / np.max(mapObj.grid[:, :, posGridCell[2]])
@@ -233,12 +214,15 @@ if __name__ == "__main__":
 
                 img = cv2.line(img, (x, y), (int(vec[0]), int(vec[1])), (0, 0, 1), 2)
 
-                cv2.imshow('frame', frame)
-                cv2.imshow('map', img)
+                depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
+
+                cv2.imshow('frame', depth)
+                cv2.imshow('map', img )
                 cv2.waitKey(1)
 
-                print('')
+                time.sleep(0.5)
+
         except KeyboardInterrupt:
             pass
 
-    mapObj.saveToMatlab('TestMap.mat')
+    mapObj.saveToMatlab( 'TestMap.mat' )
