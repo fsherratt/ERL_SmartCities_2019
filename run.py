@@ -1,13 +1,16 @@
 #! .venv/bin/python3
 
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission, LED, telemetry
+from modules import map, navigation, pixhawk, position, mission, LED, telemetry, Aircraft_Plotter
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from modules.realsense import d435
 from threading import Thread
 import time
 import traceback
 import sys
+
+import numpy as np
+np.set_printoptions(precision=3, suppress=True)
 
 if __name__ == "__main__":
     print("*** STARTING ***")
@@ -48,7 +51,7 @@ if __name__ == "__main__":
     pixObj = pixhawk.pixhawkAbstract( pixComm )
 
     pixThread = Thread( target = pixObj.loop, name='pixhawk' )
-    pixThread.daemon = True
+    # pixThread.daemon = True
     pixThread.start()
 
     while not pixObj.seenHeartbeat and pixComm.isOpen():
@@ -68,12 +71,9 @@ if __name__ == "__main__":
     posThread.start()
 
     print("*** SET HOME LOCATION ***")
-    home_lat = 151269321       # Somewhere in Africa
-    home_lon = 16624301        # Somewhere in Africa
-    home_alt = 163000 
 
-    pixObj.sendSetGlobalOrigin(home_lat, home_lon, home_alt)
-    pixObj.sendSetHomePosition(home_lat, home_lon, home_alt)
+    pixObj.sendSetGlobalOrigin()
+    pixObj.sendSetHomePosition()
 
     mapObj = None
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     # Mission progress
     misObj = None
     if args.mission:
-        misObj = mission.mission()
+        misObj = mission.mission(pixObj)
     
     print("*** RUNNING ***")
     ledObj.setMode(LED.mode.RUNNING)
@@ -105,17 +105,16 @@ if __name__ == "__main__":
         * targetPoint -> Pixhawk
     '''
     try:
-
+        mission_collision_avoidance = False
         while True:
             startTime = time.time()
 
             # Get our current location
             pos, rot, conf = posObj.update()
 
-
             # Where are we going?
             if args.mission:
-                targetPos = misObj.missionProgress(pos)
+                mission_collision_avoidance, targetPos = misObj.missionProgress(pos)
 
             if args.mapping:
                 # Update map
@@ -127,37 +126,44 @@ if __name__ == "__main__":
                     telemObj.sendData(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
                     telemObj.sendData(telemetry.DataType.TELEM_DEPTH_FRAME, frame)
 
-            if args.collision_avoidance:
-                # Plan next move but consider sticking to last move
-                meshPoints = navObj.updatePt1(pos, targetPos)
-                pointRisk = mapObj.queryMap(meshPoints)
-                goto, heading, risk = navObj.updatePt2(pointRisk)
+            if mission_collision_avoidance:
+                try:
+                    # Plan next move but consider sticking to last move
+                    meshPoints = navObj.updatePt1(pos, targetPos)
+                    pointRisk = mapObj.queryMap(meshPoints)
+                    goto, heading, risk = navObj.updatePt2(pointRisk)
 
-                print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-                
-                # Tell pixhawk where to go
-                pixObj.directAircraft(goto, heading)
+                    #print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
 
-            print('Loop time: {:.2f}'.format(loop_time))
-
-
+                    # Tell pixhawk where to go
+                    pixObj.directAircraft(goto, heading)
+                except ValueError:
+                    pass
+                Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
+            
+            
             time.sleep(0.2)
-
-
             loop_time = time.time() - startTime
+            print('update frequency: {:.2f}'.format(1/loop_time))
+            print('pos {}, conf {}'.format(pos, conf))
+
 
     except KeyboardInterrupt:
-        pass
+        if args.mapping:
+            print('*** Save Map ***')
+            mapObj.saveToMatlab('map.mat')
 
     except:
         traceback.print_exc(file=sys.stdout)
         ledObj.setMode(LED.mode.ERROR)
+        traceback.print_exc(file=sys.stdout)
 
     print("*** STOPPED ***")
 
     ledObj.clear()
 
     pixObj.stopLoop()
+    pixThread.join()
     pixComm.closePort()
 
     if args.mapping:
@@ -169,6 +175,7 @@ if __name__ == "__main__":
 
     if args.telemetry:
         telemObj.stop()
+        
+    ledObj.close()
 
     print("*** BYE ***")
-            
