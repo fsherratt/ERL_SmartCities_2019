@@ -106,7 +106,6 @@ if __name__ == "__main__":
             # Get our current location
             pos, rot, conf = posObj.update()
 
-
             # Where are we going?
             if args.mission:
                 mission_collision_avoidance, targetPos = misObj.missionProgress(pos)
@@ -129,20 +128,18 @@ if __name__ == "__main__":
                 except ValueError:
                     pass
                 Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
-            loop_time = time.time() - startTime
-            #print('update frequency: {:.2f}'.format(1/loop_time))
-
-
+            
+            
             time.sleep(0.2)
-
-
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
             print('pos {}, conf {}'.format(pos, conf))
 
 
     except KeyboardInterrupt:
-        mapObj.saveToMatlab('map.mat')
+        if args.mapping:
+            print('*** Save Map ***')
+            mapObj.saveToMatlab('map.mat')
 
     except:
         ledObj.setMode(LED.mode.ERROR)
@@ -153,11 +150,13 @@ if __name__ == "__main__":
     ledObj.clear()
 
     pixObj.stopLoop()
+    pixThread.join()
     pixComm.closePort()
 
     if args.SITL:
         posObj.stopLoop()
         posComm.closePort()
 
+    ledObj.close()
+
     print("*** BYE ***")
-            

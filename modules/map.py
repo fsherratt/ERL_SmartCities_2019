@@ -95,12 +95,12 @@ class mapper:
         gridPoints = self.digitizePoints(points)
         np.add.at(self.grid, gridPoints, 1)
 
-        activeGridCorners = np.asarray([pos - [self.localMapRange,
+        activeGridCorners = np.asarray([pos - np.asarray([self.localMapRange,
                                                self.localMapRange,
-                                               self.localMapRange],
-                                        pos + [self.localMapRange,
+                                               self.localMapRange]),
+                                        pos + np.asarray([self.localMapRange,
                                                self.localMapRange,
-                                               self.localMapRange]])
+                                               self.localMapRange])])
         activeGridCorners = self.digitizePoints(activeGridCorners)
 
         activeGrid = self.grid[activeGridCorners[0][0]:activeGridCorners[0][1],
