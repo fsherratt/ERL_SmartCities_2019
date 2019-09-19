@@ -19,12 +19,13 @@ if __name__ == "__main__":
             cv2.waitKey(1)
         
         elif msg[0] == telemetry.DataType.TELEM_DEPTH_FRAME:
-            cv2.imshow('Depth', msg[1])
+            img = cv2.imdecode(msg[1], 1)
+            cv2.imshow('Depth', img)
+            cv2.waitKey(1)
 
         elif msg[0] == telemetry.DataType.TELEM_POSITION:
             print(msg[1])
 
-        elif 
         time.sleep(0.5)
 
     localTelem.close()

@@ -19,7 +19,7 @@ class navigation:
 
     _numCoordinates = 3
 
-    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-1, max_z=-10):
+    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-0.5, max_z=-10):
         self.xRange = [min_x, max_x]
         self.yRange = [min_y, max_y]
         self.zRange = [min_z, max_z]
@@ -27,7 +27,7 @@ class navigation:
         self.aircraftPosition = np.asarray((0,0,0)) # x,y,z
         self.targetPosition = np.asarray((0,0,0)) # x,y,z
         self.heading = 0
-        self.DistanceThreshold = 8
+        self.DistanceThreshold = 20
 
     # Produce possible positions to fly to on the way to a waypoint
     def calcGotoPoints(self):
@@ -56,7 +56,7 @@ class navigation:
         az = np.reshape(az, (-1))
 
         # generate vector of random distances to look ahead
-        r = np.random.uniform(low=self.minCPDistance, high=max(pathLength, 10), size=(self.num_pts,))
+        r = np.random.uniform(low=self.minCPDistance, high=pathLength, size=(self.num_pts,))
 
         # Convert from spherical to cartesian
         x_a = r * np.cos(el) * np.cos(az)

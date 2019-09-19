@@ -112,9 +112,9 @@ class sitlMapper:
         yRange = [-20, 20]
         zRange = [-10, 0]
 
-        xDivisions = 41
-        yDivisions = 41
-        zDivisions = 20
+        xDivisions = 201
+        yDivisions = 201
+        zDivisions = 51
 
         self.xBins = np.linspace(xRange[0], xRange[1], xDivisions)
         self.yBins = np.linspace(yRange[0], yRange[1], yDivisions)
@@ -127,7 +127,7 @@ class sitlMapper:
         # north east down
 
         # self.grid[20, :, 5:14] = 1
-        map_on = 1
+        map_on = 0
         obstacle = 1
         if map_on == 1:
             self.grid[10:12, 3:11, 0:12] = obstacle  # 1

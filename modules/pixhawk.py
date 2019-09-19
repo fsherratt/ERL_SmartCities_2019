@@ -30,7 +30,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         if time.time() - self.lastSentHeartbeat > 0.5:
             self.sendHeartbeat()
             self.lastSentHeartbeat = time.time()
-            self.getHomePosition()
+            # self.getHomePosition()
 
     # Process Messages
     def _processReadMsg(self, msglist):
@@ -119,6 +119,11 @@ class pixhawkAbstract(mavThread.mavThread, object):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
 
+    def setTakeoffLocal(self, alt):
+        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF_LOCAL,0,0,0,0.1,0,0,0,-alt)
+        self.queueOutputMsg(msg)
+        
+
     def sendSetGlobalOrigin(self):
         msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,self.home_lat, self.home_lon, self.home_alt)
         self.queueOutputMsg(msg)
@@ -179,7 +184,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         UNIX_time = int(time.time()*1e6)
         # UNIX_time = 0
 
-        rot = rot.as_euler('xyz') # roll, pitch, yaw
+        rot = rot.as_euler('xyz')[0] # roll, pitch, yaw
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
                                                                 rot[0], rot[1], rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
