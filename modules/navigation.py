@@ -164,6 +164,10 @@ class navigation:
     def updatePt2(self, pointRisk):
         pathRisk = self.calculatePathRisk(self.gotoPoints, pointRisk)
 
+        # midRisk = int(self.azimuthMeshElements/2 * self.elevationMeshElements/2)
+        maxRisk = np.max(pathRisk)
+        print('Mid Risk: {}'.format(maxRisk))
+
         min_path_index = np.nanargmin(pathRisk)
         min_path_point = self.gotoPoints[min_path_index]
         min_path_risk = pathRisk[min_path_index]
