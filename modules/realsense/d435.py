@@ -44,12 +44,13 @@ class rs_d435:
         self.cfg = rs.config()
         self.cfg.enable_stream( rs.stream.depth, self.width, self.height, \
                                 rs.format.z16, self.framerate )
+        self.cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, self.framerate)
 
         self.profile = self.pipe.start( self.cfg  )
 
         self.initialise_deprojection_matrix()
 
-        print('rs_t265:D435 Connection Open')
+        print('rs_d435:D435 Connection Open')
     
     # --------------------------------------------------------------------------
     # closeConnection
@@ -102,15 +103,16 @@ class rs_d435:
         frames = self.pipe.wait_for_frames()
 
         # Get depth data
-        depth = frames.get_depth_frame()
-        if not depth:
+        depth_frame = frames.get_depth_frame()
+        color_frame = frames.get_color_frame()
+        if not depth_frame:
             return None
 
-        depth_points = np.asarray( depth.get_data(), np.float32 )
+        depth_points = np.asarray( depth_frame.get_data(), dtype=np.float32 )
+        color_image = np.asanyarray(color_frame.get_data(), dtype=np.uint8)
 
-        depth_points *= self.scale
         # depth_points = self.shrink(depth_points)
-        return depth_points
+        return depth_points, color_image
 
     # --------------------------------------------------------------------------
     # shrink
