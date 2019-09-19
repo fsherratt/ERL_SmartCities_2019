@@ -32,6 +32,11 @@ class airTelemetry():
         
         return True
 
+    def sendImage(self, name, img):
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
+        data = cv2.imencode('.jpg', img, encode_param)[1]
+        self.sendData(name, data)
+
     def sendData(self, name, data):
         if not self.connected():
             return
