@@ -67,10 +67,6 @@ class navigation:
         pointA = self.aircraftPosition + np.column_stack((x_a, y_a, z_a))
 
         # Eliminate any point that exceeds competition volume - if a cuboid arena only possible if goto outside volume
-        self.xRange = [-20, 20]
-        self.yRange = [-20, 20]
-        self.zRange = [-10, -1]
-
         xValidPoints = np.logical_and(pointA[:, 0] > self.xRange[0], pointA[:, 0] < self.xRange[1])
         yValidPoints = np.logical_and(pointA[:, 1] > self.yRange[0], pointA[:, 1] < self.yRange[1])
         zValidPoints = np.logical_and(pointA[:, 2] > self.zRange[0], pointA[:, 2] < self.zRange[1])

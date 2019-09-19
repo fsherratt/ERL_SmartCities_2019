@@ -5,13 +5,13 @@ from scipy import io
 class mapper:
     num_coordinate = 3
 
-    xRange = [-50, 50]
-    yRange = [-50, 50]
-    zRange = [-5, 20]
+    xRange = [-20, 20]
+    yRange = [-20, 20]
+    zRange = [-20, 5]
 
     localMapRange = 10
 
-    voxelSize = 0.2
+    voxelSize = 0.5
     voxelMaxWeight = 1000
     voxelWeightDecay = 20
 
