@@ -53,7 +53,7 @@ class rs_d435:
 
         self.initialise_deprojection_matrix()
 
-        print('rs_t265:D435 Connection Open')
+        print('rs_d435:D435 Connection Open')
     
     # --------------------------------------------------------------------------
     # closeConnection
