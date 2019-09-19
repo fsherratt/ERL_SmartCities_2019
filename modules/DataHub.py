@@ -35,10 +35,6 @@ class API:
         self.status = newStatus
 
     def sendImage(self, img):
-        #there is something deffo wrong with img upload file, dwl should be fine
-        #img = numpy.array(img)
-        #img = scipy.misc.toimage(img)
-        
         imbyte = cv2.imencode(".png", img)[1].tostring()
         encodedImage = base64.b64encode(imbyte).decode('utf-8')
         self.PostImage(encodedImage)
@@ -97,7 +93,7 @@ class API:
 
     def GET(self,url):
         response = requests.request("GET",url, auth=HTTPBasicAuth(self.teamkey, ''))
-        self.PrintData(response)
+        #self.PrintData(response)
         getData = json.loads(response.text)[0:5]
         return getData
 
@@ -152,7 +148,7 @@ class API:
     def GetPatient(self, getID):
         url = self.baseurl + "/master/sciroc-episode12-patient/" + getID 
         self.GET(url)
-        result = self.GET(url)
+        result = self.GET(url)[0]
         patientLocation = [result["x"], result["y"], result["z"]]
         return patientLocation, result
 
@@ -179,13 +175,6 @@ class API:
         payload = json.dumps(self.ImageReport(img))
         self.POST(url, payload)
 
-    # def decodeImage(self, encodedImage)
-    # encodedImage = self.GetImage(getID)          
-    # decodedImage = base64.b64decode(encodedImage)
-    # img = cv2.imdecode(np.frombuffer(decodedImage, dtype=np.uint8), 1)
-    # cv2.imshow("img", img)
-    # cv2.waitKey(1000)
-
 
 if __name__ == "__main__":
     apiObj = API()
@@ -195,26 +184,32 @@ if __name__ == "__main__":
     d435Obj = rs_d435()
     
     with d435Obj:
-        while True:
-            t0 = time.time()
+        i = 0
+        while i<1:
+            # id =  'bathdrones-Gary-1568881509221367'#imgList[0]['@id']
+            # print(id)
+
+            ##To post image
             # _, img = d435Obj.getFrame()
             # apiObj.sendImage(img)
-            apiObj.PostRobotStatus()
-            t1 = time.time()
-            print(t1-t0)
-            #robotstatus = apiObj.GetLocationList()
+
+            ##To get patient Location
+            Pateint_Location = apiObj.GetPatient('P001')[0]
+            print("Patient Location: "+str(Pateint_Location))
+            
+            ##To get robot Location
+            # apiObj.GetLocationList()
+            # apiObj.GetLocation(id)
+
             #print(robotstatus)
             #imgList = apiObj.GetImageList()
-            
-            id =  'bathdrones-Gary-1568881509221367'#imgList[0]['@id']
-            print(id)
 
-            ##Code to get Img
+            ##Code to gdecode Img
             # getImg = (apiObj.GetImage(id))[22:]            
             # decodedImage = base64.b64decode(getImg)
             # img = cv2.imdecode(np.frombuffer(decodedImage, dtype=np.uint8), 1)
             # cv2.imshow("img", img)
             # cv2.waitKey(1000)
             ##Code to get Img end
-
+            i = 1
         pass
