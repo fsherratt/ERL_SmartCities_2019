@@ -1,11 +1,11 @@
 import numpy as np
 import time
 class mission:
-    patientX = 10
-    patientY = -2
+    patientX = 11
+    patientY = -8
 
-    missionItems = [[0, 0, -2],[patientX,patientY,0]]
-    update_rate = 5
+    missionItems = [[0, 0, -2],[patientX,patientY,-2]]
+    update_rate = 1
     def __init__(self, pixObj):
         self.missionItem = 0
         self.missionItems = np.asarray(self.missionItems)
