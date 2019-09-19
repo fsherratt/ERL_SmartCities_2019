@@ -30,7 +30,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         if time.time() - self.lastSentHeartbeat > 0.5:
             self.sendHeartbeat()
             self.lastSentHeartbeat = time.time()
-            self.getHomePosition()
+            # self.getHomePosition()
 
     # Process Messages
     def _processReadMsg(self, msglist):
@@ -118,6 +118,11 @@ class pixhawkAbstract(mavThread.mavThread, object):
     def setTakeoff(self, alt):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
+
+    def setTakeoffLocal(self, alt):
+        msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF_LOCAL,0,0,0,0.1,0,0,0,-alt)
+        self.queueOutputMsg(msg)
+        
 
     def sendSetGlobalOrigin(self):
         msg = self._mavLib.MAVLink_set_gps_global_origin_message(0,self.home_lat, self.home_lon, self.home_alt)
