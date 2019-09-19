@@ -170,7 +170,7 @@ class sitlMapper:
 
 if __name__ == "__main__":
 
-    from modules.realsense import t265
+    from modules.realsense import t265, d435
     from modules import telemetry
 
     import cv2
@@ -179,50 +179,64 @@ if __name__ == "__main__":
     import threading
 
     t265Obj = t265.rs_t265()
+    d435Obj = d435.rs_d435(framerate=30, width=480, height=270)
 
     mapObj = mapper()
-    telemObj = telemetry.telem(50007, remote=True)
 
-    with t265Obj:
+    with t265Obj, d435Obj:
         try:
             while True:
                 # Get frames of data - points and global 6dof
                 pos, r, _ = t265Obj.getFrame()
+                print(pos)
 
                 starttime = time.time()
+                frame, rgbImg = d435Obj.getFrame()
+                points = d435Obj.deproject_frame(frame)
+                mapObj.update(points, pos,r)
+                
+                try:
+                    posGridCell = mapObj.digitizePoints(pos[np.newaxis,:])
+                    starttime = time.time()
 
-                frame, rgbImg = mapObj.update(pos,r)
-                print('Loop Time: {}'.format(time.time()-starttime))
+                    gridMax = np.max(mapObj.grid[:, :, posGridCell[2]])
+                    if gridMax > 0:
+                        grid = mapObj.grid[:, :, posGridCell[2]] / gridMax
+                    else:
+                        grid = mapObj.grid[:, :, posGridCell[2]]
 
-                starttime = time.time()
-                grid = mapObj.grid[:, :, posGridCell[2]] / np.max(mapObj.grid[:, :, posGridCell[2]])
-                empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
+                    empty = np.zeros((mapObj.xDivisions, mapObj.yDivisions))
 
-                img = cv2.merge((grid, empty, empty))
-                img = cv2.transpose(img)
+                    img = cv2.merge((grid, empty, empty))
+                    img = cv2.transpose(img)
 
-                x = np.digitize(pos[0], mapObj.xBins) - 1
-                y = np.digitize(pos[1], mapObj.yBins) - 1
+                    x = np.digitize(pos[0], mapObj.xBins) - 1
+                    y = np.digitize(pos[1], mapObj.yBins) - 1
 
-                img = cv2.circle(img, (x, y), 5, (0, 1, 0), 2)
+                    img = cv2.circle(img, (x, y), 5, (0, 1, 0), 2)
 
-                vec = [20, 0, 0]
-                vec = r.apply(vec)  # Aero-ref -> Aero-body
+                    vec = np.asarray([20, 0, 0])
+                    vec = r.apply(vec)  # Aero-ref -> Aero-body
+                    vec = vec[0]
 
-                vec[0] += x
-                vec[1] += y
+                    vec[0] += x
+                    vec[1] += y
 
-                img = cv2.line(img, (x, y), (int(vec[0]), int(vec[1])), (0, 0, 1), 2)
+                    img = cv2.line(img, (x, y), (int(vec[0]), int(vec[1])), (0, 0, 1), 2)
 
-                depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
+                    depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
 
-                cv2.imshow('frame', depth)
-                cv2.imshow('map', img )
-                cv2.waitKey(1)
+                    cv2.imshow('frame', depth)
+                    cv2.imshow('map', img )
+                    cv2.waitKey(1)
 
-                time.sleep(0.5)
+                    # time.sleep(0.5)
+                except KeyboardInterrupt:
+                    raise KeyboardInterrupt
+                except:
+                    pass
 
         except KeyboardInterrupt:
             pass
 
-    mapObj.saveToMatlab( 'TestMap.mat' )
+    # mapObj.saveToMatlab( 'TestMap.mat' )

@@ -17,8 +17,13 @@ class rs_t265:
         self.cfg = None
 
         # Adjust yaw to align north
-        self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
+        # self.rot_offset = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
+
+        self.rot_offset = [0, 1/np.sqrt(2), -1/np.sqrt(2)], [1, 0, 0], [0, -1/np.sqrt(2), -1/np.sqrt(2)] # 45 degree
+
         self.ROffset = R.from_dcm(self.rot_offset)
+        self.H_aeroRef_T265Ref = [ 0.,  0., -1.],        [ 1.,  0.,  0.],        [ 0., -1.,  0.]
+        # self.ROffset = R.from_euler([])
 
         # self.H_aeroRef_T265Ref = [[0,0,-1],[1,0,0],[0,-1,0]] # Forward Facing, USB to right
         # self.H_T265body_aeroBody = [[0,1,0],[1,0,0],[0,0,-1]]
@@ -75,12 +80,12 @@ class rs_t265:
             rot = R.from_quat( quat )
 
             # Convert from camera body to aero body and reference frame to aero ref
-            rot = self.ROffset * rot * self.ROffset.inv()
+            rot = R.from_euler('y', [45], degrees=True) * self.ROffset * rot * self.ROffset.inv()
             # rot = self.H_aeroRef_T265Ref * rot * self.H_T265body_aeroBody
 
             # Apply pixhawk rotational offset
-            pos = self.ROffset.apply(pos)
-            # pos = [-pos[2], pos[0], -pos[1]]
+            # pos = self.ROffset.apply(pos)
+            pos = [-pos[2], pos[0], -pos[1]]
 
             return pos, rot, conf
 
@@ -92,7 +97,7 @@ class rs_t265:
 
 if __name__ == "__main__":
     import time
-
+    
     t265Obj = rs_t265()
 
     with t265Obj:
@@ -102,6 +107,6 @@ if __name__ == "__main__":
 
             # print(i, pos, conf)
 
-            print( 'Pos: {}\t Eul: {}'.format(pos, eul) )
+            print( 'Pos: {}\t Eul: {}\t Conf:{}'.format(pos, eul, conf) )
 
             time.sleep(0.5)

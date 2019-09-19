@@ -8,6 +8,7 @@ from threading import Thread
 import time
 import traceback
 import sys
+import cv2
 
 import numpy as np
 np.set_printoptions(precision=3, suppress=True)
@@ -123,8 +124,10 @@ if __name__ == "__main__":
                 mapObj.update(points, pos, rot)
 
                 if args.telemetry:
-                    telemObj.sendData(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
-                    telemObj.sendData(telemetry.DataType.TELEM_DEPTH_FRAME, frame)
+                    depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
+                    telemObj.sendImage(telemetry.DataType.TELEM_DEPTH_FRAME, depth)
+
+                    telemObj.sendImage(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
 
             if mission_collision_avoidance:
                 try:
