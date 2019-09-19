@@ -55,11 +55,12 @@ class mapper:
         # Add to map
         points = self.local_to_global_points(points, pos, rot)     
         self.updateMap(points, pos)
+        self.interpFunc.values = self.grid
 
     def digitizePoints(self, points):
-        xSort = np.digitize(points[:, 0], self.xBins)
-        ySort = np.digitize(points[:, 1], self.yBins)
-        zSort = np.digitize(points[:, 2], self.zBins)
+        xSort = np.digitize(points[:, 0], self.xBins) -1
+        ySort = np.digitize(points[:, 1], self.yBins) -1
+        zSort = np.digitize(points[:, 2], self.zBins) -1
 
         return [xSort, ySort, zSort]
 
