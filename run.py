@@ -148,7 +148,7 @@ if __name__ == "__main__":
             time.sleep(0.2)
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
-            print('pos {}, conf {}'.format(pos, conf))
+            print('pos {}\t rot {}\t conf {}'.format(pos, rot.as_euler('xyz', degrees=True), conf))
 
 
     except KeyboardInterrupt:

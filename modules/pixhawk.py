@@ -179,7 +179,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         UNIX_time = int(time.time()*1e6)
         # UNIX_time = 0
 
-        rot = rot.as_euler('xyz') # roll, pitch, yaw
+        rot = rot.as_euler('xyz')[0] # roll, pitch, yaw
         msg = self._mavLib.MAVLink_vision_position_estimate_message(UNIX_time, pos[0], pos[1], pos[2], 
                                                                 rot[0], rot[1], rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority

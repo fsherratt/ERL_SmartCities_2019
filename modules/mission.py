@@ -1,7 +1,10 @@
 import numpy as np
 import time
 class mission:
-    missionItems = [[-15, -15, -5], [15, -15, -5], [15, 15, -5], [-15, 15, -5], [0, 0, 0]]
+    patientX = 10
+    patientY = -2
+
+    missionItems = [[0, 0, -2],[patientX,patientY,0]]
     update_rate = 5
     def __init__(self, pixObj):
         self.missionItem = 0

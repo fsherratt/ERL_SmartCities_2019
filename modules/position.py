@@ -25,7 +25,7 @@ class position:
 
     def setNorthOffset(self, north_offset):
         if north_offset is not None and self.north_offset is None:
-            t265_yaw = self._r.as_euler('xyz')[2]
+            t265_yaw = self._r.as_euler('xyz')[0][2]
             north_offset -= t265_yaw 
             self.north_offset = R.from_euler('xyz', [0,0,north_offset])
 
@@ -45,7 +45,7 @@ class position:
             # Convert from FRD to NED coordinate system
             if self.north_offset is not None:
                 self._pos = self.north_offset.apply(self._pos)
-                self._r = self._r * self.north_offset
+                self._r = self.north_offset * self._r
             
             if time.time() - lastUpdate > 0.04:
                 self.pixObj.sendPosition(self._pos, self._r)
