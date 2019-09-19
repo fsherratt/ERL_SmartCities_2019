@@ -48,6 +48,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
             elif id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
                 self._homeHandler(msg)
 
+            elif id ==self._mavLib.MAVLINK_MSG_ID_COMMAND_ACK:
+                print(msg)
+
     def _heartbeatHandler(self, msg): 
         if not msg.autopilot == self._mavLib.MAV_AUTOPILOT_INVALID:
             # Arm State

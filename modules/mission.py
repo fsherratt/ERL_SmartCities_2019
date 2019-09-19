@@ -1,15 +1,16 @@
 import numpy as np
 import time
 class mission:
-    patientX = 11
-    patientY = -8
-
-    missionItems = [[0, 0, -2],[patientX,patientY,-2]]
+    patientX = 10.5
+    patientY = -7
+    #patient pos R, patient pos L, back L, back R, tkOff pos
+    missionItems = [[10.6, -6.5, -2],[8.6,-8.4,-1], [1,2,-3], [-0.5,-1,-1], [0,0,-2]]
+    #missionItems = [[0, 0, -2],[patientX,patientY,-2]]
     update_rate = 1
     def __init__(self, pixObj):
         self.missionItem = 0
         self.missionItems = np.asarray(self.missionItems)
-        self.state = 0
+        self.state = 1
         self.pixObj = pixObj
         self.collision_avoidance = 0
         self.start = 0
@@ -18,20 +19,22 @@ class mission:
     def missionProgress(self, currentPos):
         currentPos = np.asarray(currentPos)
         wpDist = np.linalg.norm(currentPos - self.missionItems[self.missionItem])
+        status = 'Unknown'
 
         # set mode, begin, wait for arm
         if not self.state:
             self.collision_avoidance = 0
             self.missionItem = 0
+            status = 'Waiting'
 
             if time.time() - self.start > self.update_rate:
                 self.start = time.time()
                 print('beginning mission, setting aircraft to guided')
 
             if not self.pixObj._mode == 'GUIDED':
-                self.pixObj.setModeGuided()
+                # self.pixObj.setModeGuided()
                 time.sleep(0.2)
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                return self.collision_avoidance, self.missionItems[self.missionItem], status
             else:
                 self.state = 1
 
@@ -40,28 +43,39 @@ class mission:
             self.collision_avoidance = 0
             self.missionItem = 0
 
-            if not self.pixObj._armed:
+            alt = abs(self.missionItems[self.missionItem,2])
+            self.pixObj.setTakeoff(alt)
+
+            if not self.pixObj._armed or not self.pixObj._mode == 'GUIDED':
+                status = 'Waiting'
+
                 if time.time() - self.start > self.update_rate:
                     self.start = time.time()
-                    self.pixObj.setModeGuided()
+                    #self.pixObj.setModeGuided()
                     print("aircraft not armed, cannot take-off")
 
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                return self.collision_avoidance, self.missionItems[self.missionItem], status
             else:
+
+                status = 'Taking Off'
                 if time.time() - self.start > self.update_rate:
                     self.start = time.time()
                     print('taking off')
-
+                    
                 if abs(currentPos[2]-self.missionItems[self.missionItem,2]) > 0.4:
-                    self.pixObj.setTakeoff(abs(self.missionItems[self.missionItem,2]))
+                    alt = abs(self.missionItems[self.missionItem,2])
+                    self.pixObj.setTakeoff(alt)
+                    # self.pixObj.setTakeoffLocal(alt)
+                    print('*** Send Takeoff ***')
 
-                    return self.collision_avoidance, self.missionItems[self.missionItem]
+                    return self.collision_avoidance, self.missionItems[self.missionItem], status
                 else:
                     self.state = 2
 
         # follow waypoints
         if self.state == 2:
             self.collision_avoidance = 1
+            status = 'Heading to patient'
 
             if time.time() - self.start > self.update_rate:
                 self.start = time.time()
@@ -75,12 +89,13 @@ class mission:
                 self.missionItem -= 1
                 self.state = 3
             else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                return self.collision_avoidance, self.missionItems[self.missionItem], status
 
         #land
         if self.state == 3:
             self.collision_avoidance = 0
             self.pixObj.setModeLand()
+            status = 'Landing at patient'
 
             if time.time() - self.start > self.update_rate:
                 self.start = time.time()
@@ -91,19 +106,23 @@ class mission:
                 time.sleep(5)
                 self.state = 8
             else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                return self.collision_avoidance, self.missionItems[self.missionItem], status
 
         # disarm
         if self.state == 8:
+            status = 'Gary going to sleep'
+
             if time.time() - self.start > self.update_rate:
                 self.start = time.time()
                 print('end of mission, Gary going to sleep')
+
             if self.pixObj._armed == True:
                 self.pixObj.setArm(0)
             return self.collision_avoidance, self.missionItems[self.missionItem]
 
         self.pixObj.setModeLand()
-        return self.collision_avoidance, self.missionItems[self.missionItem]
+
+        return self.collision_avoidance, self.missionItems[self.missionItem], status
 
         '''
         #drop

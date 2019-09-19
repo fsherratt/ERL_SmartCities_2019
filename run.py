@@ -112,10 +112,15 @@ if __name__ == "__main__":
 
             # Get our current location
             pos, rot, conf = posObj.update()
+            if args.telemetry:
+                telemObj.sendData(telemetry.DataType.TELEM_POSITION, pos)
 
             # Where are we going?
             if args.mission:
-                mission_collision_avoidance, targetPos = misObj.missionProgress(pos)
+                mission_collision_avoidance, targetPos, status = misObj.missionProgress(pos)
+
+                if args.telemetry:
+                    telemObj.sendData(telemetry.DataType.TELEM_STATUS, status)
 
             if args.mapping:
                 # Update map
@@ -142,13 +147,13 @@ if __name__ == "__main__":
                     pixObj.directAircraft(goto, heading)
                 except ValueError:
                     pass
-                Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
+                # Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
             
             
             time.sleep(0.2)
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
-            print('pos {}\t rot {}\t conf {}'.format(pos, rot.as_euler('xyz', degrees=True), conf))
+            # print('pos {}\t rot {}\t conf {}'.format(pos, rot.as_euler('xyz', degrees=True), conf))
 
 
     except KeyboardInterrupt:

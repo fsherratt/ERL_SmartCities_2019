@@ -12,7 +12,7 @@ class DataType(enum.Enum):
     TELEM_RGB_IMAGE = 0
     TELEM_DEPTH_FRAME = 1
     TELEM_POSITION = 2
-    TELEM_TARGET = 3
+    TELEM_STATUS = 3
 
 class airTelemetry():
     def __init__(self, hostname=''):
