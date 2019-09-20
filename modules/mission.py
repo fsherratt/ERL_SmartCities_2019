@@ -45,9 +45,6 @@ class mission:
             self.collision_avoidance = 0
             self.missionItem = 0
 
-            alt = abs(self.missionItems[self.missionItem,2])
-            self.pixObj.setTakeoff(alt)
-
             if not self.pixObj._armed or not self.pixObj._mode == 'GUIDED':
                 status = 'Waiting'
 
