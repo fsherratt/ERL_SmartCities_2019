@@ -68,7 +68,7 @@ class tcpInterface():
     def _createSocket(self):
         self.sockObj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sockObj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sockObj.settimeout(2)
+        self.sockObj.settimeout(self._TIMEOUT)
 
     def startServer(self):
         self.addr = (self.hostname, self._PORT)

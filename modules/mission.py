@@ -2,15 +2,17 @@ import numpy as np
 import time
 class mission:
     patientX = 10.5
-    patientY = -7
+    patientY = -4
     #patient pos R, patient pos L, back L, back R, tkOff pos
-    missionItems = [[10.6, -6.5, -2],[8.6,-8.4,-1], [1,2,-3], [-0.5,-1,-1], [0,0,-2]]
-    #missionItems = [[0, 0, -2],[patientX,patientY,-2]]
+    # missionItems = [[10.6, -6.5, -2],[8.6,-8.4,-1], [1,2,-3], [-0.5,-1,-1], [0,0,-2]]
+    missionItems = [[patientX,patientY,-1]]
+    # missionItems = [[8, 0, -1],[patientX,patientY,-2]]
+
     update_rate = 1
     def __init__(self, pixObj):
         self.missionItem = 0
         self.missionItems = np.asarray(self.missionItems)
-        self.state = 1
+        self.state = 2
         self.pixObj = pixObj
         self.collision_avoidance = 0
         self.start = 0
@@ -118,7 +120,8 @@ class mission:
 
             if self.pixObj._armed == True:
                 self.pixObj.setArm(0)
-            return self.collision_avoidance, self.missionItems[self.missionItem]
+
+            return self.collision_avoidance, self.missionItems[self.missionItem], status
 
         self.pixObj.setModeLand()
 

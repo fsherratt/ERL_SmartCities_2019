@@ -131,9 +131,9 @@ if __name__ == "__main__":
                 if args.telemetry:
                     depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
                     telemObj.sendImage(telemetry.DataType.TELEM_DEPTH_FRAME, depth)
-
                     telemObj.sendImage(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
 
+            goto = [0,0,0]
             if mission_collision_avoidance:
                 try:
                     # Plan next move but consider sticking to last move
@@ -141,19 +141,15 @@ if __name__ == "__main__":
                     pointRisk = mapObj.queryMap(meshPoints)
                     goto, heading, risk = navObj.updatePt2(pointRisk)
 
-                    #print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-
                     # Tell pixhawk where to go
                     pixObj.directAircraft(goto, heading)
                 except ValueError:
-                    pass
-                # Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
-            
+                    pass            
             
             time.sleep(0.2)
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
-            # print('pos {}\t rot {}\t conf {}'.format(pos, rot.as_euler('xyz', degrees=True), conf))
+            print('Pos: {}\t Goto: {}\t conf {}'.format(pos, goto, conf))
 
 
     except KeyboardInterrupt:
