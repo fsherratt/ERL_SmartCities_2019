@@ -12,8 +12,8 @@ class mapper:
     localMapRange = 10
 
     voxelSize = 0.5
-    voxelMaxWeight = 1000
-    voxelWeightDecay = 20
+    voxelMaxWeight = 2000
+    voxelWeightDecay = 40
 
     xDivisions = int((xRange[1] - xRange[0]) / voxelSize)
     yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
@@ -72,7 +72,25 @@ class mapper:
     def updateMap(self, points, pos):
         # Update map
         gridPoints = self.digitizePoints(points)
-        np.add.at(self.grid, gridPoints, 1)
+        np.add.at(self.grid, gridPoints, 2)
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([0,0,1]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([0,0,1]), 1)
+        except:
+            pass
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([0,1,0]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([0,1,0]), 1)
+        except:
+            pass
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([1,0,0]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([1,0,0]), 1)
+        except:
+            pass
 
         activeGridCorners = np.asarray([pos - np.asarray([self.localMapRange,
                                                self.localMapRange,

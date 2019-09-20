@@ -192,6 +192,13 @@ class pixhawkAbstract(mavThread.mavThread, object):
                                                                 rot[0], rot[1], rot[2])
         self.queueOutputMsg(msg, priority=1) # Highest priority
 
+    def setServo(self, servo, position):
+        msg = pymavlink.MAVLink_command_long_message(0, 0, pymavlink.MAV_CMD_DO_SET_SERVO, 0, servo, position, 0, 0, 0, 0, 0)
+        self.queueOutputMsg(msg)
+
+    def drop_payload(self):
+        self.setServo(7, 1000)
+
     def sendPlayTune(self, tune, tune2=b''):
         # Tx set temp
         # > Up Octave
@@ -212,7 +219,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages
-    commObj = mavSocket.mavSocket(  listenAddress = ('', 14551) )
+    commObj = mavSerial.mavSerial( ('/dev/ttyUSB0', 115200))
+    # commObj = mavSocket.mavSocket(  listenAddress = ('', 14551) )
     commObj.openPort()
     
     mavObj = pixhawkAbstract( conn = commObj )
@@ -232,9 +240,13 @@ if __name__ == "__main__":
 
     try:
         while True:
-            tune = b'MFMST255L4< F#2 A  >C#2 <A2 F# D#D#D#2'
-            mavObj.sendPlayTune(b'', tune)
-            time.sleep(10)
+            # tune = b'MFMST255L4< F#2 A  >C#2 <A2 F# D#D#D#2'
+            # mavObj.sendPlayTune(b'', tune)
+
+            mavObj.setServo(7, 2000)
+            time.sleep(5)
+                      
+            time.sleep(5)
         
     except KeyboardInterrupt:
         pass

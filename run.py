@@ -1,7 +1,7 @@
 #! .venv/bin/python3
 
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission, LED, telemetry, Aircraft_Plotter
+from modules import map, navigation, pixhawk, position, mission, LED, telemetry
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from modules.realsense import d435
 from threading import Thread

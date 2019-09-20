@@ -5,7 +5,7 @@ class mission:
     patientY = -4
     #patient pos R, patient pos L, back L, back R, tkOff pos
     # missionItems = [[10.6, -6.5, -2],[8.6,-8.4,-1], [1,2,-3], [-0.5,-1,-1], [0,0,-2]]
-    missionItems = [[patientX,patientY,-1]]
+    missionItems = [[0,0,-1], [patientX,patientY,-1]]
     # missionItems = [[8, 0, -1],[patientX,patientY,-2]]
 
     update_rate = 1
@@ -74,24 +74,53 @@ class mission:
         # follow waypoints
         if self.state == 2:
             self.collision_avoidance = 1
-            status = 'Heading to patient'
+            if not self.pixObj._armed:
+                status = 'Waiting'
+            elif not self.pixObj._mode == 'GUIDED':
+                status = 'Taking Off'
+            else:
+                status = 'Heading to patient'
 
             if time.time() - self.start > self.update_rate:
                 self.start = time.time()
                 print('following waypoints, waypoint ',self.missionItem, '\t', self.missionItems[self.missionItem])
 
-            if wpDist < 2:
+            if wpDist < 0.25:
                 self.missionItem += 1
                 print('NEXT MISSION ITEM: {}'.format(self.missionItem))
 
             if self.missionItem == len(self.missionItems):
                 self.missionItem -= 1
-                self.state = 3
+                self.state = 4
             else:
                 return self.collision_avoidance, self.missionItems[self.missionItem], status
 
+        
+
+        if self.state == 4:
+            if time.time() - self.start > 1:
+                self.start = time.time()
+                print('dropping payload')
+            self.pixObj.drop_payload()
+            self.state = 5
+
+        #follow waypoints
+        if self.state == 5:
+            self.collision_avoidance = 1
+            if time.time() - self.start > 1:
+                self.start = time.time()
+                print('following waypoints, waypoint ', self.missionItem, '\t', self.missionItems[self.missionItem])
+            if wpDist < 2:
+                self.missionItem -= 1
+                print('NEXT MISSION ITEM: {}'.format(self.missionItem))
+            if self.missionItem == -1:
+                self.state = 6
+            else:
+                return self.collision_avoidance, self.missionItems[self.missionItem]
+
+
         #land
-        if self.state == 3:
+        if self.state == 6:
             self.collision_avoidance = 0
             self.pixObj.setModeLand()
             status = 'Landing at patient'
@@ -106,7 +135,6 @@ class mission:
                 self.state = 8
             else:
                 return self.collision_avoidance, self.missionItems[self.missionItem], status
-
         # disarm
         if self.state == 8:
             status = 'Gary going to sleep'
@@ -126,12 +154,7 @@ class mission:
 
         '''
         #drop
-        if self.state == 4:
-            if time.time() - self.start > 1:
-                self.start = time.time()
-                print('dropping payload')
-            self.pixObj.drop_payload()
-            self.state = 5
+        
 
         #take off
         if self.state == 5:
@@ -189,7 +212,3 @@ class mission:
             else:
                 return self.collision_avoidance, self.missionItems[self.missionItem]
         '''
-
-
-
-
