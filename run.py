@@ -133,9 +133,8 @@ if __name__ == "__main__":
                     # telemObj.sendImage(telemetry.DataType.TELEM_DEPTH_FRAME, depth)
                     telemObj.sendImage(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
 
-            
+            goto = [0,0,0]
             if mission_collision_avoidance:
-                goto = [0,0,0]
                 try:
                     # Plan next move but consider sticking to last move
                     meshPoints = navObj.updatePt1(pos, targetPos)
@@ -161,7 +160,6 @@ if __name__ == "__main__":
     except:
         traceback.print_exc(file=sys.stdout)
         ledObj.setMode(LED.mode.ERROR)
-        traceback.print_exc(file=sys.stdout)
 
     print("*** STOPPED ***")
 
