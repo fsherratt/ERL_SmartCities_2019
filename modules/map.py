@@ -113,6 +113,8 @@ class mapper:
         activeGridCorners[1][0]:activeGridCorners[1][1],
         activeGridCorners[2][0]:activeGridCorners[2][1]] = activeGrid
 
+        self.interpFunc.values = self.grid
+
     # --------------------------------------------------------------------------
     # queryMap
     # param queryPoints - (N,3) list of points to query against map
