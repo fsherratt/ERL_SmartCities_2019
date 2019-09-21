@@ -118,6 +118,7 @@ if __name__ == "__main__":
             # Where are we going?
             if args.mission:
                 mission_collision_avoidance, targetPos, status = misObj.missionProgress(pos)
+                print('Collision Avoidance:{}\t, targetPos')
 
                 if args.telemetry:
                     telemObj.sendData(telemetry.DataType.TELEM_STATUS, status)
@@ -144,13 +145,12 @@ if __name__ == "__main__":
                     # Tell pixhawk where to go
                     pixObj.directAircraft(goto, heading)
                 except ValueError:
-                    pass            
+                    pass
             
             time.sleep(0.2)
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
             print('Pos: {}\t Goto: {}\t conf {}'.format(pos, goto, conf))
-
 
     except KeyboardInterrupt:
         if args.mapping:

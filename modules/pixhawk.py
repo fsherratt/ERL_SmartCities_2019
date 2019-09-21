@@ -171,15 +171,15 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
             heading = 0
         
-        yawRate = 0.5 # rad/s
+        yawRate = 0.05 # rad/s
 
         # for global frames SET_POSITION_TARGET_GLOBAL_INT
         msg = pymavlink.MAVLink_set_position_target_local_ned_message(0,0,0,
             pymavlink.MAV_FRAME_LOCAL_NED,
             ignore,
-            pos[0] - self._gotoOffset[0],
-            pos[1] - self._gotoOffset[1],
-            pos[2] - self._gotoOffset[2],
+            pos[0],
+            pos[1],
+            pos[2],
             0,0,0, # Vx, Vy, Vz
             0,0,0, # Ax, Ay, Az
             heading, yawRate) # yaw, yaw rate

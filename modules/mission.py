@@ -1,10 +1,13 @@
 import numpy as np
 import time
 class mission:
-    patientX = 11
+    # patientX = 11
+    # patientY = -8
+
+    patientX = 9
     patientY = -8
 
-    missionItems = [[patientX,patientY,-2], [0, 0, -2]]
+    missionItems = [[patientX,patientY,-1.5], [0, 0, -1.5]]
     update_rate = 1
 
     def __init__(self, pixObj):
@@ -19,6 +22,8 @@ class mission:
         self.gotoPoint = [0,0,0]
 
         self.waitTime = 0.5
+
+        self.takeoffHeight = 1.5
 
     def missionProgress(self, currentPos):
         currentPos = np.asarray(currentPos)
@@ -66,9 +71,9 @@ class mission:
             self.status = 'Takeoff'
             self.gotoPoint = [0,0,0] #think this will make it land as soon as its taken off
 
-            self.pixObj.setTakeoff(1.5) # changed alt to 1.5 from 1
+            self.pixObj.setTakeoff(self.takeoffHeight) # changed alt to 1.5 from 1
 
-            if currentPos[2] < -1:
+            if currentPos[2] < -self.takeoffHeight + 0.5:
                 self.state = 4    
             else:
                 time.sleep(self.waitTime)       
@@ -115,7 +120,7 @@ class mission:
 
             self.pixObj.drop_payload()
             time.sleep(self.waitTime)
-            self.state = 8
+            self.state = 15
 
         elif self.state == 8:
             self.collision_avoidance = False
@@ -160,10 +165,10 @@ class mission:
             self.status = 'Takeoff'
             self.gotoPoint = [0,0,0]
 
-            self.pixObj.setTakeoff(1.5) # same again
+            self.pixObj.setTakeoff(self.takeoffHeight) # same again
 
-            if currentPos[2] < -1:
-                self.state == 12
+            if currentPos[2] < -self.takeoffHeight + 0.5:
+                self.state = 12
             else:
                 time.sleep(self.waitTime)
 
@@ -200,7 +205,7 @@ class mission:
         
         elif self.state == 15:
             self.collision_avoidance = False
-            self.status = 'Done'
+            self.status = 'Gary going to sleep'
             self.gotoPoint = [0,0,0]
 
             time.sleep(self.waitTime)
