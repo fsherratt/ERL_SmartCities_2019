@@ -48,6 +48,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
             elif id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
                 self._homeHandler(msg)
 
+            elif id == pymavlink.MAVLINK_MSG_ID_COMMAND_ACK:
+                print(msg)
+
     def _heartbeatHandler(self, msg): 
         if not msg.autopilot == self._mavLib.MAV_AUTOPILOT_INVALID:
             # Arm State
@@ -118,6 +121,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
     def setTakeoff(self, alt):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
+
 
     def setTakeoffLocal(self, alt):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF_LOCAL,0,0,0,0.1,0,0,0,-alt)
