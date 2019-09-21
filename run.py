@@ -1,7 +1,7 @@
 #! .venv/bin/python3
 
 from utilities import argparser
-from modules import map, navigation, pixhawk, position, mission, LED, telemetry, Aircraft_Plotter
+from modules import map, navigation, pixhawk, position, mission, LED, telemetry
 from modules.MAVLinkThread.mavlinkThread import mavSerial, mavSocket
 from modules.realsense import d435
 from threading import Thread
@@ -112,10 +112,15 @@ if __name__ == "__main__":
 
             # Get our current location
             pos, rot, conf = posObj.update()
+            if args.telemetry:
+                telemObj.sendData(telemetry.DataType.TELEM_POSITION, pos)
 
             # Where are we going?
             if args.mission:
-                mission_collision_avoidance, targetPos = misObj.missionProgress(pos)
+                mission_collision_avoidance, targetPos, status = misObj.missionProgress(pos)
+
+                if args.telemetry:
+                    telemObj.sendData(telemetry.DataType.TELEM_STATUS, status)
 
             if args.mapping:
                 # Update map
@@ -125,30 +130,27 @@ if __name__ == "__main__":
 
                 if args.telemetry:
                     depth = cv2.applyColorMap(cv2.convertScaleAbs(frame, alpha=0.03), cv2.COLORMAP_JET)
-                    telemObj.sendImage(telemetry.DataType.TELEM_DEPTH_FRAME, depth)
-
+                    # telemObj.sendImage(telemetry.DataType.TELEM_DEPTH_FRAME, depth)
                     telemObj.sendImage(telemetry.DataType.TELEM_RGB_IMAGE, rgbImg)
 
+            
             if mission_collision_avoidance:
+                goto = [0,0,0]
                 try:
                     # Plan next move but consider sticking to last move
                     meshPoints = navObj.updatePt1(pos, targetPos)
                     pointRisk = mapObj.queryMap(meshPoints)
                     goto, heading, risk = navObj.updatePt2(pointRisk)
 
-                    #print('Goto: {}\t Heading: {:.2f}\t Risk: {:.2f}'.format(goto, heading, risk))
-
                     # Tell pixhawk where to go
                     pixObj.directAircraft(goto, heading)
                 except ValueError:
-                    pass
-                Aircraft_Plotter.plot_map(navObj.gotoPoints, navObj.aircraftPosition, mapObj.grid, 1)
-            
+                    pass            
             
             time.sleep(0.2)
             loop_time = time.time() - startTime
             print('update frequency: {:.2f}'.format(1/loop_time))
-            print('pos {}\t rot {}\t conf {}'.format(pos, rot.as_euler('xyz', degrees=True), conf))
+            print('Pos: {}\t Goto: {}\t conf {}'.format(pos, goto, conf))
 
 
     except KeyboardInterrupt:

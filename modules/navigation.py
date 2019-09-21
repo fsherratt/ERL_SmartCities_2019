@@ -19,7 +19,7 @@ class navigation:
 
     _numCoordinates = 3
 
-    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-0.5, max_z=-10):
+    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-0.5, max_z=-5):
         self.xRange = [min_x, max_x]
         self.yRange = [min_y, max_y]
         self.zRange = [min_z, max_z]
