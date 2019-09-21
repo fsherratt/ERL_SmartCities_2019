@@ -118,7 +118,7 @@ if __name__ == "__main__":
             # Where are we going?
             if args.mission:
                 mission_collision_avoidance, targetPos, status = misObj.missionProgress(pos)
-                print('Collision Avoidance:{}\t, targetPos')
+                print('Collision Avoidance: {}\t, Status: {}'.format(mission_collision_avoidance, status))
 
                 if args.telemetry:
                     telemObj.sendData(telemetry.DataType.TELEM_STATUS, status)
