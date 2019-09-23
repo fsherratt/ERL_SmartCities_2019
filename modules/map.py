@@ -5,15 +5,15 @@ from scipy import io
 class mapper:
     num_coordinate = 3
 
-    xRange = [-50, 50]
-    yRange = [-50, 50]
-    zRange = [-5, 20]
+    xRange = [-20, 20]
+    yRange = [-20, 20]
+    zRange = [-20, 5]
 
     localMapRange = 10
 
-    voxelSize = 0.2
-    voxelMaxWeight = 1000
-    voxelWeightDecay = 20
+    voxelSize = 0.5
+    voxelMaxWeight = 2000
+    voxelWeightDecay = 40
 
     xDivisions = int((xRange[1] - xRange[0]) / voxelSize)
     yDivisions = int((yRange[1] - yRange[0]) / voxelSize)
@@ -55,11 +55,12 @@ class mapper:
         # Add to map
         points = self.local_to_global_points(points, pos, rot)     
         self.updateMap(points, pos)
+        self.interpFunc.values = self.grid
 
     def digitizePoints(self, points):
-        xSort = np.digitize(points[:, 0], self.xBins)
-        ySort = np.digitize(points[:, 1], self.yBins)
-        zSort = np.digitize(points[:, 2], self.zBins)
+        xSort = np.digitize(points[:, 0], self.xBins) -1
+        ySort = np.digitize(points[:, 1], self.yBins) -1
+        zSort = np.digitize(points[:, 2], self.zBins) -1
 
         return [xSort, ySort, zSort]
 
@@ -71,7 +72,25 @@ class mapper:
     def updateMap(self, points, pos):
         # Update map
         gridPoints = self.digitizePoints(points)
-        np.add.at(self.grid, gridPoints, 1)
+        np.add.at(self.grid, gridPoints, 2)
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([0,0,1]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([0,0,1]), 1)
+        except:
+            pass
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([0,1,0]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([0,1,0]), 1)
+        except:
+            pass
+
+        try:
+            np.add.at(self.grid, gridPoints + np.asarray([1,0,0]), 1)
+            np.add.at(self.grid, gridPoints - np.asarray([1,0,0]), 1)
+        except:
+            pass
 
         activeGridCorners = np.asarray([pos - np.asarray([self.localMapRange,
                                                self.localMapRange,
@@ -93,6 +112,8 @@ class mapper:
         self.grid[activeGridCorners[0][0]:activeGridCorners[0][1],
         activeGridCorners[1][0]:activeGridCorners[1][1],
         activeGridCorners[2][0]:activeGridCorners[2][1]] = activeGrid
+
+        self.interpFunc.values = self.grid
 
     # --------------------------------------------------------------------------
     # queryMap

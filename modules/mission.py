@@ -1,176 +1,214 @@
 import numpy as np
 import time
 class mission:
-    patientX = 11
+    # patientX = 11
+    # patientY = -8
+
+    patientX = 9
     patientY = -8
 
-    missionItems = [[0, 0, -2],[patientX,patientY,-2]]
+    missionItems = [[patientX,patientY,-1.5], [0, 0, -1.5]]
     update_rate = 1
+
     def __init__(self, pixObj):
         self.missionItem = 0
         self.missionItems = np.asarray(self.missionItems)
-        self.state = 0
         self.pixObj = pixObj
-        self.collision_avoidance = 0
-        self.start = 0
-        self.landed_pos = 0
+
+        self.state = 0
+
+        self.collision_avoidance = False
+        self.status = 'Unknown'
+        self.gotoPoint = [0,0,0]
+
+        self.waitTime = 0.5
+
+        self.takeoffHeight = 1.5
 
     def missionProgress(self, currentPos):
         currentPos = np.asarray(currentPos)
         wpDist = np.linalg.norm(currentPos - self.missionItems[self.missionItem])
 
-        # set mode, begin, wait for arm
-        if not self.state:
-            self.collision_avoidance = 0
-            self.missionItem = 0
+        if self.state == 0:
+            self.collision_avoidance = False
+            self.status = 'Initialising'
+            self.gotoPoint = [0,0,0]
 
-            if time.time() - self.start > self.update_rate:
-                self.start = time.time()
-                print('beginning mission, setting aircraft to guided')
+            self.pixObj.close_payload()
+            self.pixObj.setModePosHold()
 
-            if not self.pixObj._mode == 'GUIDED':
-                self.pixObj.setModeGuided()
-                time.sleep(0.2)
-                return self.collision_avoidance, self.missionItems[self.missionItem]
-            else:
+            if self.pixObj.mode == 'POSHOLD':
                 self.state = 1
-
-        # take off
-        if self.state == 1:
-            self.collision_avoidance = 0
-            self.missionItem = 0
-
-            if not self.pixObj._armed:
-                if time.time() - self.start > self.update_rate:
-                    self.start = time.time()
-                    self.pixObj.setModeGuided()
-                    print("aircraft not armed, cannot take-off")
-
-                return self.collision_avoidance, self.missionItems[self.missionItem]
             else:
-                if time.time() - self.start > self.update_rate:
-                    self.start = time.time()
-                    print('taking off')
+                print('Set mode to PosHold')
+                time.sleep(self.waitTime)
+            
+        elif self.state == 1:
+            self.collision_avoidance = False
+            self.status = 'Initialising'
+            self.gotoPoint = [0,0,0]
 
-                if abs(currentPos[2]-self.missionItems[self.missionItem,2]) > 0.4:
-                    self.pixObj.setTakeoff(abs(self.missionItems[self.missionItem,2]))
+            if self.pixObj.armed:
+                self.state = 2
+            else:
+                print('Waiting for arm')
+                time.sleep(self.waitTime)
 
-                    return self.collision_avoidance, self.missionItems[self.missionItem]
-                else:
-                    self.state = 2
-
-        # follow waypoints
-        if self.state == 2:
-            self.collision_avoidance = 1
-
-            if time.time() - self.start > self.update_rate:
-                self.start = time.time()
-                print('following waypoints, waypoint ',self.missionItem, '\t', self.missionItems[self.missionItem])
-
-            if wpDist < 2:
-                self.missionItem += 1
-                print('NEXT MISSION ITEM: {}'.format(self.missionItem))
-
-            if self.missionItem == len(self.missionItems):
-                self.missionItem -= 1
+        elif self.state == 2:
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0]
+            
+            self.pixObj.setModeGuided()
+            if self.pixObj.mode == 'GUIDED':
                 self.state = 3
             else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                print('Set mode to Guided')
+                time.sleep(self.waitTime)
 
-        #land
-        if self.state == 3:
-            self.collision_avoidance = 0
+        elif self.state == 3:   
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0] #think this will make it land as soon as its taken off
+
+            self.pixObj.setTakeoff(self.takeoffHeight) # changed alt to 1.5 from 1
+
+            if currentPos[2] < -self.takeoffHeight + 0.5:
+                self.state = 4    
+            else:
+                time.sleep(self.waitTime)       
+
+        elif self.state == 4:
+            self.collision_avoidance = True
+            self.status = 'Flying to patient'
+           
+            # Fly Somewhere
+            self.gotoPoint = self.missionItems[0]
+
+            if wpDist < 0.4:
+                self.state = 5
+
+        elif self.state == 5:
+            self.collision_avoidance = False
+            self.status = 'Landing'
+            self.gotoPoint = [0,0,0]
+
+            print('Set Land')
             self.pixObj.setModeLand()
 
-            if time.time() - self.start > self.update_rate:
-                self.start = time.time()
-                print('landing aircraft')
-
-            if abs(currentPos[2]) < 0.1:
-                self.landed_pos = currentPos
-                time.sleep(5)
-                self.state = 8
-            else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
-
-        # disarm
-        if self.state == 8:
-            if time.time() - self.start > self.update_rate:
-                self.start = time.time()
-                print('end of mission, Gary going to sleep')
-            if self.pixObj._armed == True:
-                self.pixObj.setArm(0)
-            return self.collision_avoidance, self.missionItems[self.missionItem]
-
-        self.pixObj.setModeLand()
-        return self.collision_avoidance, self.missionItems[self.missionItem]
-
-        '''
-        #drop
-        if self.state == 4:
-            if time.time() - self.start > 1:
-                self.start = time.time()
-                print('dropping payload')
-            self.pixObj.drop_payload()
-            self.state = 5
-
-        #take off
-        if self.state == 5:
-            self.collision_avoidance = 0
-
-            if not self.pixObj._armed or not self.pixObj._mode == 'GUIDED':
-                if time.time() - self.start > 1:
-                    self.start = time.time()
-                    print('re-setting guided')
-
-                self.pixObj.setModeGuided()
-                #self.pixObj.sendSetHomePosition(0, 0, 0)
-                time.sleep(0.2)
-                self.pixObj.setArm(1)
-                time.sleep(0.2)
-
-                #self.pixObj.sendSetHomePosition(-self.landed_pos[0], -self.landed_pos[1], 0)
-                time.sleep(0.2)
-
-                return self.collision_avoidance, self.missionItems[self.missionItem]
-
-            if abs(currentPos[2] - self.missionItems[self.missionItem, 2]) > 0.4:
-                if time.time() - self.start > 1:
-                    self.start = time.time()
-                    print('takeoff')
-                self.pixObj.setTakeoff(abs(self.missionItems[self.missionItem,2]))
-                return self.collision_avoidance, self.missionItems[self.missionItem]
-            else:
+            if self.pixObj.mode == 'LAND':
                 self.state = 6
+            else:
+                print('Set mode to land')
+                time.sleep(self.waitTime)
 
-        #follow waypoints
-        if self.state == 6:
-            self.collision_avoidance = 1
-            if time.time() - self.start > 1:
-                self.start = time.time()
-                print('following waypoints, waypoint ', self.missionItem, '\t', self.missionItems[self.missionItem])
-            if wpDist < 2:
-                self.missionItem -= 1
-                print('NEXT MISSION ITEM: {}'.format(self.missionItem))
-            if self.missionItem == -1:
+        elif self.state == 6:
+            self.collision_avoidance = False
+            self.status = 'Landing'
+            self.gotoPoint = [0,0,0]
+
+            if self.pixObj.armed:
+                time.sleep(self.waitTime)
+            else:
                 self.state = 7
+                print('Landed')
+
+        elif self.state == 7:
+            self.collision_avoidance = False
+            self.status = 'Dropping Payload'
+            self.gotoPoint = [0,0,0]
+
+            self.pixObj.drop_payload()
+            time.sleep(self.waitTime)
+            self.state = 15
+
+        elif self.state == 8:
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0]
+
+            self.pixObj.setModePosHold()
+            if self.pixObj.mode == 'POSHOLD':
+                self.state = 9
             else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
+                print('Set mode to PosHold')
+                time.sleep(self.waitTime)
 
-        # land
-        if self.state == 7:
-            self.collision_avoidance = 0
-            if time.time() - self.start > 1:
-                self.start = time.time()
-                print('landing aircraft')
-            self.pixObj.setModeLand()
-            if currentPos[2] < 0.1:
-                self.state = 8
-                time.sleep(5)
+        elif self.state == 9:
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0]
+
+            self.pixObj.setArm(True)
+            self.pixObj.setGotoOffset( currentPos )
+            if self.pixObj.armed:
+                self.state = 10
             else:
-                return self.collision_avoidance, self.missionItems[self.missionItem]
-        '''
+                time.sleep(self.waitTime)
 
+        elif self.state == 10:
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0]
 
+            print('Guided')
+            self.pixObj.setModeGuided()
+            
+            if self.pixObj.mode == 'GUIDED':
+                self.state = 11
+            else:
+                print('Set mode to Guided')
+                time.sleep(self.waitTime)
+        
+        elif self.state == 11:
+            self.collision_avoidance = False
+            self.status = 'Takeoff'
+            self.gotoPoint = [0,0,0]
 
+            self.pixObj.setTakeoff(self.takeoffHeight) # same again
 
+            if currentPos[2] < -self.takeoffHeight + 0.5:
+                self.state = 12
+            else:
+                time.sleep(self.waitTime)
+
+        elif self.state == 12:
+            self.collision_avoidance = True
+            self.status = 'Flying to patient'
+           
+            # Fly Somewhere
+            self.gotoPoint = self.missionItems[1]
+
+            if wpDist < 0.4:
+                self.state = 13
+
+        elif self.state == 13:
+            self.collision_avoidance = False
+            self.status = 'Landing'
+            self.gotoPoint = [0,0,0]
+
+            if self.pixObj.mode == 'LAND':
+                self.state = 14
+            else:
+                print('Set mode to land')
+                time.sleep(self.waitTime)
+
+        elif self.state == 14:
+            self.collision_avoidance = False
+            self.status = 'Landing'
+            self.gotoPoint = [0,0,0]
+
+            if not self.pixObj.armed:
+                self.state = 15
+            else:
+                time.sleep(self.waitTime)
+        
+        elif self.state == 15:
+            self.collision_avoidance = False
+            self.status = 'Gary going to sleep'
+            self.gotoPoint = [0,0,0]
+
+            time.sleep(self.waitTime)
+
+        # Enable collision avoidance, goto point, status
+        return self.collision_avoidance, self.gotoPoint, self.status

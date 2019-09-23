@@ -22,6 +22,8 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
         self._heading_north_yaw = None
 
+        self._gotoOffset = [0,0,0]
+
         super( pixhawkAbstract, self).__init__( conn, pymavlink )
 
     def _loopInternals(self):
@@ -47,6 +49,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
             elif id == self._mavLib.MAVLINK_MSG_ID_HOME_POSITION:
                 self._homeHandler(msg)
+
+            elif id == pymavlink.MAVLINK_MSG_ID_COMMAND_ACK:
+                print(msg)
 
     def _heartbeatHandler(self, msg): 
         if not msg.autopilot == self._mavLib.MAV_AUTOPILOT_INVALID:
@@ -119,6 +124,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF,0,0,0,0,0,0,0,alt)
         self.queueOutputMsg(msg)
 
+
     def setTakeoffLocal(self, alt):
         msg = self._mavLib.MAVLink_command_long_message(0,0,self._mavLib.MAV_CMD_NAV_TAKEOFF_LOCAL,0,0,0,0.1,0,0,0,-alt)
         self.queueOutputMsg(msg)
@@ -165,7 +171,7 @@ class pixhawkAbstract(mavThread.mavThread, object):
 
             heading = 0
         
-        yawRate = 0.5 # rad/s
+        yawRate = 0.05 # rad/s
 
         # for global frames SET_POSITION_TARGET_GLOBAL_INT
         msg = pymavlink.MAVLink_set_position_target_local_ned_message(0,0,0,
@@ -179,6 +185,9 @@ class pixhawkAbstract(mavThread.mavThread, object):
             heading, yawRate) # yaw, yaw rate
             
         self.queueOutputMsg(msg)
+
+    def setGotoOffset(self, offset):
+        self._gotoOffset = offset
 
     def sendPosition(self, pos, rot):
         UNIX_time = int(time.time()*1e6)
@@ -206,6 +215,16 @@ class pixhawkAbstract(mavThread.mavThread, object):
         # N - ???
         msg = pymavlink.MAVLink_play_tune_message(0, 0, tune, tune2)
         self.queueOutputMsg(msg)
+
+    def setServoPos(self, pos):
+        msg = pymavlink.MAVLink_command_long_message(0,0,pymavlink.MAV_CMD_DO_SET_SERVO,0,7,pos,0,0,0,0,0)
+        self.queueOutputMsg(msg)
+
+    def drop_payload(self):
+        self.setServoPos(1000)
+
+    def close_payload(self):
+        self.setServoPos(2000)
 
 if __name__ == "__main__":
     # Connect to pixhawk - write port is determined from incoming messages

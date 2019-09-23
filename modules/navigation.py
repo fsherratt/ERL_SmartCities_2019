@@ -8,8 +8,8 @@ goto, heading, risk = navObj.updatePt2(pointRisk)
 
 class navigation:
     percentGotoDist = 0.5
-    minCPDistance = 2
-    maxCPDistance = 10
+    minCPDistance = 0.5
+    maxCPDistance = 3
     pathMeshElements = 10
     elevationMeshElements = 11 # Number of elevation angles to evaluate #11
     azimuthMeshElements = 11 # Number of azimuth angles to evaluate
@@ -19,7 +19,7 @@ class navigation:
 
     _numCoordinates = 3
 
-    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-0.5, max_z=-10):
+    def __init__(self, min_x=-20, max_x=20, min_y=-20, max_y=20, min_z=-1.5, max_z=-0.5):
         self.xRange = [min_x, max_x]
         self.yRange = [min_y, max_y]
         self.zRange = [min_z, max_z]
@@ -56,7 +56,8 @@ class navigation:
         az = np.reshape(az, (-1))
 
         # generate vector of random distances to look ahead
-        r = np.random.uniform(low=self.minCPDistance, high=pathLength, size=(self.num_pts,))
+        # r = np.random.uniform(low=self.minCPDistance, high=self.maxCPDistance, size=(self.num_pts,))
+        r = 2
 
         # Convert from spherical to cartesian
         x_a = r * np.cos(el) * np.cos(az)
@@ -67,10 +68,6 @@ class navigation:
         pointA = self.aircraftPosition + np.column_stack((x_a, y_a, z_a))
 
         # Eliminate any point that exceeds competition volume - if a cuboid arena only possible if goto outside volume
-        self.xRange = [-20, 20]
-        self.yRange = [-20, 20]
-        self.zRange = [-10, -1]
-
         xValidPoints = np.logical_and(pointA[:, 0] > self.xRange[0], pointA[:, 0] < self.xRange[1])
         yValidPoints = np.logical_and(pointA[:, 1] > self.yRange[0], pointA[:, 1] < self.yRange[1])
         zValidPoints = np.logical_and(pointA[:, 2] > self.zRange[0], pointA[:, 2] < self.zRange[1])
@@ -167,6 +164,10 @@ class navigation:
 
     def updatePt2(self, pointRisk):
         pathRisk = self.calculatePathRisk(self.gotoPoints, pointRisk)
+
+        # midRisk = int(self.azimuthMeshElements/2 * self.elevationMeshElements/2)
+        maxRisk = np.max(pathRisk)
+        print('Mid Risk: {}'.format(maxRisk))
 
         min_path_index = np.nanargmin(pathRisk)
         min_path_point = self.gotoPoints[min_path_index]
