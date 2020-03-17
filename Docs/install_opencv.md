@@ -80,9 +80,9 @@ $ rm libtbb-dev_2019U5_armhf.deb
 ```
 
 
-### Download OpenCV 4.1.1
+### Download OpenCV 4.2.0
 ```bash
-export OPENCV_VERSION=4.1.1
+export OPENCV_VERSION=4.2.0
 cd ~
 mkdir opencv
 cd opencv
@@ -117,7 +117,7 @@ $ cmake ..\
     -D BUILD_PERF_TESTS=OFF \
     -D BUILD_TESTS=OFF \
     -D BUILD_DOCS=ON \
-    -D BUILD_EXAMPLES=ON \
+    -D BUILD_EXAMPLES=OFF \
     -D ENABLE_PRECOMPILED_HEADERS=OFF \
     -D WITH_TBB=ON \
     -D WITH_OPENMP=ON \
