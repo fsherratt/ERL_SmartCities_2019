@@ -102,6 +102,7 @@ cd ..
 Configure OpenCV with NEON VFPV3 arguments + redistributable package install. Using TBB, Neon and VFPV3 can result in a 30% improvements in performance
 
 ```bash
+$ cd opencv
 $ mkdir build
 $ cd build
 $ cmake ..\
