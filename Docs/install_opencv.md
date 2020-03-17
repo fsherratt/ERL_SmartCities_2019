@@ -82,7 +82,7 @@ $ rm libtbb-dev_2019U5_armhf.deb
 
 ### Download OpenCV 4.1.1
 ```bash
-OPENCV_VERSION=4.1.1
+export OPENCV_VERSION=4.1.1
 cd ~
 mkdir opencv
 cd opencv
