@@ -14,7 +14,6 @@ $ sudo apt-get upgrade -y
 $ sudo apt-get dist-upgrade -y
 $ sudo apt-get autoremove -y
 
-$ sudo pip2 install -U pip
 $ sudo pip3 install -U pip
 ```
 
@@ -29,35 +28,14 @@ $ sudo /etc/init.d/dphys-swapfile restart swapon -s
 ```
 
 ### Install Dependencies
-```bash   
+```bash
 $ sudo apt install -y devscripts debhelper libldap2-dev libgtkmm-3.0-dev libarchive-dev \
-    libcurl4-openssl-dev intltool
-sudo apt install -y build-essential pkg-config libjpeg-dev libtiff5-dev libjasper-dev \
+    libcurl4-openssl-dev opencl-headers
+$ sudo apt install -y build-essential pkg-config gfortran cmake libjpeg-dev libtiff5-dev \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libgtk2.0-dev libgtk-3-dev \
-    libatlas-base-dev libblas-dev libeigen{2,3}-dev liblapack-dev \
-    gfortran python3-dev python3-numpy python2.7-dev python-numpy 
-```
-
-### update `cmake`
-```bash
-$ cmake --version
-```
-Update cmake, currently is before 3.11.4
-
-```bash
-$ cd ~
-$ git clone https://github.com/Kitware/CMake.git
-$ cd CMake
-$ git checkout tags/v3.15.1
-$ ./configure --prefix=/home/pi/CMake
-$ ./bootstrap
-$ make -j3
-$ sudo make install
-$ export PATH=/home/pi/CMake/bin:$PATH
-$ source ~/.bashrc
-$ cmake --version
-cmake version 3.15.1
+    libatlas-base-dev libblas-dev libeigen3-dev liblapack-dev \
+    python3-dev python3-numpy
 ```
 
 ### set path
@@ -66,34 +44,22 @@ $ nano ~/.bashrc
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 $ source ~/.bashrc
-
 ```
 
-### install `TBB`
-Install TBB (Intel Threading Building Blocks) on rpi is a pain. Thankfully PINTO0309 provides upto date deb files
+### Download OpenCV 4.5.5
 ```bash
-$ cd ~
-$ wget https://github.com/PINTO0309/TBBonARMv7/raw/master/libtbb-dev_2019U5_armhf.deb
-$ sudo dpkg -i ~/libtbb-dev_2019U5_armhf.deb
-$ sudo ldconfig
-$ rm libtbb-dev_2019U5_armhf.deb
-```
-
-
-### Download OpenCV 4.1.1
-```bash
-OPENCV_VERSION=4.1.1
+OPENCV_VERSION=4.5.5
 cd ~
 mkdir opencv
 cd opencv
 
-git clone https://github.com/opencv/opencv.git
-cd opencv
+git clone https://github.com/opencv/opencv_contrib.git
+cd opencv_contrib
 git checkout tags/${OPENCV_VERSION}
 cd ..
 
-git clone https://github.com/opencv/opencv_contrib.git
-cd opencv_contrib
+git clone https://github.com/opencv/opencv.git
+cd opencv
 git checkout tags/${OPENCV_VERSION}
 cd ..
 ```
@@ -105,26 +71,24 @@ Configure OpenCV with NEON VFPV3 arguments + redistributable package install. Us
 $ mkdir build
 $ cd build
 $ cmake ..\
-    -D CPACK_BINARY_DEB=ON \
     -D INSTALL_CREATE_DISTRIB=ON \
     -D BUILD_PACKAGE=ON \
     -D OPENCV_VCSVERSION=${OPENCV_VERSION} \
     -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+    -D OPENCV_EXTRA_MODULES_PATH= ~/opencv/opencv_contrib/modules \
     -D OPENCV_ENABLE_NONFREE=ON \
     -D BUILD_PERF_TESTS=OFF \
     -D BUILD_TESTS=OFF \
-    -D BUILD_DOCS=ON \
-    -D BUILD_EXAMPLES=ON \
+    -D BUILD_DOCS=OFF \
+    -D BUILD_EXAMPLES=OFF \
     -D ENABLE_PRECOMPILED_HEADERS=OFF \
     -D WITH_TBB=ON \
+    -D BUILD_TBB=ON \
     -D WITH_OPENMP=ON \
     -D ENABLE_NEON=ON \
-    -D ENABLE_VFPV3=ON \
     -D OPENCV_EXTRA_EXE_LINKER_FLAGS=-latomic \
-    -D PYTHON3_EXECUTABLE=$(which python3) \
-    -D PYTHON_EXECUTABLE=$(which python2)
+    -D PYTHON3_EXECUTABLE=$(which python3)
 
 make -j3
 
